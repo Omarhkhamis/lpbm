@@ -157,8 +157,19 @@ const buildWheelSvg = (prefix, labels) => {
   return svg;
 };
 
-export default function LuckySpinFormSec({ data, idPrefix } = {}) {
+export default function LuckySpinFormSec({ data, idPrefix, locale } = {}) {
   const content = data || luckySpinDefaults;
+  const isRu = locale === "ru";
+  const copy = {
+    submitError: isRu
+      ? "Пожалуйста, попробуйте еще раз. Мы не смогли сохранить ваш результат."
+      : "Please try again. We could not save your spin.",
+    missingFields: isRu
+      ? "Пожалуйста, введите имя и номер телефона."
+      : "Please enter your name and phone number.",
+    swalTitle: isRu ? "Ваш приз" : "You get",
+    swalConfirm: isRu ? "ОК" : "OK"
+  };
   const prizes = content.prizes || [];
   const reactId = useId();
   const baseId = idPrefix && idPrefix.trim().length ? idPrefix : reactId;
@@ -193,7 +204,7 @@ export default function LuckySpinFormSec({ data, idPrefix } = {}) {
         page: typeof window !== "undefined" ? window.location.pathname : ""
       }, options);
     } catch (error) {
-      setFormError("Please try again. We could not save your spin.");
+      setFormError(copy.submitError);
     } finally {
       setIsSubmitting(false);
     }
@@ -206,7 +217,7 @@ export default function LuckySpinFormSec({ data, idPrefix } = {}) {
     const trimmedName = fullName.trim();
     const trimmedPhone = (phone || rawHiddenPhone).trim();
     if (!trimmedName || !trimmedPhone) {
-      setFormError("Please enter your name and phone number.");
+      setFormError(copy.missingFields);
       return;
     }
     const slices = prizes.length;
@@ -238,9 +249,9 @@ export default function LuckySpinFormSec({ data, idPrefix } = {}) {
         } finally {
           const { default: Swal } = await import("sweetalert2");
           const result = await Swal.fire({
-            title: "You get",
+            title: content.resultLabel || copy.swalTitle,
             text: chosenPrize,
-            confirmButtonText: "OK",
+            confirmButtonText: copy.swalConfirm,
             allowOutsideClick: false
           });
           if (result?.isConfirmed) {

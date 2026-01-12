@@ -185,7 +185,11 @@ export default async function DentalImplantPage({ params }) {
                 );
               case "bookAppointmentPrimary":
                 return (
-                  <BookAppointmentFormSec key={section.key} data={data} />
+                  <BookAppointmentFormSec
+                    key={section.key}
+                    data={data}
+                    locale={locale}
+                  />
                 );
               case "beforeAfter":
                 return <BeforeAfter key={section.key} data={data} />;
@@ -197,7 +201,11 @@ export default async function DentalImplantPage({ params }) {
                 return <Treatments key={section.key} data={data} />;
               case "bookAppointmentSecondary":
                 return (
-                  <BookAppointmentFormSec2 key={section.key} data={data} />
+                  <BookAppointmentFormSec2
+                    key={section.key}
+                    data={data}
+                    locale={locale}
+                  />
                 );
               case "internationalPatients":
                 return (
@@ -221,6 +229,7 @@ export default async function DentalImplantPage({ params }) {
                     key={section.key}
                     idPrefix="lucky-section"
                     data={data}
+                    locale={locale}
                   />
                 );
               case "localAttractions":
@@ -238,7 +247,7 @@ export default async function DentalImplantPage({ params }) {
               case "googleReviews":
                 return <GoogleReviews key={section.key} data={data} />;
               case "faqs":
-                return <Faqs key={section.key} data={data} />;
+                return <Faqs key={section.key} data={data} locale={locale} />;
               default:
                 return null;
             }
@@ -250,6 +259,7 @@ export default async function DentalImplantPage({ params }) {
         consultationDelaySeconds={general?.consultationDelaySeconds}
         whatsappLink={whatsappLink}
         luckySpinData={sectionsMap.luckySpin?.data}
+        locale={locale}
       />
     </>
   );

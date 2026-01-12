@@ -18,6 +18,11 @@ export default function Footer({ general, locale = "en" }) {
   const facebookLink = settings.social?.facebook || "#";
   const youtubeLink = settings.social?.youtube || "#";
   const i18n = locale === "ru" ? SECTION_DEFAULTS_RU.footer : null;
+  const badgeCopy = i18n?.badge || "Advanced dentistry • Personalised care";
+  const footerNote =
+    i18n?.footerNote || "Comfortable experience, clear planning, and premium results.";
+  const copyrightCopy =
+    i18n?.copyright || "© 2025 BM TÜRKIEY. All Rights Reserved.";
   return (
     <footer className="relative overflow-hidden bg-white border-t border-gray-200/70">
       <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-copper-400/60 to-transparent"></div>
@@ -75,7 +80,7 @@ export default function Footer({ general, locale = "en" }) {
 
               <div className="inline-flex ml-4 items-center gap-2 rounded-full border border-copper-200/60 bg-white/60 px-3 py-1 text-[11px] text-gray-600">
                 <span className="h-1.5 w-1.5 rounded-full bg-copper-400"></span>
-                Advanced dentistry • Personalised care
+                {badgeCopy}
               </div>
             </div>
           </div>
@@ -132,7 +137,7 @@ export default function Footer({ general, locale = "en" }) {
             </div>
 
             <p className="mt-6 text-xs text-gray-500 font-light leading-relaxed max-w-sm">
-              Comfortable experience, clear planning, and premium results.
+              {footerNote}
             </p>
           </div>
 
@@ -189,7 +194,7 @@ export default function Footer({ general, locale = "en" }) {
         <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
 
         <div className="mb-20 xl:mb-0 mx-auto flex w-full md:max-w-max flex-col md:flex-row items-start md:items-center md:justify-between gap-6 xl:gap-23 py-6 text-xs text-gray-500">
-          <p>© 2025 BM TÜRKIEY. All Rights Reserved.</p>
+          <p>{copyrightCopy}</p>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a

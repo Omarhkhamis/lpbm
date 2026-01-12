@@ -12,12 +12,22 @@ export default function Overlays({
   heroData,
   consultationDelaySeconds,
   whatsappLink,
-  luckySpinData
+  luckySpinData,
+  locale
 }) {
   const [isLuckyOpen, setIsLuckyOpen] = useState(false);
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const spinButtonRef = useRef(null);
   const resolvedForm = heroData?.form || heroDefaults.form;
+  const isRu = locale === "ru";
+  const copy = {
+    close: isRu ? "Закрыть" : "Close",
+    whatsappCta: isRu ? "Консультация в WhatsApp" : "WhatsApp Consultation",
+    whatsappLabel: "WhatsApp",
+    consultationLabel: isRu ? "Консультация" : "Consultation",
+    openLuckySpin: isRu ? "Открыть Лаки-спин" : "Open Lucky Spin",
+    tryChance: isRu ? "Испытай удачу!" : "Try your chance!"
+  };
 
   useEffect(() => {
     const handleLuckyOpen = () => setIsLuckyOpen(true);
@@ -125,7 +135,7 @@ export default function Overlays({
                 type="button"
                 className="absolute -top-4 right-3 z-50 h-9.5 w-9.5 inline-flex items-center justify-center rounded-full border bg-white/90 text-gray-700 border-1 border-gray-200 backdrop-blur hover:bg-gray-50 hover:border-copper-200 hover:text-copper-700 cursor-pointer"
                 onClick={handleConsultationClose}
-                aria-label="Close"
+                aria-label={copy.close}
               >
                 X
               </button>
@@ -133,6 +143,7 @@ export default function Overlays({
                 form={resolvedForm}
                 idPrefix="consultation-modal"
                 className="w-full"
+                locale={locale}
               />
             </div>
           </div>
@@ -159,11 +170,15 @@ export default function Overlays({
                 type="button"
                 className="absolute top-5 right-6 z-50 h-9.5 w-9.5 inline-flex items-center justify-center rounded-full border bg-white/85 text-gray-700 border-1 border-gray-200 backdrop-blur hover:bg-gray-50 hover:border-copper-200 hover:text-copper-700 cursor-pointer"
                 onClick={handleClose}
-                aria-label="Close"
+                aria-label={copy.close}
               >
                 X
               </button>
-              <LuckySpinFormSec idPrefix="lucky-modal" data={luckySpinData} />
+              <LuckySpinFormSec
+                idPrefix="lucky-modal"
+                data={luckySpinData}
+                locale={locale}
+              />
             </div>
           </div>
         </>
@@ -173,7 +188,7 @@ export default function Overlays({
         href={resolvedWhatsappLink}
         target="_blank"
         rel="noreferrer"
-        aria-label="WhatsApp Consultation"
+        aria-label={copy.whatsappCta}
         className="fixed bottom-6 lg:hover:-translate-y-0.5  transition left-4 lg:bottom-7 sm:left-7 z-[9999]"
       >
         <div className="relative rounded-xl p-[1.2px] wa-shimmer-border">
@@ -186,10 +201,10 @@ export default function Overlays({
 
             <span className="flex flex-col leading-tight">
               <span className="text-[11px] font-medium uppercase tracking-[0.24em] text-main-900">
-                WhatsApp
+                {copy.whatsappLabel}
               </span>
               <span className="text-[9.5px] mt-0.5 uppercase tracking-[0.32em] text-copper-700">
-                Consultation
+                {copy.consultationLabel}
               </span>
             </span>
 
@@ -203,7 +218,7 @@ export default function Overlays({
         className="hidden md:block wheel-toggle fixed small-spin z-[999] spin-enter bottom-8 right-9 cursor-pointer bg-transparent border-0 p-0"
         onClick={handleOpen}
         ref={spinButtonRef}
-        aria-label="Open Lucky Spin"
+        aria-label={copy.openLuckySpin}
       >
         <img
           src="/uploads/lucky-spin-small.png"
@@ -216,7 +231,7 @@ export default function Overlays({
         type="button"
         className="hidden md:block md:fixed bottom-8 md:right-16 z-[99] cursor-pointer select-none cta-after-spin bg-transparent border-0 p-0"
         onClick={handleOpen}
-        aria-label="Open Lucky Spin"
+        aria-label={copy.openLuckySpin}
       >
         <div
           className="relative inline-block p-[1.5px]"
@@ -230,7 +245,7 @@ export default function Overlays({
             className="relative overflow-hidden pl-5 pr-7.5 py-1.5 text-[13px] italic font-normal tracking-tight bg-white/95 backdrop-blur text-copper-800"
             style={{ borderRadius: "6px" }}
           >
-            Try your chance!
+            {copy.tryChance}
             <span className="relative ml-1 not-italic text-[15px] text-copper-700/60">
               &rsaquo;
             </span>

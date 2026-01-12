@@ -1,7 +1,38 @@
 import { DEFAULT_GENERAL_SETTINGS } from "../../../../../lib/generalSettings";
 
-export default function Footer({ general }) {
+export default function Footer({ general, locale }) {
   const settings = general || DEFAULT_GENERAL_SETTINGS;
+  const isRu = locale === "ru";
+  const copy = {
+    description: isRu
+      ? "В BM TÜRKIEY мы заботимся о здоровье ваших зубов. Опытная команда, современные технологии и индивидуальный подход помогают сохранить здоровую и уверенную улыбку. Давайте вместе изменим ваше стоматологическое впечатление. Свяжитесь с нами уже сегодня — для более яркой и здоровой улыбки."
+      : "At BM TÜRKIEY, we're dedicated to your dental well-being. Our experienced team, advanced technology, and personalized care ensure a healthy, confident smile. Let us redefine your dental experience. Contact us today for a brighter, healthier smile.",
+    badge: isRu
+      ? "Современная стоматология • Индивидуальный подход"
+      : "Advanced dentistry • Personalised care",
+    nav: {
+      treatments: isRu ? "Процедуры" : "Treatments",
+      popularTreatments: isRu ? "Популярные процедуры" : "Popular Treatments",
+      beforeAfter: isRu ? "До и после" : "Before & After",
+      testimonials: isRu ? "Отзывы" : "Testimonials",
+      faqs: isRu ? "Вопросы и ответы" : "FAQs",
+      healthTourism: isRu ? "Медицинский туризм" : "Health Tourism"
+    },
+    note: isRu
+      ? "Комфортный опыт, понятный план и премиальные результаты."
+      : "Comfortable experience, clear planning, and premium results.",
+    labels: {
+      phone: isRu ? "Телефон" : "Phone",
+      whatsapp: "WhatsApp",
+      email: isRu ? "мейл" : "E-mail",
+      address: isRu ? "Адрес" : "Address"
+    },
+    copyright: isRu
+      ? "© 2025 BM TÜRKIEY. Все права защищены."
+      : "© 2025 BM TÜRKIEY. All Rights Reserved.",
+    privacy: isRu ? "Политика конфиденциальности" : "Privacy Policy",
+    terms: isRu ? "Условия" : "Terms"
+  };
   const phoneLink = settings.phone
     ? `tel:${settings.phone.replace(/\s+/g, "")}`
     : "tel:+905465266449";
@@ -34,11 +65,7 @@ export default function Footer({ general }) {
 
               <div className="space-y-2 mt-4 sm:mt-0">
                 <p className="text-sm font-light text-gray-600 leading-relaxed lg:max-w-md">
-                  At BM TÜRKIEY, we&#039;re dedicated to your dental well-being.
-                  Our experienced team, advanced technology, and personalized
-                  care ensure a healthy, confident smile. Let us redefine your
-                  dental experience. Contact us today for a brighter, healthier
-                  smile.
+                  {copy.description}
                 </p>
               </div>
             </div>
@@ -76,7 +103,7 @@ export default function Footer({ general }) {
 
               <div className="inline-flex ml-4 items-center gap-2 rounded-full border border-copper-200/60 bg-white/60 px-3 py-1 text-[11px] text-gray-600">
                 <span className="h-1.5 w-1.5 rounded-full bg-copper-400"></span>
-                Advanced dentistry • Personalised care
+                {copy.badge}
               </div>
             </div>
           </div>
@@ -88,7 +115,7 @@ export default function Footer({ general }) {
                 className="group inline-flex items-center gap-2 text-gray-600 hover:text-copper-900 transition"
               >
                 <span className="h-1 w-1 rounded-full bg-gray-300 group-hover:bg-copper-400 transition"></span>
-                Treatments
+                {copy.nav.treatments}
               </a>
 
               <a
@@ -96,7 +123,7 @@ export default function Footer({ general }) {
                 className="group inline-flex items-center gap-2 text-gray-600 hover:text-copper-900 transition"
               >
                 <span className="h-1 w-1 rounded-full bg-gray-300 group-hover:bg-copper-400 transition"></span>
-                Popular Treatments
+                {copy.nav.popularTreatments}
               </a>
 
               <a
@@ -104,7 +131,7 @@ export default function Footer({ general }) {
                 className="group inline-flex items-center gap-2 text-gray-600 hover:text-copper-900 transition"
               >
                 <span className="h-1 w-1 rounded-full bg-gray-300 group-hover:bg-copper-400 transition"></span>
-                Before &amp; After
+                {copy.nav.beforeAfter}
               </a>
 
               <a
@@ -112,7 +139,7 @@ export default function Footer({ general }) {
                 className="group inline-flex items-center gap-2 text-gray-600 hover:text-copper-900 transition"
               >
                 <span className="h-1 w-1 rounded-full bg-gray-300 group-hover:bg-copper-400 transition"></span>
-                Testimonials
+                {copy.nav.testimonials}
               </a>
 
               <a
@@ -120,7 +147,7 @@ export default function Footer({ general }) {
                 className="group inline-flex items-center gap-2 text-gray-600 hover:text-copper-900 transition"
               >
                 <span className="h-1 w-1 rounded-full bg-gray-300 group-hover:bg-copper-400 transition"></span>
-                FAQs
+                {copy.nav.faqs}
               </a>
 
               <a
@@ -128,19 +155,19 @@ export default function Footer({ general }) {
                 className="group inline-flex items-center gap-2 text-gray-600 hover:text-copper-900 transition"
               >
                 <span className="h-1 w-1 rounded-full bg-gray-300 group-hover:bg-copper-400 transition"></span>
-                Health Tourism
+                {copy.nav.healthTourism}
               </a>
             </div>
 
             <p className="mt-6 text-xs text-gray-500 font-light leading-relaxed max-w-sm">
-              Comfortable experience, clear planning, and premium results.
+              {copy.note}
             </p>
           </div>
 
           <div className="lg:col-span-3 sm:max-w-80 ">
             <div className="space-y-2 text-sm font-light text-gray-600">
               <p>
-                <span className="font-medium text-copper-900">Phone:</span>
+                <span className="font-medium text-copper-900">{copy.labels.phone}:</span>
                 <a
                   className="hover:text-copper-900 transition"
                   href={phoneLink}
@@ -150,7 +177,7 @@ export default function Footer({ general }) {
               </p>
 
               <p>
-                <span className="font-medium text-copper-900">WhatsApp:</span>
+                <span className="font-medium text-copper-900">{copy.labels.whatsapp}:</span>
                 <a
                   className="hover:text-copper-900 transition"
                   target="_blank"
@@ -162,7 +189,7 @@ export default function Footer({ general }) {
               </p>
 
               <p>
-                <span className="font-medium text-copper-900">E-mail:</span>
+                <span className="font-medium text-copper-900">{copy.labels.email}:</span>
                 <a
                   className="hover:text-copper-900 transition"
                   href={emailLink}
@@ -172,7 +199,7 @@ export default function Footer({ general }) {
               </p>
 
               <p className="leading-relaxed">
-                <span className="font-medium text-copper-900">Address:</span>
+                <span className="font-medium text-copper-900">{copy.labels.address}:</span>
                 {settings.address}
               </p>
             </div>
@@ -182,21 +209,21 @@ export default function Footer({ general }) {
         <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
 
         <div className="mb-20 xl:mb-0 mx-auto flex w-full md:max-w-max flex-col md:flex-row items-start md:items-center md:justify-between gap-6 xl:gap-23 py-6 text-xs text-gray-500">
-          <p>© 2025 BM TÜRKIEY. All Rights Reserved.</p>
+          <p>{copy.copyright}</p>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a
               href="/privacy-policy"
               className="bg-transparent p-0 border-0 hover:text-gray-800 transition"
             >
-              Privacy Policy
+              {copy.privacy}
             </a>
             <span className="text-gray-300">|</span>
             <a
               href="/terms"
               className="bg-transparent p-0 border-0 hover:text-gray-800 transition"
             >
-              Terms
+              {copy.terms}
             </a>
           </div>
         </div>
