@@ -2,7 +2,7 @@
 
 import { useId, useMemo, useState } from "react";
 
-import { luckySpinDefaults } from "../../../../../../lib/sectionDefaults";
+import { luckySpinDefaults, SECTION_DEFAULTS_RU } from "../../../../../../lib/sectionDefaults";
 import { submitFormPayload } from "../../../../../../lib/formSubmit";
 
 const wheelSvgTemplate = `
@@ -158,8 +158,19 @@ const buildWheelSvg = (prefix, labels) => {
 };
 
 export default function LuckySpinFormSec({ data, idPrefix, locale } = {}) {
-  const content = data || luckySpinDefaults;
   const isRu = locale === "ru";
+  const ruDefaults = SECTION_DEFAULTS_RU?.luckySpin;
+  const content = isRu && ruDefaults
+    ? {
+        ...ruDefaults,
+        backgroundImage: data?.backgroundImage || ruDefaults.backgroundImage,
+        backgroundAlt: data?.backgroundAlt || ruDefaults.backgroundAlt,
+        prizes:
+          Array.isArray(data?.prizes) && data.prizes.length
+            ? data.prizes
+            : ruDefaults.prizes
+      }
+    : (data || luckySpinDefaults);
   const copy = {
     submitError: isRu
       ? "Пожалуйста, попробуйте еще раз. Мы не смогли сохранить ваш результат."
