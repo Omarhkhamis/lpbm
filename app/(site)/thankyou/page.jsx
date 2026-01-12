@@ -2,6 +2,8 @@ import DentalFooter from "../dental-implant/en/components/Footer";
 import DentalHeader from "../dental-implant/en/components/Header";
 import HollywoodFooter from "../hollywood-smile/en/components/Footer";
 import HollywoodHeader from "../hollywood-smile/en/components/Header";
+import CustomHeadSnippet from "../components/CustomHeadSnippet";
+import { getCustomHeader } from "../../../lib/customHeader";
 import { getGeneralSettings } from "../../../lib/generalSettings";
 import { getPageBySlug } from "../../../lib/pages";
 import { normalizeLocale, normalizeSite } from "../../../lib/sites";
@@ -32,9 +34,10 @@ export default async function ThankYouPage({ searchParams }) {
   const { Header, Footer } =
     SITE_COMPONENTS[site] || SITE_COMPONENTS["hollywood-smile"];
 
-  const [general, page] = await Promise.all([
+  const [general, page, customHeader] = await Promise.all([
     getGeneralSettings(site),
-    getPageBySlug("thankyou")
+    getPageBySlug("thankyou"),
+    getCustomHeader(site)
   ]);
 
   if (!page) {
@@ -50,6 +53,7 @@ export default async function ThankYouPage({ searchParams }) {
 
   return (
     <>
+      <CustomHeadSnippet html={customHeader?.content} />
       <Header general={general} locale={locale} />
       <main className="relative overflow-hidden bg-gradient-to-br from-main-950 via-main-900 to-main-800 text-white">
         <div className="absolute inset-0">
@@ -89,6 +93,9 @@ export default async function ThankYouPage({ searchParams }) {
         </section>
       </main>
       <Footer general={general} locale={locale} />
+      {customHeader?.bodyContent ? (
+        <div dangerouslySetInnerHTML={{ __html: customHeader.bodyContent }} />
+      ) : null}
     </>
   );
 }
