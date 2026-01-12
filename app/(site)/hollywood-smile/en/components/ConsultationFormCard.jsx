@@ -5,17 +5,7 @@ import { useId, useMemo, useState } from "react";
 import { heroDefaults } from "../../../../../lib/sectionDefaults";
 import { buildFormPayload, submitFormPayload } from "../../../../../lib/formSubmit";
 
-const resolveEmailLabel = (label, locale) => {
-  if (locale !== "ru" || !label) return label;
-  return label.replace(/e-?mail/gi, "мейл");
-};
-
-export default function ConsultationFormCard({
-  form,
-  idPrefix,
-  className,
-  locale = "en"
-}) {
+export default function ConsultationFormCard({ form, idPrefix, className }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fallbackForm = heroDefaults.form;
   const resolvedForm = form || fallbackForm;
@@ -107,7 +97,7 @@ export default function ConsultationFormCard({
 
               <div className="space-y-1.5">
                 <label className="block text-[10px] font-medium tracking-[0.15em] uppercase text-main-100/70">
-                  {resolveEmailLabel(fields.emailLabel, locale)}
+                  {fields.emailLabel}
                 </label>
 
                 <input

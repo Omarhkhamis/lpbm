@@ -5,12 +5,7 @@ import { useState } from "react";
 import { bookAppointmentSecondaryDefaults } from "../../../../../../lib/sectionDefaults";
 import { buildFormPayload, submitFormPayload } from "../../../../../../lib/formSubmit";
 
-const resolveEmailLabel = (label, locale) => {
-  if (locale !== "ru" || !label) return label;
-  return label.replace(/e-?mail/gi, "мейл");
-};
-
-export default function BookAppointmentFormSec2({ data, locale = "en" }) {
+export default function BookAppointmentFormSec2({ data }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const content = data || bookAppointmentSecondaryDefaults;
   const fields = content.fields;
@@ -138,7 +133,7 @@ export default function BookAppointmentFormSec2({ data, locale = "en" }) {
 
               <div>
                 <label className="block text-[10px] tracking-[0.18em] uppercase mb-1 text-main-100/70">
-                  {resolveEmailLabel(fields.emailLabel, locale)}
+                  {fields.emailLabel}
                 </label>
                 <input
                   type="email"

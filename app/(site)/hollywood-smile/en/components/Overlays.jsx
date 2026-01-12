@@ -143,7 +143,6 @@ export default function Overlays({
                 form={resolvedForm}
                 idPrefix="consultation-modal"
                 className="w-full"
-                locale={locale}
               />
             </div>
           </div>

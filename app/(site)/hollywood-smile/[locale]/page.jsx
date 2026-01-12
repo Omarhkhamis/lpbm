@@ -176,7 +176,6 @@ export default async function HollywoodSmilePage({ params }) {
         {sectionsMap.bookAppointmentPrimary?.enabled ? (
           <BookAppointmentFormSec
             data={sectionsMap.bookAppointmentPrimary?.data}
-            locale={locale}
           />
         ) : null}
         {sectionsMap.beforeAfter?.enabled ? (
@@ -196,7 +195,6 @@ export default async function HollywoodSmilePage({ params }) {
         {sectionsMap.bookAppointmentSecondary?.enabled ? (
           <BookAppointmentFormSec2
             data={sectionsMap.bookAppointmentSecondary?.data}
-            locale={locale}
           />
         ) : null}
         {sectionsMap.internationalPatients?.enabled ? (
@@ -227,7 +225,7 @@ export default async function HollywoodSmilePage({ params }) {
           <GoogleReviews data={sectionsMap.googleReviews?.data} />
         ) : null}
         {sectionsMap.faqs?.enabled ? (
-          <Faqs data={sectionsMap.faqs?.data} locale={locale} />
+          <Faqs data={sectionsMap.faqs?.data} />
         ) : null}
       </main>
       <Footer general={general} locale={locale} />

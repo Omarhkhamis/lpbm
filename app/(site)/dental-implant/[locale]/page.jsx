@@ -188,7 +188,6 @@ export default async function DentalImplantPage({ params }) {
                   <BookAppointmentFormSec
                     key={section.key}
                     data={data}
-                    locale={locale}
                   />
                 );
               case "beforeAfter":
@@ -204,7 +203,6 @@ export default async function DentalImplantPage({ params }) {
                   <BookAppointmentFormSec2
                     key={section.key}
                     data={data}
-                    locale={locale}
                   />
                 );
               case "internationalPatients":
@@ -247,7 +245,7 @@ export default async function DentalImplantPage({ params }) {
               case "googleReviews":
                 return <GoogleReviews key={section.key} data={data} />;
               case "faqs":
-                return <Faqs key={section.key} data={data} locale={locale} />;
+                return <Faqs key={section.key} data={data} />;
               default:
                 return null;
             }

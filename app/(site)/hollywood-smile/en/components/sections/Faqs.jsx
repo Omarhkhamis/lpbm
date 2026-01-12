@@ -5,12 +5,7 @@ import { useRef, useState } from "react";
 import { faqsDefaults } from "../../../../../../lib/sectionDefaults";
 import { buildFormPayload, submitFormPayload } from "../../../../../../lib/formSubmit";
 
-const resolveEmailLabel = (label, locale) => {
-  if (locale !== "ru" || !label) return label;
-  return label.replace(/e-?mail/gi, "мейл");
-};
-
-export default function Faqs({ data, locale = "en" }) {
+export default function Faqs({ data }) {
   const content = data || faqsDefaults;
   const faqItems = content.items || [];
   const form = content.form || {};
@@ -240,7 +235,7 @@ export default function Faqs({ data, locale = "en" }) {
 
                   <div className="space-y-1.5">
                     <label className="block text-[10px] font-medium tracking-[0.15em] uppercase text-main-900/60">
-                      {resolveEmailLabel(fields.emailLabel, locale)}
+                      {fields.emailLabel}
                     </label>
 
                     <input

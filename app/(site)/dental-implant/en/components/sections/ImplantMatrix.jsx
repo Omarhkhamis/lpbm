@@ -92,35 +92,45 @@ export default function ImplantMatrix({ data }) {
           </div>
         </div>
 
-        {/* Mobile/Tablet cards */}
-        <div className="lg:hidden grid grid-cols-1 gap-4">
-          {rows.map((row, rowIndex) => (
-            // Mobile cards
-            <div
-              key={`implant-matrix-card-${rowIndex}`}
-              className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-[0_18px_60px_rgba(0,0,0,0.35)] overflow-hidden"
-            >
-              <div className="bg-gradient-to-r from-copper-600 to-copper-500 px-4 py-3 text-sm uppercase tracking-[0.18em] font-semibold text-main-50">
-                {resolveRowValues(row)[0] || row.technique || `Row ${rowIndex + 1}`}
+        {/* Mobile/Tablet horizontal scroll table */}
+        <div className="lg:hidden -mx-6 px-6 overflow-x-auto">
+          <div className="min-w-[960px] rounded-2xl border border-white/10 shadow-[0_28px_90px_rgba(0,0,0,0.35)] overflow-hidden">
+            <div className="grid grid-cols-7">
+              <div className="contents">
+                {columns.map((column, index) => (
+                  <div
+                    key={`implant-matrix-head-mobile-${column}-${index}`}
+                    className="bg-gradient-to-b from-copper-700 via-copper-600 to-copper-500 text-main-50 px-4 py-4 text-sm font-semibold uppercase tracking-[0.12em] border-b border-white/10"
+                    style={{ gridColumn: `${index + 1} / span 1` }}
+                  >
+                    {column}
+                  </div>
+                ))}
               </div>
-              <div className="divide-y divide-white/10">
-                {columns.slice(1).map((column, index) => {
-                  const values = resolveRowValues(row);
-                  const value = values[index + 1] ?? "";
-                  return (
-                    <div key={`implant-matrix-card-row-${rowIndex}-${index}`} className="px-4 py-3">
-                      <p className="text-[12px] uppercase tracking-[0.16em] text-main-200/80">
-                        {column}
-                      </p>
-                      <p className="mt-1 text-[15px] leading-relaxed text-main-50">
-                        {value}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
+
+              {rows.map((row, rowIndex) => {
+                const isAlt = rowIndex % 2 === 1;
+                const baseClass = isAlt
+                  ? "bg-main-900/70"
+                  : "bg-main-900/50";
+                const values = resolveRowValues(row);
+                return (
+                  <div className="contents" key={`implant-matrix-row-mobile-${rowIndex}`}>
+                    {columns.map((_, cellIndex) => (
+                      <div
+                        key={`implant-matrix-cell-mobile-${rowIndex}-${cellIndex}`}
+                        className={`${baseClass} px-4 py-5 border-t border-white/5 text-[15px] leading-relaxed`}
+                      >
+                        <div className="text-main-50">
+                          {values[cellIndex] ?? ""}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </section>
