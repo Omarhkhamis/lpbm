@@ -2,7 +2,7 @@ import DentalFooter from "../dental-implant/en/components/Footer";
 import DentalHeader from "../dental-implant/en/components/Header";
 import HollywoodFooter from "../hollywood-smile/en/components/Footer";
 import HollywoodHeader from "../hollywood-smile/en/components/Header";
-import CustomHeadSnippet from "../components/CustomHeadSnippet";
+import CustomHeadSnippet from "../../components/CustomHeadSnippet";
 import { getCustomHeader } from "../../../lib/customHeader";
 import { getGeneralSettings } from "../../../lib/generalSettings";
 import { getPageBySlug } from "../../../lib/pages";
