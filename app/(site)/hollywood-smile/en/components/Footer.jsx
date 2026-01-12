@@ -1,6 +1,6 @@
 import { DEFAULT_GENERAL_SETTINGS } from "../../../../../lib/generalSettings";
 
-export default function Footer({ general, locale }) {
+export default function Footer({ general, locale, site }) {
   const settings = general || DEFAULT_GENERAL_SETTINGS;
   const isRu = locale === "ru";
   const copy = {
@@ -47,6 +47,13 @@ export default function Footer({ general, locale }) {
   const instagramLink = settings.social?.instagram || "#";
   const facebookLink = settings.social?.facebook || "#";
   const youtubeLink = settings.social?.youtube || "#";
+  const buildPageLink = (path) => {
+    const params = new URLSearchParams();
+    if (locale) params.set("locale", locale);
+    if (site) params.set("site", site);
+    const query = params.toString();
+    return query ? `${path}?${query}` : path;
+  };
   return (
     <footer className="relative overflow-hidden bg-white border-t border-gray-200/70">
       <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-copper-400/60 to-transparent"></div>
@@ -213,14 +220,14 @@ export default function Footer({ general, locale }) {
 
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a
-              href="/privacy-policy"
+              href={buildPageLink("/privacy-policy")}
               className="bg-transparent p-0 border-0 hover:text-gray-800 transition"
             >
               {copy.privacy}
             </a>
             <span className="text-gray-300">|</span>
             <a
-              href="/terms"
+              href={buildPageLink("/terms")}
               className="bg-transparent p-0 border-0 hover:text-gray-800 transition"
             >
               {copy.terms}

@@ -34,7 +34,7 @@ export default async function PrivacyPolicyPage({ searchParams }) {
 
   const [general, page, customHeader] = await Promise.all([
     getGeneralSettings(site),
-    getPageBySlug("privacy-policy"),
+    getPageBySlug("privacy-policy", locale),
     getCustomHeader(site)
   ]);
 
@@ -46,20 +46,19 @@ export default async function PrivacyPolicyPage({ searchParams }) {
     <>
       <CustomHeadSnippet html={customHeader?.content} />
       <Header general={general} locale={locale} />
-      <main className="mx-auto max-w-screen-md px-6 lg:px-10 py-16 lg:py-20">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-main-400">
-          Pages
-        </p>
-        <h1 className="mt-2 text-3xl sm:text-4xl font-extralight text-main-900">
-          {page.title}
-        </h1>
-        <div className="mt-6 space-y-4 text-sm sm:text-[15px] leading-relaxed text-main-700 font-light">
-          {renderParagraphs(page.content).map((paragraph, index) => (
-            <p key={`privacy-paragraph-${index}`}>{paragraph}</p>
-          ))}
+      <main className="mx-auto min-h-[70vh] max-w-screen-md px-6 lg:px-10 py-16 lg:py-20 pt-24 flex items-center">
+        <div className="w-full">
+          <h1 className="mt-2 text-3xl sm:text-4xl font-extralight text-main-900">
+            {page.title}
+          </h1>
+          <div className="mt-6 space-y-4 text-sm sm:text-[15px] leading-relaxed text-main-700 font-light">
+            {renderParagraphs(page.content).map((paragraph, index) => (
+              <p key={`privacy-paragraph-${index}`}>{paragraph}</p>
+            ))}
+          </div>
         </div>
       </main>
-      <Footer general={general} locale={locale} />
+      <Footer general={general} locale={locale} site={site} />
       {customHeader?.bodyContent ? (
         <div dangerouslySetInnerHTML={{ __html: customHeader.bodyContent }} />
       ) : null}

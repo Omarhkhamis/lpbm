@@ -30,9 +30,12 @@ export default function SidebarNav({ site, sections, locale = "en" }) {
       <CollapsibleNavGroup
         title="Pages"
         items={[
-          { label: "Thank You", href: `${prefix}/pages/thankyou?${siteQuery}` },
-          { label: "Privacy Policy", href: `${prefix}/pages/privacy-policy?${siteQuery}` },
-          { label: "Terms", href: `${prefix}/pages/terms?${siteQuery}` }
+          { label: "Thank You (EN)", href: `${prefix}/pages/thankyou-en?${siteQuery}` },
+          { label: "Thank You (RU)", href: `${prefix}/pages/thankyou-ru?${siteQuery}` },
+          { label: "Privacy Policy (EN)", href: `${prefix}/pages/privacy-policy-en?${siteQuery}` },
+          { label: "Privacy Policy (RU)", href: `${prefix}/pages/privacy-policy-ru?${siteQuery}` },
+          { label: "Terms (EN)", href: `${prefix}/pages/terms-en?${siteQuery}` },
+          { label: "Terms (RU)", href: `${prefix}/pages/terms-ru?${siteQuery}` }
         ]}
         defaultOpen={false}
         isActive={isPages}

@@ -213,6 +213,7 @@ export default async function HollywoodSmilePage({ params }) {
             idPrefix="lucky-section"
             data={sectionsMap.luckySpin?.data}
             locale={locale}
+            site={SITE}
           />
         ) : null}
         {sectionsMap.localAttractions?.enabled ? (
@@ -228,13 +229,14 @@ export default async function HollywoodSmilePage({ params }) {
           <Faqs data={sectionsMap.faqs?.data} />
         ) : null}
       </main>
-      <Footer general={general} locale={locale} />
+      <Footer general={general} locale={locale} site={SITE} />
       <Overlays
         heroData={sectionsMap.hero?.data}
         consultationDelaySeconds={general?.consultationDelaySeconds}
         whatsappLink={whatsappLink}
         luckySpinData={sectionsMap.luckySpin?.data}
         locale={locale}
+        site={SITE}
       />
     </>
   );

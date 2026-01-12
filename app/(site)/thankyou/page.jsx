@@ -36,7 +36,7 @@ export default async function ThankYouPage({ searchParams }) {
 
   const [general, page, customHeader] = await Promise.all([
     getGeneralSettings(site),
-    getPageBySlug("thankyou"),
+    getPageBySlug("thankyou", locale),
     getCustomHeader(site)
   ]);
 
@@ -55,20 +55,20 @@ export default async function ThankYouPage({ searchParams }) {
     <>
       <CustomHeadSnippet html={customHeader?.content} />
       <Header general={general} locale={locale} />
-      <main className="relative overflow-hidden bg-gradient-to-br from-main-950 via-main-900 to-main-800 text-white">
+      <main className="relative overflow-hidden bg-gradient-to-br from-main-950 via-main-900 to-main-800 text-white pt-24">
         <div className="absolute inset-0">
           <div className="absolute left-[-20%] top-[-10%] h-64 w-64 rounded-full bg-copper-600/20 blur-[100px]" />
           <div className="absolute right-[-15%] bottom-[-20%] h-72 w-72 rounded-full bg-copper-500/25 blur-[120px]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.05),_transparent_45%)]" />
         </div>
 
-        <section className="relative mx-auto flex min-h-[68vh] max-w-screen-xl flex-col items-center justify-center gap-10 px-6 py-16 text-center lg:px-12">
+        <section className="relative mx-auto flex min-h-[70vh] max-w-screen-xl flex-col items-center justify-center gap-10 px-6 py-16 text-center lg:px-12">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[11px] uppercase tracking-[0.24em] text-main-100 shadow-[0_10px_40px_rgba(0,0,0,0.25)]">
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/90 text-white shadow-lg">
               <i className="fa-solid fa-check" />
             </span>
             <span className="text-xs font-semibold text-white">
-              Request Received
+              {locale === "ru" ? "Запрос получен" : "Request Received"}
             </span>
           </div>
 
@@ -85,14 +85,15 @@ export default async function ThankYouPage({ searchParams }) {
               ))
             ) : (
               <p>
-                We&apos;ll call you shortly to confirm your details and book the best
-                available time for you.
+                {locale === "ru"
+                  ? "Мы свяжемся с вами в ближайшее время, чтобы подтвердить детали и подобрать удобное время."
+                  : "We'll call you shortly to confirm your details and book the best available time for you."}
               </p>
             )}
           </div>
         </section>
       </main>
-      <Footer general={general} locale={locale} />
+      <Footer general={general} locale={locale} site={site} />
       {customHeader?.bodyContent ? (
         <div dangerouslySetInnerHTML={{ __html: customHeader.bodyContent }} />
       ) : null}

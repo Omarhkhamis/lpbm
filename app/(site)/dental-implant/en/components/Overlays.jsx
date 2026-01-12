@@ -13,7 +13,8 @@ export default function Overlays({
   consultationDelaySeconds,
   whatsappLink,
   luckySpinData,
-  locale
+  locale,
+  site
 }) {
   const [isLuckyOpen, setIsLuckyOpen] = useState(false);
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
@@ -177,6 +178,7 @@ export default function Overlays({
                 idPrefix="lucky-modal"
                 data={luckySpinData}
                 locale={locale}
+                site={site}
               />
             </div>
           </div>

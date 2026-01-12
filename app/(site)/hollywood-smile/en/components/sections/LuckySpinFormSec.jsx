@@ -157,7 +157,7 @@ const buildWheelSvg = (prefix, labels) => {
   return svg;
 };
 
-export default function LuckySpinFormSec({ data, idPrefix, locale } = {}) {
+export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) {
   const isRu = locale === "ru";
   const ruDefaults = SECTION_DEFAULTS_RU?.luckySpin;
   const content = isRu && ruDefaults
@@ -266,7 +266,11 @@ export default function LuckySpinFormSec({ data, idPrefix, locale } = {}) {
             allowOutsideClick: false
           });
           if (result?.isConfirmed) {
-            window.location.assign("/thankyou");
+            const params = new URLSearchParams();
+            if (site) params.set("site", site);
+            if (locale) params.set("locale", locale);
+            const query = params.toString();
+            window.location.assign(query ? `/thankyou?${query}` : "/thankyou");
           }
         }
       })();

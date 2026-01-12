@@ -228,6 +228,7 @@ export default async function DentalImplantPage({ params }) {
                     idPrefix="lucky-section"
                     data={data}
                     locale={locale}
+                    site={SITE}
                   />
                 );
               case "localAttractions":
@@ -251,13 +252,14 @@ export default async function DentalImplantPage({ params }) {
             }
           })}
       </main>
-      <Footer general={general} locale={locale} />
+      <Footer general={general} locale={locale} site={SITE} />
       <Overlays
         heroData={sectionsMap.hero?.data}
         consultationDelaySeconds={general?.consultationDelaySeconds}
         whatsappLink={whatsappLink}
         luckySpinData={sectionsMap.luckySpin?.data}
         locale={locale}
+        site={SITE}
       />
     </>
   );
