@@ -1,0 +1,115 @@
+import { getSeoSettings } from "@lib/seoSettings";
+import { normalizeLocale, normalizeSite } from "@lib/sites";
+import { updateSeoSettingsAction } from "../actions";
+import AdminShell from "../AdminShell";
+import FieldInput from "../components/FieldInput";
+import SaveToast from "../components/SaveToast";
+
+export default async function SeoSettingsPage({ searchParams }) {
+  const site = normalizeSite(searchParams?.site) || "hollywood-smile";
+  const locale = normalizeLocale(searchParams?.locale);
+  const seo = await getSeoSettings(site, locale);
+  const action = updateSeoSettingsAction.bind(null, site);
+
+  return (
+    <AdminShell site={site} locale={locale}>
+      <div className="space-y-6">
+      <SaveToast successMessage="SEO settings saved" errorMessage="Failed to save SEO settings" />
+      <div>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
+              Settings
+            </p>
+            <h2 className="text-2xl font-semibold text-slate-900">
+              SEO ({locale.toUpperCase()})
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Control how your page appears in search and link previews.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <a
+              href={`/admin90/seo?site=${site}&locale=en`}
+              className={`rounded-lg border px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] ${
+                locale === "en"
+                  ? "border-copper-500 text-copper-700 bg-copper-50"
+                  : "border-slate-200 text-slate-600 bg-white"
+              }`}
+            >
+              EN
+            </a>
+            <a
+              href={`/admin90/seo?site=${site}&locale=ru`}
+              className={`rounded-lg border px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] ${
+                locale === "ru"
+                  ? "border-copper-500 text-copper-700 bg-copper-50"
+                  : "border-slate-200 text-slate-600 bg-white"
+              }`}
+            >
+              RU
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <form action={action} className="space-y-6">
+        <input type="hidden" name="locale" value={locale} />
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+            Meta Information
+          </p>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <FieldInput
+              name="metaTitle"
+              label="Meta Title"
+              defaultValue={seo.metaTitle}
+            />
+            <FieldInput
+              name="metaKeywords"
+              label="Meta Keywords (comma separated)"
+              defaultValue={seo.metaKeywords || ""}
+            />
+          </div>
+
+          <div className="mt-4">
+            <FieldInput
+              name="metaDescription"
+              label="Meta Description"
+              defaultValue={seo.metaDescription}
+              isTextarea
+            />
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+            Social Preview
+          </p>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <FieldInput
+              name="metaImage"
+              label="Meta Image (1200x630 recommended)"
+              defaultValue={seo.metaImage || ""}
+            />
+          </div>
+          <p className="mt-2 text-xs text-slate-500">
+            Paste an image URL or upload to replace the link preview image.
+          </p>
+        </div>
+
+        <div className="flex items-center justify-end">
+          <button
+            type="submit"
+            className="rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:from-copper-700 hover:to-copper-500"
+          >
+            Save SEO Settings
+          </button>
+        </div>
+      </form>
+      </div>
+    </AdminShell>
+  );
+}
