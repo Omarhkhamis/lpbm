@@ -5,12 +5,12 @@ import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 
 import { clearAdminSession } from "@lib/adminAuth";
-import { DEFAULT_CUSTOM_HEADER } from "@lib/customHeader";
+import { DEFAULT_CUSTOM_HEADER, getSharedCustomHeaderSite } from "@lib/customHeader";
 import { prisma } from "@lib/prisma";
 import { getSectionDefaults } from "@lib/sectionDefaults";
 import { applyFormData, mergeSectionData } from "@lib/sectionForm";
 import { ensureSeoSettings } from "@lib/seoSettings";
-import { normalizeLocale, normalizeSite } from "@lib/sites";
+import { normalizeLocale, normalizeSite, SITES } from "@lib/sites";
 
 const revalidatePublic = (site, locale) => {
   revalidatePath(`/${site}/${locale}`);
@@ -225,6 +225,7 @@ export const updateSeoSettingsAction = async (site, formData) => {
 
 export const updateCustomHeaderAction = async (site, formData) => {
   const siteId = safeSite(site);
+  const sharedSite = getSharedCustomHeaderSite();
   try {
     const content =
       String(formData.get("customHeader") || "").trim() ||
@@ -234,16 +235,18 @@ export const updateCustomHeaderAction = async (site, formData) => {
       DEFAULT_CUSTOM_HEADER.bodyContent;
 
     await prisma.customHeader.upsert({
-      where: { site: siteId },
+      where: { site: sharedSite },
       update: { content, bodyContent },
-      create: { site: siteId, content, bodyContent }
+      create: { site: sharedSite, content, bodyContent }
     });
   } catch (error) {
     redirect(`/admin90/custom-header?site=${siteId}&error=1`);
   }
 
-  revalidatePublic(siteId, "en");
-  revalidatePublic(siteId, "ru");
+  SITES.forEach((siteItem) => {
+    revalidatePublic(siteItem.id, "en");
+    revalidatePublic(siteItem.id, "ru");
+  });
   redirect(`/admin90/custom-header?site=${siteId}&saved=1`);
 };
 
