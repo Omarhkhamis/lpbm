@@ -7,12 +7,18 @@ import { beforeAfterDefaults } from "../../../../../../lib/sectionDefaults";
 export default function BeforeAfter({ data }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(null);
+  const [isDesktopPaused, setIsDesktopPaused] = useState(false);
   const content = data || beforeAfterDefaults;
   const cases = content.cases || [];
   const items = cases.length ? [...cases, ...cases, ...cases] : [];
   const sliderRef = useRef(null);
-  const marqueeRef = useRef(null);
+  const desktopSliderRef = useRef(null);
   const loopWidthRef = useRef(0);
+  const desktopLoopWidthRef = useRef(0);
+  const desktopRafRef = useRef(null);
+  const desktopPauseTimeoutRef = useRef(null);
+  const isDesktopPausedRef = useRef(false);
+  const isDesktopHoverRef = useRef(false);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -29,6 +35,10 @@ export default function BeforeAfter({ data }) {
     setActiveImage(image);
     setIsOpen(true);
   };
+
+  useEffect(() => {
+    isDesktopPausedRef.current = isDesktopPaused;
+  }, [isDesktopPaused]);
 
   useEffect(() => {
     const node = sliderRef.current;
@@ -73,10 +83,80 @@ export default function BeforeAfter({ data }) {
     };
   }, [items.length]);
 
+  useEffect(() => {
+    const node = desktopSliderRef.current;
+    if (!node) return undefined;
+    const setWidth = node.scrollWidth / 3;
+    if (!Number.isFinite(setWidth)) return undefined;
+    desktopLoopWidthRef.current = setWidth;
+    node.scrollLeft = setWidth;
+
+    const normalize = () => {
+      const width = desktopLoopWidthRef.current;
+      if (!width) return;
+      const low = width * 0.35;
+      const high = width * 1.65;
+      const max = width * 2;
+      if (node.scrollLeft < low) {
+        const prev = node.style.scrollBehavior;
+        node.style.scrollBehavior = "auto";
+        node.scrollLeft += width;
+        node.style.scrollBehavior = prev;
+      } else if (node.scrollLeft > high) {
+        const prev = node.style.scrollBehavior;
+        node.style.scrollBehavior = "auto";
+        node.scrollLeft -= width;
+        node.style.scrollBehavior = prev;
+      } else if (node.scrollLeft > max) {
+        const prev = node.style.scrollBehavior;
+        node.style.scrollBehavior = "auto";
+        node.scrollLeft = width + (node.scrollLeft - max);
+        node.style.scrollBehavior = prev;
+      }
+    };
+
+    const handleScroll = () => {
+      normalize();
+    };
+
+    node.addEventListener("scroll", handleScroll, { passive: true });
+
+    let lastTime = performance.now();
+    const speed = 28;
+    const tick = (time) => {
+      const target = desktopSliderRef.current;
+      if (!target) return;
+      if (isDesktopPausedRef.current) {
+        desktopRafRef.current = requestAnimationFrame(tick);
+        return;
+      }
+      const delta = time - lastTime;
+      lastTime = time;
+      target.scrollLeft += (delta / 1000) * speed;
+      normalize();
+      desktopRafRef.current = requestAnimationFrame(tick);
+    };
+    desktopRafRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      desktopLoopWidthRef.current = 0;
+      node.removeEventListener("scroll", handleScroll);
+      if (desktopRafRef.current) {
+        cancelAnimationFrame(desktopRafRef.current);
+      }
+      if (desktopPauseTimeoutRef.current) {
+        clearTimeout(desktopPauseTimeoutRef.current);
+      }
+    };
+  }, [items.length]);
+
   const scrollByAmount = (direction) => {
     const node = sliderRef.current;
     if (!node) return;
-    const amount = Math.round(node.clientWidth * 0.9);
+    const firstCard = node.querySelector("article");
+    const gap = Number.parseFloat(window.getComputedStyle(node).columnGap || "0");
+    const amount = firstCard ? firstCard.getBoundingClientRect().width + gap : 0;
+    if (!amount) return;
     node.scrollBy({ left: amount * direction, behavior: "smooth" });
 
     requestAnimationFrame(() => {
@@ -104,8 +184,74 @@ export default function BeforeAfter({ data }) {
     });
   };
 
+  const pauseDesktopAuto = () => {
+    setIsDesktopPaused(true);
+  };
+
+  const resumeDesktopAuto = () => {
+    setIsDesktopPaused(false);
+  };
+
+  const pauseDesktopTemporarily = (durationMs = 2500) => {
+    setIsDesktopPaused(true);
+    if (desktopPauseTimeoutRef.current) {
+      clearTimeout(desktopPauseTimeoutRef.current);
+    }
+    desktopPauseTimeoutRef.current = setTimeout(() => {
+      if (!isDesktopHoverRef.current) {
+        setIsDesktopPaused(false);
+      }
+    }, durationMs);
+  };
+
+  const scrollDesktopBy = (direction) => {
+    const node = desktopSliderRef.current;
+    if (!node) return;
+    pauseDesktopTemporarily();
+    const firstCard = node.querySelector("article");
+    const gap = Number.parseFloat(window.getComputedStyle(node).columnGap || "0");
+    const amount = firstCard ? firstCard.getBoundingClientRect().width + gap : 0;
+    if (!amount) return;
+    node.scrollBy({ left: amount * direction, behavior: "smooth" });
+
+    requestAnimationFrame(() => {
+      const width = desktopLoopWidthRef.current;
+      if (!width) return;
+      const low = width * 0.35;
+      const high = width * 1.65;
+      const max = width * 2;
+      if (node.scrollLeft < low) {
+        const prev = node.style.scrollBehavior;
+        node.style.scrollBehavior = "auto";
+        node.scrollLeft += width;
+        node.style.scrollBehavior = prev;
+      } else if (node.scrollLeft > high) {
+        const prev = node.style.scrollBehavior;
+        node.style.scrollBehavior = "auto";
+        node.scrollLeft -= width;
+        node.style.scrollBehavior = prev;
+      } else if (node.scrollLeft > max) {
+        const prev = node.style.scrollBehavior;
+        node.style.scrollBehavior = "auto";
+        node.scrollLeft = width + (node.scrollLeft - max);
+        node.style.scrollBehavior = prev;
+      }
+    });
+  };
+
   return (
-    <section id="before-after" className="relative overflow-hidden bg-white py-16 lg:py-20">
+    <section
+      id="before-after"
+      className="relative overflow-hidden bg-white py-16 lg:py-20"
+      onMouseEnter={() => {
+        isDesktopHoverRef.current = true;
+        pauseDesktopAuto();
+      }}
+      onMouseLeave={() => {
+        isDesktopHoverRef.current = false;
+        resumeDesktopAuto();
+      }}
+    >
       <div className="mx-auto grid max-w-screen-2xl gap-12 px-6 lg:px-10 lg:grid-cols-2 lg:items-center">
         <div className="order-1 mb-6 space-y-7 lg:order-1 lg:mb-10">
           <h2 className="text-4xl   xl:text-5xl font-extralight leading-snug text-main-900">
@@ -188,17 +334,31 @@ export default function BeforeAfter({ data }) {
               </div>
             </div>
 
-            <div className="relative overflow-hidden marquee before-after-marquee hidden sm:block">
+            <div className="relative hidden sm:block">
+              <div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-10 hidden items-center justify-between px-4 md:flex">
+                <button
+                  type="button"
+                  aria-label="السابق"
+                  onClick={() => scrollDesktopBy(-1)}
+                  className="pointer-events-auto h-11 w-11 rounded-full border border-main-200 bg-white/95 text-main-700 shadow-md transition hover:bg-white"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  aria-label="التالي"
+                  onClick={() => scrollDesktopBy(1)}
+                  className="pointer-events-auto h-11 w-11 rounded-full border border-main-200 bg-white/95 text-main-700 shadow-md transition hover:bg-white"
+                >
+                  ›
+                </button>
+              </div>
+
               <div
-                ref={marqueeRef}
-                className="marquee__track before-after-track gap-4 md:gap-6 pr-4 md:pr-32"
-                style={{
-                  "--marquee-offset": "0px",
-                  "--marquee-duration": "42s",
-                  "--marquee-duration-mobile": "30s"
-                }}
+                ref={desktopSliderRef}
+                className="flex gap-6 overflow-x-auto pb-4 pr-4 no-scrollbar"
               >
-                {[...cases, ...cases].map((item, index) => (
+                {items.map((item, index) => (
                   <article
                     key={`${item.image}-${index}`}
                     className="shrink-0 w-[calc(100vw-3rem)] sm:w-[calc(50vw-2.5rem)] md:w-[325px]"
