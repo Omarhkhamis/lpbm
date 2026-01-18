@@ -1,9 +1,7 @@
-import Script from "next/script";
 import { notFound, redirect } from "next/navigation";
 
 import Footer from "../en/components/Footer";
 import Header from "../en/components/Header";
-import DentalImplantEffects from "../en/components/DentalImplantEffects";
 import Overlays from "../en/components/Overlays";
 import { getGeneralSettings } from "@lib/generalSettings";
 import { getSectionsByLocale, getSectionsMap } from "@lib/sections";
@@ -149,16 +147,7 @@ export default async function DentalImplantPage({ params }) {
 
   return (
     <>
-      <Script
-        src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/intlTelInput.min.js"
-        strategy="afterInteractive"
-      />
-      <Script
-        src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/utils.js"
-        strategy="afterInteractive"
-      />
       <Header general={general} locale={locale} />
-      <DentalImplantEffects />
       <main>
         {orderedSections
           .filter((section) => sectionsMap[section.key]?.enabled)

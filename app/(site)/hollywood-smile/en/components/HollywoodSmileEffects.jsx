@@ -41,35 +41,54 @@ const enforceE164 = (value) => {
   return "+" + digits;
 };
 
-const isVisible = (element) =>
-  !!(
-    element &&
-    (element.offsetWidth || element.offsetHeight || element.getClientRects().length)
-  );
+const sanitizePhoneInput = (value) => {
+  const cleaned = String(value || "").replace(/[^\d+]/g, "");
+  if (!cleaned) return "";
+  if (cleaned.startsWith("+")) {
+    return "+" + cleaned.slice(1).replace(/\+/g, "");
+  }
+  return cleaned.replace(/\+/g, "");
+};
 
 export default function HollywoodSmileEffects() {
   useEffect(() => {
     let cancelled = false;
     let rafId = 0;
     const bound = new WeakSet();
+    const shouldDebug =
+      typeof window !== "undefined" &&
+      window.localStorage &&
+      window.localStorage.getItem("iti-debug") === "1";
+    const debugLog = (...args) => {
+      if (!shouldDebug) return;
+      console.log("[iti]", ...args);
+    };
+    debugLog("effects:mounted");
 
     const initOne = (input, { force = false } = {}) => {
+      debugLog("initOne:start", {
+        id: input?.id,
+        force,
+        hasIntl: Boolean(window.intlTelInput)
+      });
       if (!window.intlTelInput) return;
       if (!input || input.type !== "tel") return;
       if (!input.id) return;
 
       const hidden = document.getElementById(`${input.id}_hidden`);
+      debugLog("initOne:hidden", { found: Boolean(hidden) });
       if (!hidden) return;
 
       const wrapper = input.closest("[data-iti]");
+      debugLog("initOne:wrapper", { found: Boolean(wrapper) });
       if (!wrapper) return;
 
-      if (!isVisible(input)) {
-        requestAnimationFrame(() => setTimeout(() => initOne(input, { force }), 80));
-        return;
-      }
-
       const existing = getIntlInstance(input);
+      debugLog("initOne:instance", {
+        id: input.id,
+        mounted: input.dataset.itiMounted,
+        hasInstance: Boolean(existing)
+      });
       if (force && existing) {
         try {
           existing.destroy();
@@ -79,16 +98,14 @@ export default function HollywoodSmileEffects() {
       }
 
       const stillThere = getIntlInstance(input);
+      debugLog("initOne:instanceCheck", {
+        id: input.id,
+        hasInstance: Boolean(stillThere)
+      });
       if (!force && input.dataset.itiMounted === "1" && stillThere) return;
 
       if (input.dataset.itiMounted === "1" && !stillThere) {
         delete input.dataset.itiMounted;
-      }
-
-      const host = wrapper.querySelector(".iti-host") || document.createElement("div");
-      if (!host.parentNode) {
-        host.className = "iti-host";
-        wrapper.appendChild(host);
       }
 
       if (getComputedStyle(wrapper).position === "static") {
@@ -96,12 +113,9 @@ export default function HollywoodSmileEffects() {
       }
 
       wrapper.style.overflow = "visible";
-      host.style.position = "absolute";
-      host.style.left = "0";
-      host.style.top = "calc(100% + 6px)";
-      host.style.width = "100%";
-      host.style.zIndex = "999999";
-      host.style.pointerEvents = "auto";
+
+      const dialog = input.closest('[role="dialog"]');
+      const dropdownContainer = dialog || document.body;
 
       const iti = window.intlTelInput(input, {
         initialCountry: "auto",
@@ -111,14 +125,21 @@ export default function HollywoodSmileEffects() {
             .then((data) => callback(String(data?.country_code || "tr").toLowerCase()))
             .catch(() => callback("tr"));
         },
+        allowDropdown: true,
         nationalMode: false,
         separateDialCode: false,
         autoHideDialCode: false,
         formatOnDisplay: true,
         autoPlaceholder: "polite",
-        dropdownContainer: host,
+        dropdownContainer,
         utilsScript: UTILS_URL
       });
+      debugLog("initOne:created", {
+        id: input.id,
+        hasInstance: Boolean(iti),
+        hasOpenDropdown: typeof iti?.openDropdown === "function"
+      });
+
 
       input.dataset.itiMounted = "1";
 
@@ -186,7 +207,13 @@ export default function HollywoodSmileEffects() {
       }, 100);
 
       if (!bound.has(input)) {
-        input.addEventListener("input", syncHidden);
+        input.addEventListener("input", () => {
+          const sanitized = sanitizePhoneInput(input.value);
+          if (sanitized !== input.value) {
+            input.value = sanitized;
+          }
+          syncHidden();
+        });
         input.addEventListener("blur", () => {
           applyPrefixIfEmpty();
           syncHidden();
@@ -218,6 +245,67 @@ export default function HollywoodSmileEffects() {
       rafId = requestAnimationFrame(() => setTimeout(() => initAll(force), 0));
     };
 
+    const handleFocusIn = (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement)) return;
+      if (target.type !== "tel") return;
+      debugLog("focusin", { id: target.id });
+      const wrapper = target.closest("[data-iti]");
+      if (!wrapper) return;
+      if (!window.intlTelInput) {
+        waitForIntlTelInput().then(() => initOne(target, { force: true }));
+        return;
+      }
+      initOne(target, { force: false });
+    };
+
+    const handlePointerDown = (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const wrapper = target.closest("[data-iti]");
+      if (!wrapper) return;
+      const input = wrapper.querySelector('input[type="tel"]');
+      if (!input) return;
+      const flagContainer = wrapper.querySelector(".iti__flag-container");
+      const onFlag =
+        Boolean(
+          target.closest(".iti__flag-container, .iti__selected-flag, .iti__arrow")
+        ) || Boolean(flagContainer?.contains(target));
+      debugLog("pointerdown", {
+        id: input.id,
+        onFlag
+      });
+      if (onFlag) {
+        event.preventDefault();
+        input.focus();
+      }
+      if (!window.intlTelInput) {
+        waitForIntlTelInput().then(() => {
+          initOne(input, { force: true });
+          const iti = getIntlInstance(input);
+          if (iti && typeof iti.openDropdown === "function" && onFlag) {
+            requestAnimationFrame(() => {
+              input.focus();
+              iti.openDropdown();
+            });
+          }
+        });
+        return;
+      }
+      initOne(input, { force: false });
+      let iti = getIntlInstance(input);
+      if (!iti) {
+        initOne(input, { force: true });
+        iti = getIntlInstance(input);
+      }
+      if (iti && typeof iti.openDropdown === "function" && onFlag) {
+        requestAnimationFrame(() => {
+          input.focus();
+          iti.openDropdown();
+        });
+      }
+    };
+
     scheduleInit(false);
 
     const observer = new MutationObserver((mutations) => {
@@ -230,12 +318,16 @@ export default function HollywoodSmileEffects() {
 
     const handlePageShow = () => scheduleInit(true);
     window.addEventListener("pageshow", handlePageShow);
+    document.addEventListener("focusin", handleFocusIn);
+    document.addEventListener("pointerdown", handlePointerDown, true);
 
     return () => {
       cancelled = true;
       observer.disconnect();
       if (rafId) cancelAnimationFrame(rafId);
       window.removeEventListener("pageshow", handlePageShow);
+      document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("pointerdown", handlePointerDown, true);
     };
   }, []);
 

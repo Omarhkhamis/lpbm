@@ -165,6 +165,64 @@
 
 .phone-iti .iti__flag-container {
   border-radius: 12px 0 0 12px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.phone-field {
+  width: 100%;
+  --react-international-phone-height: 42px;
+  --react-international-phone-border-radius: 12px;
+}
+
+.phone-field .react-international-phone-input-container {
+  width: 100%;
+}
+
+.phone-field .react-international-phone-country-selector-button {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  padding: 0 10px;
+  gap: 6px;
+}
+
+.phone-field .react-international-phone-input {
+  padding: 0 12px;
+}
+
+.phone-field .react-international-phone-country-selector-button__flag-emoji {
+  margin: 0 2px 0 0;
+}
+
+.phone-field .react-international-phone-country-selector-button__dropdown-arrow {
+  margin-right: 2px;
+}
+
+.phone-field--light {
+  --react-international-phone-background-color: #ffffff;
+  --react-international-phone-border-color: #e5e7eb;
+  --react-international-phone-text-color: #111827;
+  --react-international-phone-country-selector-background-color: #ffffff;
+  --react-international-phone-dropdown-item-background-color: #ffffff;
+  --react-international-phone-dropdown-item-text-color: #111827;
+  --react-international-phone-selected-dropdown-item-background-color: #f3f4f6;
+  --react-international-phone-dropdown-item-dial-code-color: #6b7280;
+}
+
+.phone-field--dark {
+  --react-international-phone-background-color: rgba(255, 255, 255, 0.05);
+  --react-international-phone-border-color: rgba(255, 255, 255, 0.15);
+  --react-international-phone-text-color: #ffffff;
+  --react-international-phone-country-selector-background-color: rgba(255, 255, 255, 0.05);
+  --react-international-phone-dropdown-item-background-color: #1f1c18;
+  --react-international-phone-dropdown-item-text-color: #f9fafb;
+  --react-international-phone-selected-dropdown-item-background-color: rgba(255, 255, 255, 0.08);
+  --react-international-phone-dropdown-item-dial-code-color: rgba(255, 255, 255, 0.6);
+}
+
+.phone-field .react-international-phone-country-selector-dropdown {
+  z-index: 1000001;
+  max-height: 280px;
 }
 
 .phone-iti input:focus {
@@ -349,6 +407,13 @@ input.iti__search-input {
 
 .iti__container {
   width: auto !important;
+  z-index: 1000001 !important;
+}
+
+body.overflow-hidden .iti__container {
+  position: fixed !important;
+  z-index: 1000001 !important;
+  pointer-events: auto;
 }
 
 .iti__country-list {

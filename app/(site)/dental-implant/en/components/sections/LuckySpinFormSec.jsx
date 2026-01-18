@@ -4,6 +4,7 @@ import { useId, useMemo, useState } from "react";
 
 import { luckySpinDefaults, SECTION_DEFAULTS_RU } from "../../../../../../lib/sectionDefaults";
 import { submitFormPayload } from "../../../../../../lib/formSubmit";
+import PhoneField from "../../../../components/PhoneField";
 
 const wheelSvgTemplate = `
 <svg viewBox="0 0 1000 1000" class="absolute inset-0" aria-hidden="true">
@@ -185,7 +186,6 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
   const reactId = useId();
   const baseId = idPrefix && idPrefix.trim().length ? idPrefix : reactId;
   const safeId = baseId.replace(/[^a-zA-Z0-9_-]/g, "") || "spin";
-  const phoneId = `phone-${safeId}`;
   const wheelPinId = `wheelPin-${safeId}`;
   const luckyPinAnimId = `luckyPinAnim-${safeId}`;
   const copperGradId = `${safeId}-copperGrad`;
@@ -202,18 +202,28 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
   const [selectedPrize, setSelectedPrize] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitSpin = async (payload, options = {}) => {
     setIsSubmitting(true);
     setFormError("");
+    setFieldErrors({});
     try {
-      await submitFormPayload({
+      const result = await submitFormPayload({
         ...payload,
         source: "lucky-spin",
         page: typeof window !== "undefined" ? window.location.pathname : ""
-      }, options);
+      }, { showSuccess: false, ...options });
+      if (!result?.ok) {
+        if (result.fieldErrors && Object.keys(result.fieldErrors).length) {
+          setFieldErrors(result.fieldErrors);
+        } else {
+          setFormError(copy.submitError);
+        }
+        return;
+      }
     } catch (error) {
       setFormError(copy.submitError);
     } finally {
@@ -223,12 +233,13 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
 
   const handleSpin = () => {
     if (isSpinning) return;
-    const hiddenPhoneInput = document.getElementById(`${phoneId}_hidden`);
-    const rawHiddenPhone = hiddenPhoneInput?.value ?? "";
     const trimmedName = fullName.trim();
-    const trimmedPhone = (phone || rawHiddenPhone).trim();
+    const trimmedPhone = phone.trim();
     if (!trimmedName || !trimmedPhone) {
-      setFormError(copy.missingFields);
+      setFieldErrors({
+        name: !trimmedName ? "This field is required." : undefined,
+        phone: !trimmedPhone ? "This field is required." : undefined
+      });
       return;
     }
     const slices = prizes.length;
@@ -435,9 +446,27 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
                         type="text"
                         placeholder={content.form?.fields?.fullNamePlaceholder}
                         autoComplete="name"
-                        onChange={(event) => setFullName(event.target.value)}
-                        className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition rounded-xl px-2.5 py-1.5 lg:px-3.5 lg:py-2.5 text-[14px] border-gray-200 bg-white text-main-900 placeholder:text-gray-400 focus:border-copper-500 focus:ring-copper-500/20"
+                        onChange={(event) => {
+                          setFullName(event.target.value);
+                          if (fieldErrors.name) {
+                            setFieldErrors((prev) => {
+                              const next = { ...prev };
+                              delete next.name;
+                              return next;
+                            });
+                          }
+                        }}
+                        className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition rounded-xl px-2.5 py-1.5 lg:px-3.5 lg:py-2.5 text-[14px] border-gray-200 bg-white text-main-900 placeholder:text-gray-400 focus:border-copper-500 focus:ring-copper-500/20 ${
+                          fieldErrors.name
+                            ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
+                            : ""
+                        }`}
                       />
+                      {fieldErrors.name ? (
+                        <p className="mt-1 text-[11px] text-red-500">
+                          {fieldErrors.name}
+                        </p>
+                      ) : null}
                     </div>
 
                     <div>
@@ -445,23 +474,33 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
                         {content.form?.fields?.phoneLabel}
                       </label>
 
-                      <div className="relative phone-iti" data-iti>
-                        <input
-                          type="tel"
-                          placeholder={content.form?.fields?.phonePlaceholder}
-                          autoComplete="tel"
-                          onChange={(event) => setPhone(event.target.value)}
-                          className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition border-gray-200 bg-white text-main-900 placeholder:text-gray-400 focus:border-copper-500 focus:ring-copper-500/20  rounded-xl px-2.5 py-1.5 lg:px-3.5 lg:py-2.5 text-[14px] w-full"
-                          id={phoneId}
-                        />
-                      </div>
-
-                      <input
-                        type="hidden"
-                        id={`${phoneId}_hidden`}
+                      <PhoneField
+                        defaultCountry="tr"
                         name="phone"
                         value={phone}
+                        onChange={(value) => {
+                          setPhone(value);
+                          if (fieldErrors.phone) {
+                            setFieldErrors((prev) => {
+                              const next = { ...prev };
+                              delete next.phone;
+                              return next;
+                            });
+                          }
+                        }}
+                        placeholder={content.form?.fields?.phonePlaceholder}
+                        inputClassName={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition border-gray-200 bg-white text-main-900 placeholder:text-gray-400 focus:border-copper-500 focus:ring-copper-500/20  rounded-xl px-2.5 py-1.5 lg:px-3.5 lg:py-2.5 text-[14px] w-full ${
+                          fieldErrors.phone
+                            ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
+                            : ""
+                        }`}
+                        variant="light"
                       />
+                      {fieldErrors.phone ? (
+                        <p className="mt-1 text-[11px] text-red-500">
+                          {fieldErrors.phone}
+                        </p>
+                      ) : null}
                     </div>
 
                     <div className="hidden mt-2.5 lg:flex items-center gap-2 text-[12px] text-main-500">

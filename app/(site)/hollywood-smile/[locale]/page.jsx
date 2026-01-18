@@ -1,9 +1,7 @@
-import Script from "next/script";
 import { notFound, redirect } from "next/navigation";
 
 import Footer from "../en/components/Footer";
 import Header from "../en/components/Header";
-import HollywoodSmileEffects from "../en/components/HollywoodSmileEffects";
 import Overlays from "../en/components/Overlays";
 import { getGeneralSettings } from "@lib/generalSettings";
 import { getSectionsMap } from "@lib/sections";
@@ -147,16 +145,7 @@ export default async function HollywoodSmilePage({ params }) {
 
   return (
     <>
-      <Script
-        src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/intlTelInput.min.js"
-        strategy="afterInteractive"
-      />
-      <Script
-        src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/utils.js"
-        strategy="afterInteractive"
-      />
       <Header general={general} locale={locale} />
-      <HollywoodSmileEffects />
       <main>
         {sectionsMap.hero?.enabled ? (
           <HeroSlide data={sectionsMap.hero?.data} whatsappLink={whatsappLink} />

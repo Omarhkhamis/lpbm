@@ -1,32 +1,45 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
+import { useState } from "react";
 
 import { heroDefaults } from "../../../../../lib/sectionDefaults";
 import { buildFormPayload, submitFormPayload } from "../../../../../lib/formSubmit";
+import PhoneField from "../../../components/PhoneField";
 
 export default function ConsultationFormCard({ form, idPrefix, className }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
   const fallbackForm = heroDefaults.form;
   const resolvedForm = form || fallbackForm;
   const fields = resolvedForm.fields || fallbackForm.fields;
-  const baseId = useId();
-  const phoneInputId = useMemo(
-    () => `${idPrefix || "consultation"}-${baseId}`,
-    [baseId, idPrefix]
-  );
+  const [phoneValue, setPhoneValue] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
+    setFieldErrors({});
     try {
       const payload = buildFormPayload(event.currentTarget, "consultation-card");
-      await submitFormPayload(payload);
+      const result = await submitFormPayload(payload);
+      if (!result?.ok) {
+        setFieldErrors(result.fieldErrors || {});
+        return;
+      }
       event.currentTarget.reset();
+      setPhoneValue("");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const clearFieldError = (field) => {
+    setFieldErrors((prev) => {
+      if (!prev?.[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
   };
 
   return (
@@ -68,8 +81,18 @@ export default function ConsultationFormCard({ form, idPrefix, className }) {
                   placeholder={fields.fullNamePlaceholder}
                   autoComplete="name"
                   name="fullName"
-                  className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition rounded-xl px-3.5 py-2.5 text-[14px] border-white/10 bg-main-900/60 text-white placeholder:text-main-300/60 focus:border-copper-400 focus:ring-copper-400/60"
+                  onInput={() => clearFieldError("name")}
+                  className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition rounded-xl px-3.5 py-2.5 text-[14px] border-white/10 bg-main-900/60 text-white placeholder:text-main-300/60 focus:border-copper-400 focus:ring-copper-400/60 ${
+                    fieldErrors.name
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
+                      : ""
+                  }`}
                 />
+                {fieldErrors.name ? (
+                  <p className="mt-1 text-[11px] text-red-400">
+                    {fieldErrors.name}
+                  </p>
+                ) : null}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -77,22 +100,25 @@ export default function ConsultationFormCard({ form, idPrefix, className }) {
                 <label className="block text-[10px] font-medium tracking-[0.15em] uppercase text-main-100/70">
                   {fields.phoneLabel}
                 </label>
-
-                <div className="relative phone-iti" data-iti>
-                  <input
-                    type="tel"
-                    placeholder={fields.phonePlaceholder}
-                    autoComplete="tel"
-                    className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition border-white/10 bg-main-900/60 text-white placeholder:text-main-300/60 focus:border-copper-400 focus:ring-copper-400/60"
-                    id={phoneInputId}
-                  />
-                </div>
-
-                <input
-                  type="hidden"
-                  id={`${phoneInputId}_hidden`}
+                <PhoneField
+                  defaultCountry="tr"
                   name="phone"
+                  value={phoneValue}
+                  onChange={setPhoneValue}
+                  placeholder={fields.phonePlaceholder}
+                  onInput={() => clearFieldError("phone")}
+                  inputClassName={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition border-white/10 bg-main-900/60 text-white placeholder:text-main-300/60 focus:border-copper-400 focus:ring-copper-400/60 ${
+                    fieldErrors.phone
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
+                      : ""
+                  }`}
+                  variant="dark"
                 />
+                {fieldErrors.phone ? (
+                  <p className="mt-1 text-[11px] text-red-400">
+                    {fieldErrors.phone}
+                  </p>
+                ) : null}
               </div>
 
               <div className="space-y-1.5">
@@ -105,8 +131,18 @@ export default function ConsultationFormCard({ form, idPrefix, className }) {
                   placeholder={fields.emailPlaceholder}
                   autoComplete="email"
                   name="email"
-                  className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition rounded-xl px-3.5 py-2.5 text-[14px] border-white/10 bg-main-900/60 text-white placeholder:text-main-300/60 focus:border-copper-400 focus:ring-copper-400/60"
+                  onInput={() => clearFieldError("email")}
+                  className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition rounded-xl px-3.5 py-2.5 text-[14px] border-white/10 bg-main-900/60 text-white placeholder:text-main-300/60 focus:border-copper-400 focus:ring-copper-400/60 ${
+                    fieldErrors.email
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
+                      : ""
+                  }`}
                 />
+                {fieldErrors.email ? (
+                  <p className="mt-1 text-[11px] text-red-400">
+                    {fieldErrors.email}
+                  </p>
+                ) : null}
               </div>
             </div>
 

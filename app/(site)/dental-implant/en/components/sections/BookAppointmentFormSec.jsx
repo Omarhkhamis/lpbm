@@ -4,9 +4,12 @@ import { useState } from "react";
 
 import { bookAppointmentDefaults } from "../../../../../../lib/sectionDefaults";
 import { buildFormPayload, submitFormPayload } from "../../../../../../lib/formSubmit";
+import PhoneField from "../../../../components/PhoneField";
 
 export default function BookAppointmentFormSec({ data }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [phoneValue, setPhoneValue] = useState("");
   const content = data || bookAppointmentDefaults;
   const fields = content.fields;
 
@@ -14,13 +17,28 @@ export default function BookAppointmentFormSec({ data }) {
     event.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
+    setFieldErrors({});
     try {
       const payload = buildFormPayload(event.currentTarget, "book-appointment");
-      await submitFormPayload(payload);
+      const result = await submitFormPayload(payload);
+      if (!result?.ok) {
+        setFieldErrors(result.fieldErrors || {});
+        return;
+      }
       event.currentTarget.reset();
+      setPhoneValue("");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const clearFieldError = (field) => {
+    setFieldErrors((prev) => {
+      if (!prev?.[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
   };
 
   return (
@@ -101,9 +119,19 @@ export default function BookAppointmentFormSec({ data }) {
                   type="text"
                   placeholder={fields.fullNamePlaceholder}
                   autoComplete="name"
-                  className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition border-white/15 bg-white/5 text-white placeholder:text-main-200/60 focus:border-copper-400 focus:ring-copper-400/70"
+                  onInput={() => clearFieldError("name")}
+                  className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition border-white/15 bg-white/5 text-white placeholder:text-main-200/60 focus:border-copper-400 focus:ring-copper-400/70 ${
+                    fieldErrors.name
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
+                      : ""
+                  }`}
                   name="name"
                 />
+                {fieldErrors.name ? (
+                  <p className="mt-1 text-[11px] text-red-300">
+                    {fieldErrors.name}
+                  </p>
+                ) : null}
               </div>
 
               <div className="space-y-1.5">
@@ -111,21 +139,25 @@ export default function BookAppointmentFormSec({ data }) {
                   {fields.phoneLabel}
                 </label>
 
-                <div className="relative phone-iti" data-iti>
-                  <input
-                    type="tel"
-                    placeholder={fields.phonePlaceholder}
-                    autoComplete="tel"
-                    className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition border-white/15 bg-white/5 text-white placeholder:text-main-200/60 focus:border-copper-400 focus:ring-copper-400/70"
-                    id="phone-fYkqlm9seEEWSauk2AMZ"
-                  />
-                </div>
-
-                <input
-                  type="hidden"
-                  id="phone-fYkqlm9seEEWSauk2AMZ_hidden"
+                <PhoneField
+                  defaultCountry="tr"
                   name="phone"
+                  value={phoneValue}
+                  onChange={setPhoneValue}
+                  placeholder={fields.phonePlaceholder}
+                  onInput={() => clearFieldError("phone")}
+                  inputClassName={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition border-white/15 bg-white/5 text-white placeholder:text-main-200/60 focus:border-copper-400 focus:ring-copper-400/70 ${
+                    fieldErrors.phone
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
+                      : ""
+                  }`}
+                  variant="dark"
                 />
+                {fieldErrors.phone ? (
+                  <p className="mt-1 text-[11px] text-red-300">
+                    {fieldErrors.phone}
+                  </p>
+                ) : null}
               </div>
 
               <div>
@@ -136,9 +168,19 @@ export default function BookAppointmentFormSec({ data }) {
                   type="email"
                   placeholder={fields.emailPlaceholder}
                   autoComplete="email"
-                  className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition border-white/15 bg-white/5 text-white placeholder:text-main-200/60 focus:border-copper-400 focus:ring-copper-400/70"
+                  onInput={() => clearFieldError("email")}
+                  className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition border-white/15 bg-white/5 text-white placeholder:text-main-200/60 focus:border-copper-400 focus:ring-copper-400/70 ${
+                    fieldErrors.email
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
+                      : ""
+                  }`}
                   name="email"
                 />
+                {fieldErrors.email ? (
+                  <p className="mt-1 text-[11px] text-red-300">
+                    {fieldErrors.email}
+                  </p>
+                ) : null}
               </div>
             </div>
 

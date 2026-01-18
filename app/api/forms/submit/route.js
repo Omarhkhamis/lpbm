@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 import { getGeneralSettings } from "../../../../lib/generalSettings";
 import { prisma } from "../../../../lib/prisma";
@@ -43,6 +44,26 @@ const sanitizePayload = (payload) => {
   return cleaned;
 };
 
+const normalizePhone = (value) => {
+  const digits = String(value || "")
+    .replace(/[^\d+]/g, "")
+    .replace(/^0+/, "");
+  if (!digits) return "";
+  const cleaned = digits.replace(/\D/g, "").slice(0, 15);
+  return cleaned ? `+${cleaned}` : "";
+};
+
+const isValidPhone = (value) => {
+  const normalized = normalizePhone(value);
+  if (!normalized) return false;
+  const parsed = parsePhoneNumberFromString(normalized);
+  if (!parsed) return false;
+  return parsed.isValid();
+};
+
+const isValidEmail = (value) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+
 const buildTextBody = (fields) => {
   const lines = [];
   const entries = Object.entries(fields);
@@ -61,6 +82,15 @@ const pickReplyTo = (fields) => {
   ].filter(Boolean);
   const email = candidates.find((value) => /\S+@\S+\.\S+/.test(value));
   return email || undefined;
+};
+
+const pickFrom = () => {
+  const candidates = [
+    process.env.EMAIL_FROM,
+    process.env.SMTP_USER,
+    EMAIL_TO_FALLBACK
+  ].filter(Boolean);
+  return candidates.find(isValidEmail) || EMAIL_TO_FALLBACK;
 };
 
 const createTransport = () => {
@@ -108,6 +138,20 @@ export async function POST(request) {
     return Response.json({ ok: true, skipped: true });
   }
 
+  if (cleaned.phone && !isValidPhone(cleaned.phone)) {
+    return Response.json(
+      { ok: false, error: "INVALID_PHONE" },
+      { status: 400 }
+    );
+  }
+
+  if (cleaned.email && !isValidEmail(cleaned.email)) {
+    return Response.json(
+      { ok: false, error: "INVALID_EMAIL" },
+      { status: 400 }
+    );
+  }
+
   const site = detectSite(cleaned.page, cleaned.site);
   const locale =
     String(cleaned.locale || "").toLowerCase() === "ru" ? "ru" : "en";
@@ -123,8 +167,7 @@ export async function POST(request) {
   }
 
   const to = settingsRecipient || process.env.EMAIL_TO || EMAIL_TO_FALLBACK;
-  const from =
-    process.env.EMAIL_FROM || process.env.SMTP_USER || EMAIL_TO_FALLBACK;
+  const from = pickFrom();
   const replyTo = pickReplyTo(cleaned);
 
   const baseFields = {

@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 
 import { faqsDefaults } from "../../../../../../lib/sectionDefaults";
 import { buildFormPayload, submitFormPayload } from "../../../../../../lib/formSubmit";
+import PhoneField from "../../../../components/PhoneField";
 
 export default function Faqs({ data }) {
   const content = data || faqsDefaults;
@@ -12,6 +13,8 @@ export default function Faqs({ data }) {
   const fields = form.fields || {};
   const [openIndex, setOpenIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [phoneValue, setPhoneValue] = useState("");
   const panelRefs = useRef([]);
 
   const toggle = (index) => {
@@ -22,13 +25,28 @@ export default function Faqs({ data }) {
     event.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
+    setFieldErrors({});
     try {
       const payload = buildFormPayload(event.currentTarget, "faq-form");
-      await submitFormPayload(payload);
+      const result = await submitFormPayload(payload);
+      if (!result?.ok) {
+        setFieldErrors(result.fieldErrors || {});
+        return;
+      }
       event.currentTarget.reset();
+      setPhoneValue("");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const clearFieldError = (field) => {
+    setFieldErrors((prev) => {
+      if (!prev?.[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
   };
 
   return (
@@ -206,8 +224,18 @@ export default function Faqs({ data }) {
                     placeholder={fields.fullNamePlaceholder}
                     autoComplete="name"
                     name="fullName"
-                    className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition rounded-xl px-3.5 py-2.5 text-[14px] border-gray-200 bg-white text-main-900 placeholder:text-gray-400 focus:border-copper-500 focus:ring-copper-500/20"
+                    onInput={() => clearFieldError("name")}
+                    className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition rounded-xl px-3.5 py-2.5 text-[14px] border-gray-200 bg-white text-main-900 placeholder:text-gray-400 focus:border-copper-500 focus:ring-copper-500/20 ${
+                      fieldErrors.name
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
+                        : ""
+                    }`}
                   />
+                  {fieldErrors.name ? (
+                    <p className="mt-1 text-[11px] text-red-500">
+                      {fieldErrors.name}
+                    </p>
+                  ) : null}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -216,21 +244,25 @@ export default function Faqs({ data }) {
                       {fields.phoneLabel}
                     </label>
 
-                    <div className="relative phone-iti" data-iti>
-                      <input
-                        type="tel"
-                        placeholder={fields.phonePlaceholder}
-                        autoComplete="tel"
-                        className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition border-gray-200 bg-white text-main-900 placeholder:text-gray-400 focus:border-copper-500 focus:ring-copper-500/20"
-                        id="phone-CBUwdZYPZhe7VcEgRKic"
-                      />
-                    </div>
-
-                    <input
-                      type="hidden"
-                      id="phone-CBUwdZYPZhe7VcEgRKic_hidden"
+                    <PhoneField
+                      defaultCountry="tr"
                       name="phone"
+                      value={phoneValue}
+                      onChange={setPhoneValue}
+                      placeholder={fields.phonePlaceholder}
+                      onInput={() => clearFieldError("phone")}
+                      inputClassName={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition border-gray-200 bg-white text-main-900 placeholder:text-gray-400 focus:border-copper-500 focus:ring-copper-500/20 ${
+                        fieldErrors.phone
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
+                          : ""
+                      }`}
+                      variant="light"
                     />
+                    {fieldErrors.phone ? (
+                      <p className="mt-1 text-[11px] text-red-500">
+                        {fieldErrors.phone}
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="space-y-1.5">
@@ -243,8 +275,18 @@ export default function Faqs({ data }) {
                       placeholder={fields.emailPlaceholder}
                       autoComplete="email"
                       name="email"
-                      className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition rounded-xl px-3.5 py-2.5 text-[14px] border-gray-200 bg-white text-main-900 placeholder:text-gray-400 focus:border-copper-500 focus:ring-copper-500/20"
+                      onInput={() => clearFieldError("email")}
+                      className={`w-full rounded-lg border px-3 py-2.5 text-sm outline-none focus:ring-1 transition rounded-xl px-3.5 py-2.5 text-[14px] border-gray-200 bg-white text-main-900 placeholder:text-gray-400 focus:border-copper-500 focus:ring-copper-500/20 ${
+                        fieldErrors.email
+                          ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
+                          : ""
+                      }`}
                     />
+                    {fieldErrors.email ? (
+                      <p className="mt-1 text-[11px] text-red-500">
+                        {fieldErrors.email}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
 

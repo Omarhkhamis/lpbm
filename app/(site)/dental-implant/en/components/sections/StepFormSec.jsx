@@ -1,9 +1,10 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { stepFormDefaults } from "../../../../../../lib/sectionDefaults";
 import { submitFormPayload } from "../../../../../../lib/formSubmit";
+import PhoneField from "../../../../components/PhoneField";
 
 export default function StepFormSec({ data }) {
   const content = data || stepFormDefaults;
@@ -16,8 +17,7 @@ export default function StepFormSec({ data }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const phoneInputId = useId();
-  const resolvedPhoneId = `analysis-phone-${phoneInputId}`;
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const progress = useMemo(() => {
     if (step === 1) return 0.28;
@@ -57,20 +57,21 @@ export default function StepFormSec({ data }) {
     }
 
     setIsSubmitting(true);
+    setFieldErrors({});
     try {
-      const hiddenPhoneInput = document.getElementById(
-        `${resolvedPhoneId}_hidden`
-      );
-      const rawHiddenPhone = hiddenPhoneInput?.value ?? "";
       const payload = {
         source: "step-form",
         fullName: name.trim(),
-        phone: (phone || rawHiddenPhone).trim(),
+        phone: phone.trim(),
         gender: gender || "",
         toothModel,
         toothModelLabel: selectedTooth?.label || ""
       };
-      await submitFormPayload(payload);
+      const result = await submitFormPayload(payload);
+      if (!result?.ok) {
+        setFieldErrors(result.fieldErrors || {});
+        return;
+      }
       handleFinish();
     } finally {
       setIsSubmitting(false);
@@ -221,10 +222,28 @@ export default function StepFormSec({ data }) {
                             id="analysis-name"
                             type="text"
                             value={name}
-                            onChange={(event) => setName(event.target.value)}
+                            onChange={(event) => {
+                              setName(event.target.value);
+                              if (fieldErrors.name) {
+                                setFieldErrors((prev) => {
+                                  const next = { ...prev };
+                                  delete next.name;
+                                  return next;
+                                });
+                              }
+                            }}
                             placeholder={content.fields?.fullNamePlaceholder}
-                            className="w-full rounded-lg border border-main-200 bg-white px-3 py-2.5 text-sm text-main-900 outline-none transition focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
+                            className={`w-full rounded-lg border border-main-200 bg-white px-3 py-2.5 text-sm text-main-900 outline-none transition focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40 ${
+                              fieldErrors.name
+                                ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
+                                : ""
+                            }`}
                           />
+                          {fieldErrors.name ? (
+                            <p className="mt-1 text-[11px] text-red-500">
+                              {fieldErrors.name}
+                            </p>
+                          ) : null}
                         </div>
 
                         <div>
@@ -234,21 +253,35 @@ export default function StepFormSec({ data }) {
                           >
                             {content.fields?.phoneLabel}
                           </label>
-                          <div className="relative phone-iti" data-iti>
-                            <input
-                              id={resolvedPhoneId}
-                              type="tel"
+                          <div className="relative">
+                            <PhoneField
+                              defaultCountry="tr"
+                              name="phone"
                               value={phone}
-                              onChange={(event) => setPhone(event.target.value)}
+                              onChange={(value) => {
+                                setPhone(value);
+                                if (fieldErrors.phone) {
+                                  setFieldErrors((prev) => {
+                                    const next = { ...prev };
+                                    delete next.phone;
+                                    return next;
+                                  });
+                                }
+                              }}
                               placeholder={content.fields?.phonePlaceholder}
-                              className="w-full rounded-lg border border-main-200 bg-white px-3 py-2.5 text-sm text-main-900 outline-none transition focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
+                              inputClassName={`w-full rounded-lg border border-main-200 bg-white px-3 py-2.5 text-sm text-main-900 outline-none transition focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40 ${
+                                fieldErrors.phone
+                                  ? "border-red-500 focus:border-red-500 focus:ring-red-500/40"
+                                  : ""
+                              }`}
+                              variant="light"
                             />
                           </div>
-                          <input
-                            type="hidden"
-                            id={`${resolvedPhoneId}_hidden`}
-                            name="phone"
-                          />
+                          {fieldErrors.phone ? (
+                            <p className="mt-1 text-[11px] text-red-500">
+                              {fieldErrors.phone}
+                            </p>
+                          ) : null}
                         </div>
                       </div>
 
