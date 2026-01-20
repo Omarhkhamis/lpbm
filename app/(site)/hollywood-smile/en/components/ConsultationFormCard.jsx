@@ -14,6 +14,33 @@ export default function ConsultationFormCard({ form, idPrefix, className }) {
   const fields = resolvedForm.fields || fallbackForm.fields;
   const [phoneValue, setPhoneValue] = useState("");
 
+  const validatePayload = (payload) => {
+    const errors = {};
+    const nameValue = payload?.fullName || payload?.name;
+    const phoneValue = payload?.phone;
+    const emailValue = payload?.email;
+    const phoneDigits = String(phoneValue || "").replace(/\D/g, "");
+
+    if (!nameValue) {
+      errors.name = "This field is required.";
+    }
+
+    if (!phoneValue) {
+      errors.phone = "This field is required.";
+    } else if (phoneDigits && phoneDigits.length < 8) {
+      errors.phone = "Please enter a valid phone number.";
+    }
+
+    if (
+      emailValue &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(emailValue).trim())
+    ) {
+      errors.email = "Please enter a valid email address.";
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (isSubmitting) return;
@@ -21,7 +48,12 @@ export default function ConsultationFormCard({ form, idPrefix, className }) {
     setFieldErrors({});
     try {
       const payload = buildFormPayload(event.currentTarget, "consultation-card");
-      const result = await submitFormPayload(payload);
+      const validationErrors = validatePayload(payload);
+      if (Object.keys(validationErrors).length) {
+        setFieldErrors(validationErrors);
+        return;
+      }
+      const result = await submitFormPayload(payload, { showError: false });
       if (!result?.ok) {
         setFieldErrors(result.fieldErrors || {});
         return;

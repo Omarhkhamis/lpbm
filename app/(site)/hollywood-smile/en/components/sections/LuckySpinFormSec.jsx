@@ -274,9 +274,18 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
             title: content.resultLabel || copy.swalTitle,
             text: chosenPrize,
             confirmButtonText: copy.swalConfirm,
-            allowOutsideClick: false
+            allowOutsideClick: false,
+            customClass: {
+              container: "swal-over-modal"
+            },
+            zIndex: 1000000,
+            timer: 5000,
+            timerProgressBar: true
           });
-          if (result?.isConfirmed) {
+          if (
+            result?.isConfirmed ||
+            result?.dismiss === Swal.DismissReason.timer
+          ) {
             const params = new URLSearchParams();
             if (site) params.set("site", site);
             if (locale) params.set("locale", locale);

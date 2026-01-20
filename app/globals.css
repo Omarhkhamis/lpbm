@@ -198,6 +198,10 @@
   margin-right: 2px;
 }
 
+.swal-over-modal {
+  z-index: 10000000 !important;
+}
+
 .phone-field--light {
   --react-international-phone-background-color: #ffffff;
   --react-international-phone-border-color: #e5e7eb;
