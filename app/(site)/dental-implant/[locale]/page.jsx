@@ -12,6 +12,7 @@ import {
   PopularTreatments,
   BookAppointmentFormSec,
   BeforeAfter,
+  CertificatesGallery,
   FullWidthCampaignBanner,
   StepFormSec,
   Treatments,
@@ -182,6 +183,8 @@ export default async function DentalImplantPage({ params }) {
                 );
               case "beforeAfter":
                 return <BeforeAfter key={section.key} data={data} />;
+              case "certificatesGallery":
+                return <CertificatesGallery key={section.key} data={data} />;
               case "fullWidthCampaign":
                 return <FullWidthCampaignBanner key={section.key} data={data} />;
               case "stepForm":

@@ -13,6 +13,7 @@ import {
   PopularTreatments,
   BookAppointmentFormSec,
   BeforeAfter,
+  CertificatesGallery,
   FullWidthCampaignBanner,
   StepFormSec,
   Treatments,
@@ -170,6 +171,9 @@ export default async function HollywoodSmilePage({ params }) {
         ) : null}
         {sectionsMap.beforeAfter?.enabled ? (
           <BeforeAfter data={sectionsMap.beforeAfter?.data} />
+        ) : null}
+        {sectionsMap.certificatesGallery?.enabled ? (
+          <CertificatesGallery data={sectionsMap.certificatesGallery?.data} />
         ) : null}
         {sectionsMap.fullWidthCampaign?.enabled ? (
           <FullWidthCampaignBanner

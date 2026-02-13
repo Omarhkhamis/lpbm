@@ -3,6 +3,7 @@ export { default as DentalImplantSec } from './DentalImplantSec';
 export { default as PopularTreatments } from './PopularTreatments';
 export { default as BookAppointmentFormSec } from './BookAppointmentFormSec';
 export { default as BeforeAfter } from './BeforeAfter';
+export { default as CertificatesGallery } from './CertificatesGallery';
 export { default as FullWidthCampaignBanner } from './FullWidthCampaignBanner';
 export { default as StepFormSec } from './StepFormSec';
 export { default as Treatments } from './Treatments';

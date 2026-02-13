@@ -18,6 +18,7 @@ import TreatmentsMediaEditor from "../../components/TreatmentsMediaEditor";
 import TeamMembersEditor from "../../components/TeamMembersEditor";
 import ImplantMatrixEditor from "../../components/ImplantMatrixEditor";
 import TechniquesUsedEditor from "../../components/TechniquesUsedEditor";
+import CertificatesGalleryEditor from "../../components/CertificatesGalleryEditor";
 
 export default async function SectionEditorPage({ params, searchParams }) {
   const site = normalizeSite(searchParams?.site) || "hollywood-smile";
@@ -38,6 +39,7 @@ export default async function SectionEditorPage({ params, searchParams }) {
   const isTeamMembers = section.key === "teamMembers";
   const isImplantMatrix = section.key === "implantMatrix";
   const isTechniquesUsed = section.key === "techniquesUsed";
+  const isCertificatesGallery = section.key === "certificatesGallery";
   const casesData = Array.isArray(data.cases) ? data.cases : [];
   const fields =
     section.key === "luckySpin"
@@ -56,6 +58,9 @@ export default async function SectionEditorPage({ params, searchParams }) {
     }
     if (isTeamMembers) {
       return !field.path.startsWith("items.") && !field.path.startsWith("cta");
+    }
+    if (isCertificatesGallery) {
+      return !field.path.startsWith("items.");
     }
     if (isImplantMatrix) {
       return (
@@ -162,6 +167,11 @@ export default async function SectionEditorPage({ params, searchParams }) {
           ) : null}
           {isTeamMembers ? (
             <TeamMembersEditor
+              initialItems={Array.isArray(data.items) ? data.items : []}
+            />
+          ) : null}
+          {isCertificatesGallery ? (
+            <CertificatesGalleryEditor
               initialItems={Array.isArray(data.items) ? data.items : []}
             />
           ) : null}

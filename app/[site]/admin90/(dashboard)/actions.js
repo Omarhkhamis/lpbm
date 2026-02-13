@@ -35,6 +35,7 @@ export const updateSectionAction = async (site, key, formData) => {
     const columnsLengthRaw = formData.get("columnsLength");
     const rowsLengthRaw = formData.get("rowsLength");
     const slidesLengthRaw = formData.get("slidesLength");
+    const certificateItemsLengthRaw = formData.get("certificateItemsLength");
     const casesLength = casesLengthRaw ? Number(casesLengthRaw) : null;
     const mediaItemsLength = mediaItemsLengthRaw
       ? Number(mediaItemsLengthRaw)
@@ -43,6 +44,9 @@ export const updateSectionAction = async (site, key, formData) => {
     const columnsLength = columnsLengthRaw ? Number(columnsLengthRaw) : null;
     const rowsLength = rowsLengthRaw ? Number(rowsLengthRaw) : null;
     const slidesLength = slidesLengthRaw ? Number(slidesLengthRaw) : null;
+    const certificateItemsLength = certificateItemsLengthRaw
+      ? Number(certificateItemsLengthRaw)
+      : null;
 
     if (key === "beforeAfter" && Number.isFinite(casesLength)) {
       updatedData.cases = Array.isArray(updatedData.cases)
@@ -101,6 +105,11 @@ export const updateSectionAction = async (site, key, formData) => {
     if (key === "techniquesUsed" && Number.isFinite(slidesLength)) {
       updatedData.slides = Array.isArray(updatedData.slides)
         ? updatedData.slides.slice(0, slidesLength)
+        : [];
+    }
+    if (key === "certificatesGallery" && Number.isFinite(certificateItemsLength)) {
+      updatedData.items = Array.isArray(updatedData.items)
+        ? updatedData.items.slice(0, certificateItemsLength)
         : [];
     }
     if (key === "teamMembers") {
