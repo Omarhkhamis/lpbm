@@ -1,10 +1,14 @@
+"use client";
+
 import { clinicDefaults } from "../../../../../../lib/sectionDefaults";
 
 export default function ClinicSec({ data, whatsappLink }) {
   const content = data || clinicDefaults;
   const images = content.images || [];
-  const resolvedWhatsappLink =
-    whatsappLink || "https://wa.me/+905465266449";
+  const handleConsultationOpen = () => {
+    if (typeof window === "undefined") return;
+    window.dispatchEvent(new CustomEvent("open-book-consultation"));
+  };
   return (
     <section className=" overflow-hidden bg-gray-100 py-16 lg:py-28 ">
       <div className="mx-auto max-w-screen-2xl px-0 ">
@@ -86,19 +90,14 @@ export default function ClinicSec({ data, whatsappLink }) {
               {content.paragraphs?.[1]}
             </p>
 
-            <a
-              href={resolvedWhatsappLink}
-              target="_blank"
-              className="inline-block"
-              rel="noreferrer"
+            <button
+              type="button"
+              className="rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 text-white shadow-[0_10px_10px_rgba(0,0,0,0.09)] hover:from-copper-700 hover:to-copper-500 px-4 py-3 text-[11.5px] font-medium uppercase tracking-[0.13em] inline-flex items-center justify-center cursor-pointer transition-transform duration-200 ease-out disabled:opacity-60 disabled:pointer-events-none"
+              onClick={handleConsultationOpen}
             >
-              <button
-                type="button"
-                className="rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 text-white shadow-[0_10px_10px_rgba(0,0,0,0.09)] hover:from-copper-700 hover:to-copper-500 px-4 py-3 text-[11.5px] font-medium uppercase tracking-[0.13em] inline-flex items-center justify-center cursor-pointer transition-transform duration-200 ease-out disabled:opacity-60 disabled:pointer-events-none"
-              >
-                <i className="fa-brands fa-whatsapp text-[15px] opacity-90 mr-2"></i>
-                {content.ctaText}</button>
-            </a>
+              <i className="fa-brands fa-whatsapp text-[15px] opacity-90 mr-2"></i>
+              {content.ctaText}
+            </button>
           </div>
         </div>
       </div>

@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { heroDefaults } from "../../../../../lib/sectionDefaults";
 import { buildFormPayload, submitFormPayload } from "../../../../../lib/formSubmit";
+import {
+  buildPrivacyPolicyLink,
+  getPrivacyConsentText
+} from "../../../../../lib/pageLinks";
 import PhoneField from "../../../components/PhoneField";
 
 export default function ConsultationFormCard({ form, idPrefix, className }) {
@@ -13,6 +18,15 @@ export default function ConsultationFormCard({ form, idPrefix, className }) {
   const fallbackForm = heroDefaults.form;
   const resolvedForm = form || fallbackForm;
   const fields = resolvedForm.fields || fallbackForm.fields;
+  const pathname = usePathname();
+  const privacyLink = useMemo(
+    () => buildPrivacyPolicyLink(pathname),
+    [pathname]
+  );
+  const privacyText = useMemo(
+    () => getPrivacyConsentText(pathname),
+    [pathname]
+  );
 
   const validatePayload = (payload) => {
     const errors = {};
@@ -78,7 +92,11 @@ export default function ConsultationFormCard({ form, idPrefix, className }) {
     <div className={className}>
       <div className="w-full rounded-3xl bg-gradient-to-br from-copper-500/40 via-main-800/70 to-copper-700/20 p-[1px] shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
         <div className="rounded-[22px] bg-main-950/80 backdrop-blur-xl border border-white/10 px-7 py-8">
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form
+            className="space-y-4"
+            onSubmit={handleSubmit}
+            data-form-name="Consultation Form"
+          >
             <div className="space-y-1.5 pointer-events-none relative z-0">
               <p className="text-[11px] tracking-[0.20em] uppercase font-medium text-main-100/70">
                 {resolvedForm.kicker}
@@ -234,6 +252,14 @@ export default function ConsultationFormCard({ form, idPrefix, className }) {
 
                 {resolvedForm.privacyNote}
               </span>
+              <p className="mt-2 text-[12px] text-gray-300">
+                <a
+                  href={privacyLink}
+                  className="underline decoration-white/50 underline-offset-4 hover:text-white"
+                >
+                  {privacyText}
+                </a>
+              </p>
             </div>
           </form>
         </div>

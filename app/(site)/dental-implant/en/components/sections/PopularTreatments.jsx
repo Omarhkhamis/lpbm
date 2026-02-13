@@ -6,9 +6,12 @@ import { popularTreatmentsDefaults } from "../../../../../../lib/sectionDefaults
 export default function PopularTreatments({ data, whatsappLink }) {
   const content = data || popularTreatmentsDefaults;
   const treatments = content.items || [];
-  const resolvedCtaLink = whatsappLink || content.ctaHref;
   const [current, setCurrent] = useState(0);
   const total = treatments.length || 1;
+  const handleConsultationOpen = () => {
+    if (typeof window === "undefined") return;
+    window.dispatchEvent(new CustomEvent("open-book-consultation"));
+  };
   const goTo = (direction) => {
     setCurrent((prev) => {
       const next = (prev + direction + total) % total;
@@ -40,16 +43,13 @@ export default function PopularTreatments({ data, whatsappLink }) {
           {item.description}
         </p>
 
-        <a
-          href={resolvedCtaLink}
-          target="_blank"
-          className="inline-block"
-          rel="noreferrer"
+        <button
+          type="button"
+          className="mt-7 inline-flex items-center gap-2 text-[15px] font-light cursor-pointer text-copper-700 hover:text-copper-900 transition"
+          onClick={handleConsultationOpen}
         >
-          <button className="mt-7 inline-flex items-center gap-2 text-[15px] font-light cursor-pointer text-copper-700 hover:text-copper-900 transition">
-            {content.ctaText}
-          </button>
-        </a>
+          {content.ctaText}
+        </button>
       </div>
     </article>
   );

@@ -1,9 +1,14 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { faqsDefaults } from "../../../../../../lib/sectionDefaults";
 import { buildFormPayload, submitFormPayload } from "../../../../../../lib/formSubmit";
+import {
+  buildPrivacyPolicyLink,
+  getPrivacyConsentText
+} from "../../../../../../lib/pageLinks";
 import PhoneField from "../../../../components/PhoneField";
 
 export default function Faqs({ data }) {
@@ -16,6 +21,9 @@ export default function Faqs({ data }) {
   const [fieldErrors, setFieldErrors] = useState({});
   const [phoneValue, setPhoneValue] = useState("");
   const panelRefs = useRef([]);
+  const pathname = usePathname();
+  const privacyLink = buildPrivacyPolicyLink(pathname);
+  const privacyText = getPrivacyConsentText(pathname);
 
   const toggle = (index) => {
     setOpenIndex((current) => (current === index ? null : index));
@@ -178,7 +186,11 @@ export default function Faqs({ data }) {
               <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-copper-200/30 blur-3xl"></div>
               <div className="pointer-events-none absolute -bottom-28 -left-24 h-72 w-72 rounded-full bg-copper-300/20 blur-3xl"></div>
 
-              <form className="space-y-4" onSubmit={handleSubmit}>
+            <form
+              className="space-y-4"
+              onSubmit={handleSubmit}
+              data-form-name="FAQ Form"
+            >
                 <div className="space-y-1.5 pointer-events-none relative z-0">
                   <p className="text-[11px] tracking-[0.20em] uppercase font-medium text-gray-600">
                     {form.kicker}
@@ -333,6 +345,14 @@ export default function Faqs({ data }) {
 
                     {form.privacyNote}
                   </span>
+                  <p className="mt-2 text-[12px] text-main-500">
+                    <a
+                      href={privacyLink}
+                      className="underline decoration-main-400/70 underline-offset-4 hover:text-main-700"
+                    >
+                      {privacyText}
+                    </a>
+                  </p>
                 </div>
               </form>
             </div>

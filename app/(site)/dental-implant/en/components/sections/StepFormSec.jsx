@@ -1,9 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { stepFormDefaults } from "../../../../../../lib/sectionDefaults";
 import { submitFormPayload } from "../../../../../../lib/formSubmit";
+import {
+  buildPrivacyPolicyLink,
+  getPrivacyConsentText
+} from "../../../../../../lib/pageLinks";
 import PhoneField from "../../../../components/PhoneField";
 
 export default function StepFormSec({ data }) {
@@ -18,6 +23,15 @@ export default function StepFormSec({ data }) {
   const [phone, setPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const pathname = usePathname();
+  const privacyLink = useMemo(
+    () => buildPrivacyPolicyLink(pathname),
+    [pathname]
+  );
+  const privacyText = useMemo(
+    () => getPrivacyConsentText(pathname),
+    [pathname]
+  );
 
   const progress = useMemo(() => {
     if (step === 1) return 0.28;
@@ -61,6 +75,7 @@ export default function StepFormSec({ data }) {
     try {
       const payload = {
         source: "step-form",
+        formName: "Step Form",
         fullName: name.trim(),
         phone: phone.trim(),
         gender: gender || "",
@@ -291,6 +306,14 @@ export default function StepFormSec({ data }) {
                         </span>
                         {content.steps?.privacyNote}
                       </div>
+                      <p className="mt-2 text-[12px] text-main-500">
+                        <a
+                          href={privacyLink}
+                          className="underline decoration-main-400/70 underline-offset-4 hover:text-main-700"
+                        >
+                          {privacyText}
+                        </a>
+                      </p>
                     </>
                   )}
                 </div>

@@ -184,7 +184,7 @@ export default async function FormDataPage({ searchParams, params }) {
             <table className="min-w-full text-left text-sm">
               <thead className="border-b border-slate-200 text-[11px] uppercase tracking-[0.2em] text-slate-400">
                 <tr>
-                  <th className="px-6 py-4">Source</th>
+                  <th className="px-6 py-4">Form</th>
                   <th className="px-6 py-4">Name</th>
                   <th className="px-6 py-4">Email</th>
                   <th className="px-6 py-4">Phone</th>
@@ -202,12 +202,18 @@ export default async function FormDataPage({ searchParams, params }) {
                   const email = pickValue(payload, ["email"]);
                   const phone = pickValue(payload, ["phone"]);
                   const source = record.source || payload.source || "form";
+                  const formName = pickValue(payload, [
+                    "formName",
+                    "form_name",
+                    "formLabel",
+                    "form_label"
+                  ]);
                   const message = pickValue(payload, ["message"]);
 
                   return (
                     <tr key={record.id} className="text-slate-700 align-top">
                       <td className="px-6 py-4 font-medium text-slate-900">
-                        {source}
+                        {formName || source}
                       </td>
                       <td className="px-6 py-4">{name || "—"}</td>
                       <td className="px-6 py-4">{email || "—"}</td>

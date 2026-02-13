@@ -71,6 +71,7 @@ export async function GET(request, { params }) {
   const header = [
     "id",
     "source",
+    "formName",
     "page",
     "fullName",
     "email",
@@ -86,9 +87,16 @@ export async function GET(request, { params }) {
     const email = pickValue(payload, ["email"]);
     const phone = pickValue(payload, ["phone"]);
     const message = pickValue(payload, ["message"]);
+    const formName = pickValue(payload, [
+      "formName",
+      "form_name",
+      "formLabel",
+      "form_label"
+    ]);
     return [
       escapeCsv(record.id),
       escapeCsv(record.source || payload.source || "form"),
+      escapeCsv(formName),
       escapeCsv(record.page || payload.page || ""),
       escapeCsv(fullName),
       escapeCsv(email),

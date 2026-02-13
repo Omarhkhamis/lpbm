@@ -1,9 +1,14 @@
 "use client";
 
 import { useId, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { luckySpinDefaults, SECTION_DEFAULTS_RU } from "../../../../../../lib/sectionDefaults";
 import { submitFormPayload } from "../../../../../../lib/formSubmit";
+import {
+  buildPrivacyPolicyLink,
+  getPrivacyConsentText
+} from "../../../../../../lib/pageLinks";
 import PhoneField from "../../../../components/PhoneField";
 
 const wheelSvgTemplate = `
@@ -205,6 +210,15 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const pathname = usePathname();
+  const privacyLink = useMemo(
+    () => buildPrivacyPolicyLink(pathname),
+    [pathname]
+  );
+  const privacyText = useMemo(
+    () => getPrivacyConsentText(pathname),
+    [pathname]
+  );
 
   const submitSpin = async (payload, options = {}) => {
     setIsSubmitting(true);
@@ -214,6 +228,7 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
       const result = await submitFormPayload({
         ...payload,
         source: "lucky-spin",
+        formName: "Lucky Spin",
         page: typeof window !== "undefined" ? window.location.pathname : ""
       }, { showSuccess: false, ...options });
       if (!result?.ok) {
@@ -516,6 +531,14 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
                       <i className="fa-solid fa-lock text-emerald-600 text-[13px]"></i>
                       {content.form?.privacyNote}
                     </div>
+                    <p className="mt-2 text-[12px] text-main-500">
+                      <a
+                        href={privacyLink}
+                        className="underline decoration-main-400/70 underline-offset-4 hover:text-main-700"
+                      >
+                        {privacyText}
+                      </a>
+                    </p>
                   </div>
 
                   <div className="mt-0  pt-6 flex justify-start">

@@ -1,9 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { bookAppointmentSecondaryDefaults } from "../../../../../../lib/sectionDefaults";
 import { buildFormPayload, submitFormPayload } from "../../../../../../lib/formSubmit";
+import {
+  buildPrivacyPolicyLink,
+  getPrivacyConsentText
+} from "../../../../../../lib/pageLinks";
 import PhoneField from "../../../../components/PhoneField";
 
 export default function BookAppointmentFormSec2({ data }) {
@@ -12,6 +17,9 @@ export default function BookAppointmentFormSec2({ data }) {
   const [phoneValue, setPhoneValue] = useState("");
   const content = data || bookAppointmentSecondaryDefaults;
   const fields = content.fields;
+  const pathname = usePathname();
+  const privacyLink = buildPrivacyPolicyLink(pathname);
+  const privacyText = getPrivacyConsentText(pathname);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -58,6 +66,7 @@ export default function BookAppointmentFormSec2({ data }) {
         <form
           onSubmit={handleSubmit}
           className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-10"
+          data-form-name="Book Appointment (Secondary)"
         >
           <input
             type="text"
@@ -110,6 +119,14 @@ export default function BookAppointmentFormSec2({ data }) {
 
               {content.privacyNote}
             </span>
+            <p className="mt-2 text-[12px] text-gray-300">
+              <a
+                href={privacyLink}
+                className="underline decoration-white/50 underline-offset-4 hover:text-white"
+              >
+                {privacyText}
+              </a>
+            </p>
           </div>
 
           <div className="flex-1 space-y-3">
