@@ -25,6 +25,7 @@ import {
   ImplantMatrix,
   TechniquesUsed,
   GoogleReviews,
+  TrustpilotReviews,
   Faqs
 } from "../en/components/sections";
 
@@ -234,6 +235,8 @@ export default async function DentalImplantPage({ params }) {
                 return <TechniquesUsed key={section.key} data={data} />;
               case "googleReviews":
                 return <GoogleReviews key={section.key} data={data} />;
+              case "trustpilotReviews":
+                return <TrustpilotReviews key={section.key} data={data} />;
               case "faqs":
                 return <Faqs key={section.key} data={data} />;
               default:

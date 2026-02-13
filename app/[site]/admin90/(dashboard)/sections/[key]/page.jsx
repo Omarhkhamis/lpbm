@@ -35,7 +35,8 @@ export default async function SectionEditorPage({ params, searchParams }) {
   const visibleFields = rawFields.filter((field) => shouldIncludeField(field.path));
   const isBeforeAfter = section.key === "beforeAfter";
   const isTreatments = section.key === "treatments";
-  const isGoogleReviews = section.key === "googleReviews";
+  const isReviewsSection =
+    section.key === "googleReviews" || section.key === "trustpilotReviews";
   const isTeamMembers = section.key === "teamMembers";
   const isImplantMatrix = section.key === "implantMatrix";
   const isTechniquesUsed = section.key === "techniquesUsed";
@@ -52,7 +53,7 @@ export default async function SectionEditorPage({ params, searchParams }) {
         !field.path.startsWith("mediaItems.")
       );
     }
-    if (isGoogleReviews) {
+    if (isReviewsSection) {
       return !field.path.startsWith("items.");
     }
     if (isTeamMembers) {
@@ -139,7 +140,7 @@ export default async function SectionEditorPage({ params, searchParams }) {
             </div>
           );
           })}
-          {isGoogleReviews ? (
+          {isReviewsSection ? (
             <GoogleReviewsEditor
               initialItems={Array.isArray(data.items) ? data.items : []}
             />

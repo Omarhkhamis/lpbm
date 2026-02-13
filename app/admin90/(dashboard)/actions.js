@@ -67,7 +67,10 @@ export const updateSectionAction = async (site, key, formData) => {
         : [];
     }
 
-    if (key === "googleReviews" && Number.isFinite(reviewsLength)) {
+    if (
+      (key === "googleReviews" || key === "trustpilotReviews") &&
+      Number.isFinite(reviewsLength)
+    ) {
       updatedData.items = Array.isArray(updatedData.items)
         ? updatedData.items.slice(0, reviewsLength)
         : [];

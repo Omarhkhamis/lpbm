@@ -24,6 +24,7 @@ import {
   LuckySpinFormSec,
   LocalAttractions,
   GoogleReviews,
+  TrustpilotReviews,
   Faqs
 } from "../en/components/sections";
 
@@ -213,6 +214,9 @@ export default async function HollywoodSmilePage({ params }) {
         ) : null}
         {sectionsMap.googleReviews?.enabled ? (
           <GoogleReviews data={sectionsMap.googleReviews?.data} />
+        ) : null}
+        {sectionsMap.trustpilotReviews?.enabled ? (
+          <TrustpilotReviews data={sectionsMap.trustpilotReviews?.data} />
         ) : null}
         {sectionsMap.faqs?.enabled ? (
           <Faqs data={sectionsMap.faqs?.data} />

@@ -16,4 +16,5 @@ export { default as LocalAttractions } from './LocalAttractions';
 export { default as ImplantMatrix } from './ImplantMatrix';
 export { default as TechniquesUsed } from './TechniquesUsed';
 export { default as GoogleReviews } from './GoogleReviews';
+export { default as TrustpilotReviews } from './TrustpilotReviews';
 export { default as Faqs } from './Faqs';

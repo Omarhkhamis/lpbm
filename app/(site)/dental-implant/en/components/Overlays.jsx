@@ -195,10 +195,6 @@ export default function Overlays({
       >
         <div className="relative rounded-xl p-[1.2px] wa-shimmer-border">
           <div className="flex items-center gap-3 rounded-xl bg-white px-3.5 py-2.5 border border-main-200/60">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-r from-copper-400 via-copper-500 to-copper-600 text-white">
-              <i className="fa-brands fa-whatsapp text-[15px] opacity-90"></i>
-            </span>
-
             <span className="h-6 w-px bg-main-400/40"></span>
 
             <span className="flex flex-col leading-tight">

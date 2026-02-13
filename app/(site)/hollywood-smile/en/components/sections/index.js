@@ -14,4 +14,5 @@ export { default as HealthTourism } from './HealthTourism';
 export { default as LuckySpinFormSec } from './LuckySpinFormSec';
 export { default as LocalAttractions } from './LocalAttractions';
 export { default as GoogleReviews } from './GoogleReviews';
+export { default as TrustpilotReviews } from './TrustpilotReviews';
 export { default as Faqs } from './Faqs';

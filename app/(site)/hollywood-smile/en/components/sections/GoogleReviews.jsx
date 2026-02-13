@@ -105,16 +105,13 @@ export default function GoogleReviews({ data }) {
           </div>
 
           <div className="w-fit sm:w-auto inline-flex items-center justify-between sm:justify-start gap-3 rounded-full border border-main-200/70 bg-white/70 backdrop-blur px-4 py-2">
-            <span className="inline-flex h-7 items-center justify-center gap-2 rounded-full bg-white shrink-0 pr-1.5">
-              <svg viewBox="0 0 48 48" className="h-5 w-5" aria-hidden="true">
-                <path
-                  fill="#00B67A"
-                  d="M24 0l6.9 17.1H48L34.5 28.7 41.4 46 24 35.8 6.6 46 13.5 28.7 0 17.1h17.1z"
-                />
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white shrink-0">
+              <svg viewBox="0 0 48 48" className="h-5 w-5">
+                <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.236 32.659 29.02 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.957 3.043l5.657-5.657C34.047 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+                <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 16.108 18.961 12 24 12c3.059 0 5.842 1.154 7.957 3.043l5.657-5.657C34.047 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+                <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.197l-6.191-5.238C29.236 35.091 26.747 36 24 36c-4.999 0-9.205-3.324-10.685-7.955l-6.522 5.025C9.993 39.556 16.457 44 24 44z"/>
+                <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.07 12.07 0 0 1-4.085 5.565l.003-.002 6.191 5.238C36.971 40.205 44 36 44 24c0-1.341-.138-2.65-.389-3.917z"/>
               </svg>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-main-600">
-                Trustpilot
-              </span>
             </span>
 
             <div className="flex items-center gap-2 min-w-0">
