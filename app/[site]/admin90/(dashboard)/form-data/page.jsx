@@ -26,6 +26,46 @@ const pickValue = (payload, keys) => {
   return "";
 };
 
+const getEmailDelivery = (payload) => {
+  if (!payload || typeof payload !== "object") {
+    return { status: "legacy", error: "" };
+  }
+  const info = payload.emailDelivery;
+  if (!info || typeof info !== "object" || Array.isArray(info)) {
+    return { status: "legacy", error: "" };
+  }
+  const status =
+    typeof info.status === "string" && info.status.trim()
+      ? info.status.trim().toLowerCase()
+      : "pending";
+  const error = typeof info.error === "string" ? info.error.trim() : "";
+  return { status, error };
+};
+
+const getEmailStatusClasses = (status) => {
+  if (status === "sent") {
+    return "bg-emerald-50 text-emerald-700 ring-emerald-600/20";
+  }
+  if (status === "failed") {
+    return "bg-rose-50 text-rose-700 ring-rose-600/20";
+  }
+  if (status === "skipped") {
+    return "bg-amber-50 text-amber-700 ring-amber-600/20";
+  }
+  if (status === "pending") {
+    return "bg-slate-100 text-slate-700 ring-slate-600/20";
+  }
+  return "bg-slate-50 text-slate-500 ring-slate-600/20";
+};
+
+const getEmailStatusLabel = (status) => {
+  if (status === "sent") return "Sent";
+  if (status === "failed") return "Failed";
+  if (status === "skipped") return "Skipped";
+  if (status === "pending") return "Pending";
+  return "N/A";
+};
+
 const normalizeDate = (value, fallback) => {
   const date = value ? new Date(value) : null;
   return Number.isNaN(date?.getTime()) ? fallback : date;
@@ -187,6 +227,7 @@ export default async function FormDataPage({ searchParams, params }) {
                   <th className="px-6 py-4">Form</th>
                   <th className="px-6 py-4">Name</th>
                   <th className="px-6 py-4">Email</th>
+                  <th className="px-6 py-4">Email Status</th>
                   <th className="px-6 py-4">Phone</th>
                   <th className="px-6 py-4">Submitted</th>
                   <th className="px-6 py-4">Message</th>
@@ -209,6 +250,7 @@ export default async function FormDataPage({ searchParams, params }) {
                     "form_label"
                   ]);
                   const message = pickValue(payload, ["message"]);
+                  const emailDelivery = getEmailDelivery(payload);
 
                   return (
                     <tr key={record.id} className="text-slate-700 align-top">
@@ -217,6 +259,20 @@ export default async function FormDataPage({ searchParams, params }) {
                       </td>
                       <td className="px-6 py-4">{name || "—"}</td>
                       <td className="px-6 py-4">{email || "—"}</td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-1 text-[11px] font-medium ring-1 ring-inset ${getEmailStatusClasses(
+                            emailDelivery.status
+                          )}`}
+                        >
+                          {getEmailStatusLabel(emailDelivery.status)}
+                        </span>
+                        {emailDelivery.status === "failed" && emailDelivery.error ? (
+                          <p className="mt-1 max-w-[220px] truncate text-[11px] text-rose-600">
+                            {emailDelivery.error}
+                          </p>
+                        ) : null}
+                      </td>
                       <td className="px-6 py-4">{phone || "—"}</td>
                       <td className="px-6 py-4">
                         {formatDate(record.createdAt)}

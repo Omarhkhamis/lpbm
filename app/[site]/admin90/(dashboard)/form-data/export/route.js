@@ -41,6 +41,22 @@ const pickValue = (payload, keys) => {
   return "";
 };
 
+const getEmailDelivery = (payload) => {
+  if (!payload || typeof payload !== "object") {
+    return { status: "", error: "" };
+  }
+  const info = payload.emailDelivery;
+  if (!info || typeof info !== "object" || Array.isArray(info)) {
+    return { status: "", error: "" };
+  }
+  const status =
+    typeof info.status === "string" && info.status.trim()
+      ? info.status.trim().toLowerCase()
+      : "";
+  const error = typeof info.error === "string" ? info.error.trim() : "";
+  return { status, error };
+};
+
 const escapeCsv = (value) => {
   if (value == null) return "";
   const str = String(value).replace(/"/g, '""');
@@ -75,6 +91,8 @@ export async function GET(request, { params }) {
     "page",
     "fullName",
     "email",
+    "emailStatus",
+    "emailError",
     "phone",
     "message",
     "createdAt"
@@ -85,6 +103,7 @@ export async function GET(request, { params }) {
       typeof record.payload === "object" && record.payload ? record.payload : {};
     const fullName = pickValue(payload, ["fullName", "name"]);
     const email = pickValue(payload, ["email"]);
+    const emailDelivery = getEmailDelivery(payload);
     const phone = pickValue(payload, ["phone"]);
     const message = pickValue(payload, ["message"]);
     const formName = pickValue(payload, [
@@ -100,6 +119,8 @@ export async function GET(request, { params }) {
       escapeCsv(record.page || payload.page || ""),
       escapeCsv(fullName),
       escapeCsv(email),
+      escapeCsv(emailDelivery.status || ""),
+      escapeCsv(emailDelivery.error || ""),
       escapeCsv(phone),
       escapeCsv(message),
       escapeCsv(record.createdAt?.toISOString?.() || "")

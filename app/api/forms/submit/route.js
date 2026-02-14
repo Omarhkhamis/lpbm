@@ -73,6 +73,13 @@ const buildTextBody = (fields) => {
   return lines.join("\n");
 };
 
+const toErrorMessage = (error) => {
+  if (!error) return "Unknown error";
+  if (typeof error === "string") return error.slice(0, 500);
+  const message = error?.message || String(error);
+  return String(message).slice(0, 500);
+};
+
 const pickReplyTo = (fields) => {
   const candidates = [
     fields.email,
@@ -181,6 +188,12 @@ export async function POST(request) {
     ...baseFields,
     ...cleaned
   });
+  let formSubmissionId = null;
+  let emailDelivery = {
+    attempted: false,
+    sent: false,
+    status: "pending"
+  };
 
   // Save spin submissions separately and do it early so email failures don't block storage.
   if (cleaned.fullName && cleaned.phone && cleaned.prize) {
@@ -200,17 +213,19 @@ export async function POST(request) {
 
   if (!isSpin) {
     try {
-      await prisma.formSubmission.create({
+      const submission = await prisma.formSubmission.create({
         data: {
           source,
           page: cleaned.page || null,
           site,
           payload: {
             ...cleaned,
-            submittedAt: baseFields.submittedAt
+            submittedAt: baseFields.submittedAt,
+            emailDelivery
           }
         }
       });
+      formSubmissionId = submission.id;
     } catch (error) {
       // Don't block the response if storage fails.
     }
@@ -221,16 +236,58 @@ export async function POST(request) {
   const transport = createTransport();
   if (transport) {
     try {
-      await transport.sendMail({
+      const info = await transport.sendMail({
         to,
         from,
         subject,
         text: messageBody,
         ...(replyTo ? { replyTo } : {})
       });
+      emailDelivery = {
+        attempted: true,
+        sent: true,
+        status: "sent",
+        to,
+        from,
+        messageId: info?.messageId || null
+      };
     } catch (error) {
+      emailDelivery = {
+        attempted: true,
+        sent: false,
+        status: "failed",
+        to,
+        from,
+        error: toErrorMessage(error)
+      };
       // Log and continue so submissions are not blocked by email failures.
       console.error("Email delivery failed for form submission:", error);
+    }
+  } else {
+    emailDelivery = {
+      attempted: false,
+      sent: false,
+      status: "skipped",
+      to,
+      from,
+      error: "SMTP_NOT_CONFIGURED"
+    };
+  }
+
+  if (!isSpin && formSubmissionId) {
+    try {
+      await prisma.formSubmission.update({
+        where: { id: formSubmissionId },
+        data: {
+          payload: {
+            ...cleaned,
+            submittedAt: baseFields.submittedAt,
+            emailDelivery
+          }
+        }
+      });
+    } catch {
+      // Keep response successful even if post-send metadata update fails.
     }
   }
 
