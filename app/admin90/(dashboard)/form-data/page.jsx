@@ -226,10 +226,10 @@ export default async function FormDataPage({ searchParams }) {
                   <th className="px-6 py-4">Form</th>
                   <th className="px-6 py-4">Name</th>
                   <th className="px-6 py-4">Email</th>
-                  <th className="px-6 py-4">Email Status</th>
                   <th className="px-6 py-4">Phone</th>
                   <th className="px-6 py-4">Submitted</th>
                   <th className="px-6 py-4">Message</th>
+                  <th className="px-6 py-4">Email Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -258,6 +258,19 @@ export default async function FormDataPage({ searchParams }) {
                       </td>
                       <td className="px-6 py-4">{name || "—"}</td>
                       <td className="px-6 py-4">{email || "—"}</td>
+                      <td className="px-6 py-4">{phone || "—"}</td>
+                      <td className="px-6 py-4">
+                        {formatDate(record.createdAt)}
+                      </td>
+                      <td className="px-6 py-4">
+                        {message ? (
+                          <p className="max-w-sm whitespace-pre-wrap text-[13px] text-slate-700">
+                            {message}
+                          </p>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
                       <td className="px-6 py-4">
                         <span
                           className={`inline-flex items-center rounded-full px-2 py-1 text-[11px] font-medium ring-1 ring-inset ${getEmailStatusClasses(
@@ -271,19 +284,6 @@ export default async function FormDataPage({ searchParams }) {
                             {emailDelivery.error}
                           </p>
                         ) : null}
-                      </td>
-                      <td className="px-6 py-4">{phone || "—"}</td>
-                      <td className="px-6 py-4">
-                        {formatDate(record.createdAt)}
-                      </td>
-                      <td className="px-6 py-4">
-                        {message ? (
-                          <p className="max-w-sm whitespace-pre-wrap text-[13px] text-slate-700">
-                            {message}
-                          </p>
-                        ) : (
-                          "—"
-                        )}
                       </td>
                     </tr>
                   );
