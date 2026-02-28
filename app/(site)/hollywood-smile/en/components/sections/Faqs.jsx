@@ -324,7 +324,7 @@ export default function Faqs({ data }) {
                     {isSubmitting ? form.submittingText : form.submitText}
                   </button>
 
-                  <span className="inline-flex text-[12px] mt-4 items-center gap-2 text-gray-500">
+                  <span data-form-privacy-note className="inline-flex text-[12px] mt-4 items-center gap-2 text-gray-500">
                     <span className="relative inline-flex items-center justify-center">
                       <span
                         className="absolute -inset-1 rounded-full"
@@ -345,7 +345,7 @@ export default function Faqs({ data }) {
 
                     {form.privacyNote}
                   </span>
-                  <p className="mt-2 text-[12px] text-main-500">
+                  <p data-form-privacy-note className="mt-2 text-[12px] text-main-500">
                     <a
                       href={privacyLink}
                       className="underline decoration-main-400/70 underline-offset-4 hover:text-main-700"

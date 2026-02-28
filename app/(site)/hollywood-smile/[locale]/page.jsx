@@ -147,9 +147,10 @@ export default async function HollywoodSmilePage({ params }) {
     general?.whatsappLink ||
     footer?.whatsappLink ||
     (whatsappNumber ? `https://wa.me/${whatsappNumber}` : "https://wa.me/+905382112583");
+  const pageClassName = general?.hideFormPrivacyNote ? "hide-form-privacy" : "";
 
   return (
-    <>
+    <div className={pageClassName}>
       <Header general={general} footer={footer} locale={locale} />
       <main>
         {sectionsMap.hero?.enabled ? (
@@ -238,6 +239,6 @@ export default async function HollywoodSmilePage({ params }) {
         locale={locale}
         site={SITE}
       />
-    </>
+    </div>
   );
 }

@@ -303,7 +303,7 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
             result?.dismiss === Swal.DismissReason.timer
           ) {
             if (submissionResult?.redirectTo) {
-              window.location.assign(submissionResult.redirectTo);
+              window.open(submissionResult.redirectTo, "_blank", "noopener,noreferrer");
             }
           }
         }
@@ -526,11 +526,11 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
                       ) : null}
                     </div>
 
-                    <div className="hidden mt-2.5 lg:flex items-center gap-2 text-[12px] text-main-500">
+                    <div data-form-privacy-note className="hidden mt-2.5 lg:flex items-center gap-2 text-[12px] text-main-500">
                       <i className="fa-solid fa-lock text-emerald-600 text-[13px]"></i>
                       {content.form?.privacyNote}
                     </div>
-                    <p className="mt-2 text-[12px] text-main-500">
+                    <p data-form-privacy-note className="mt-2 text-[12px] text-main-500">
                       <a
                         href={privacyLink}
                         className="underline decoration-main-400/70 underline-offset-4 hover:text-main-700"

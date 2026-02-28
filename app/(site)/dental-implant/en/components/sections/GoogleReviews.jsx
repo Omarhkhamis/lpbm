@@ -17,10 +17,19 @@ export default function GoogleReviews({ data }) {
     shiftPx: 0
   });
   const [isDragging, setIsDragging] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (!trackRef.current) return;
     stateRef.current.shiftPx = trackRef.current.scrollWidth / 2;
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   const setX = (value) => {
@@ -69,12 +78,38 @@ export default function GoogleReviews({ data }) {
     state.dragging = false;
     setIsDragging(false);
 
+    if (isMobile) {
+      trackRef.current.style.animation = "none";
+      setX(state.x);
+      return;
+    }
+
     const progress = state.shiftPx > 0 ? -state.x / state.shiftPx : 0;
     const delay = -(progress * state.duration);
 
     trackRef.current.style.transform = "";
     trackRef.current.style.animation = `marquee-left ${state.duration}s linear infinite`;
     trackRef.current.style.animationDelay = `${delay}s`;
+  };
+
+  const getStepPx = () => {
+    if (!trackRef.current) return 320;
+    const firstCard = trackRef.current.firstElementChild;
+    if (!firstCard) return 320;
+    const cardWidth = firstCard.getBoundingClientRect().width || 320;
+    const styles = getComputedStyle(trackRef.current);
+    const gap = Number.parseFloat(styles.columnGap || styles.gap || "0") || 0;
+    return cardWidth + gap;
+  };
+
+  const slideBy = (direction) => {
+    const state = stateRef.current;
+    if (!trackRef.current) return;
+    if (isMobile) {
+      trackRef.current.style.animation = "none";
+    }
+    const delta = getStepPx() * direction;
+    setX(state.x + delta);
   };
 
   const getInitials = (name, fallback) => {
@@ -153,7 +188,8 @@ export default function GoogleReviews({ data }) {
             className={`marquee__track${isDragging ? " is-dragging" : ""}`}
             style={{
               "--marquee-duration": "50s",
-              "--marquee-duration-mobile": "35s"
+              "--marquee-duration-mobile": "35s",
+              ...(isMobile ? { animation: "none" } : {})
             }}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
@@ -194,6 +230,25 @@ export default function GoogleReviews({ data }) {
               </article>
             ))}
           </div>
+        </div>
+
+        <div className="mt-5 flex items-center justify-center gap-3 md:hidden">
+          <button
+            type="button"
+            aria-label="Previous reviews"
+            className="h-10 w-10 rounded-full border border-main-200 bg-white text-main-700 shadow-sm"
+            onClick={() => slideBy(1)}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            aria-label="Next reviews"
+            className="h-10 w-10 rounded-full border border-main-200 bg-white text-main-700 shadow-sm"
+            onClick={() => slideBy(-1)}
+          >
+            ›
+          </button>
         </div>
 
         <div className="flex flex-col pt-15 gap-6 lg:flex-row lg:items-end lg:justify-between">

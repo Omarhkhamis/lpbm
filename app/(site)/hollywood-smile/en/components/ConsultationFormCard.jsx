@@ -231,7 +231,7 @@ export default function ConsultationFormCard({ form, idPrefix, className }) {
                 }
               `}</style>
 
-              <span className="inline-flex text-[12px] mt-4 items-center gap-2 text-gray-300">
+              <span data-form-privacy-note className="inline-flex text-[12px] mt-4 items-center gap-2 text-gray-300">
                 <span className="relative inline-flex items-center justify-center">
                   <span
                     className="absolute -inset-1 rounded-full"
@@ -252,7 +252,7 @@ export default function ConsultationFormCard({ form, idPrefix, className }) {
 
                 {resolvedForm.privacyNote}
               </span>
-              <p className="mt-2 text-[12px] text-gray-300">
+              <p data-form-privacy-note className="mt-2 text-[12px] text-gray-300">
                 <a
                   href={privacyLink}
                   className="underline decoration-white/50 underline-offset-4 hover:text-white"

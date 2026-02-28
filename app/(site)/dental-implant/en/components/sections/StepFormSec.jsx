@@ -300,13 +300,13 @@ export default function StepFormSec({ data }) {
                         </div>
                       </div>
 
-                      <div className="mt-4 inline-flex items-center gap-2 text-[12px] text-main-500">
+                      <div data-form-privacy-note className="mt-4 inline-flex items-center gap-2 text-[12px] text-main-500">
                         <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-main-200 bg-white text-copper-600">
                           <i className="fa-solid fa-lock text-[11px]"></i>
                         </span>
                         {content.steps?.privacyNote}
                       </div>
-                      <p className="mt-2 text-[12px] text-main-500">
+                      <p data-form-privacy-note className="mt-2 text-[12px] text-main-500">
                         <a
                           href={privacyLink}
                           className="underline decoration-main-400/70 underline-offset-4 hover:text-main-700"

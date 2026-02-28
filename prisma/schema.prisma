@@ -50,6 +50,7 @@ model GeneralSettings {
   address        String?
   whatsappNumber String?
   whatsappLink   String?
+  hideFormPrivacyNote Boolean @default(false)
   consultationDelaySeconds Int?
   logoUrl        String?
   faviconUrl     String?

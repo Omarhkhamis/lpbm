@@ -58,6 +58,22 @@ export default async function GeneralSettingsPage({ params }) {
                 All WhatsApp/contact buttons will use this link.
               </p>
             </div>
+            <div>
+              <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                Form Privacy Note
+              </label>
+              <select
+                name="hideFormPrivacyNote"
+                defaultValue={settings.hideFormPrivacyNote ? "hide" : "show"}
+                className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
+              >
+                <option value="show">Show</option>
+                <option value="hide">Hide</option>
+              </select>
+              <p className="mt-1 text-xs text-slate-500">
+                Hide will apply <code>display: none</code> to the privacy text under all forms.
+              </p>
+            </div>
           </div>
         </div>
 

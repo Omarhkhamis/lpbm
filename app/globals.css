@@ -20,6 +20,10 @@
 }
 
 @layer utilities {
+  .hide-form-privacy [data-form-privacy-note] {
+    display: none !important;
+  }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }

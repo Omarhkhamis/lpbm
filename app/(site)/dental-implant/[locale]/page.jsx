@@ -149,9 +149,10 @@ export default async function DentalImplantPage({ params }) {
     general?.whatsappLink ||
     footer?.whatsappLink ||
     (whatsappNumber ? `https://wa.me/${whatsappNumber}` : "https://wa.me/+905382112583");
+  const pageClassName = general?.hideFormPrivacyNote ? "hide-form-privacy" : "";
 
   return (
-    <>
+    <div className={pageClassName}>
       <Header general={general} footer={footer} locale={locale} />
       <main>
         {orderedSections
@@ -259,6 +260,6 @@ export default async function DentalImplantPage({ params }) {
         locale={locale}
         site={SITE}
       />
-    </>
+    </div>
   );
 }

@@ -168,6 +168,8 @@ export const updateGeneralSettingsAction = async (site, formData) => {
         String(formData.get("formRecipientEmail") || "").trim() || null,
       whatsappLink:
         String(formData.get("whatsappLink") || "").trim() || null,
+      hideFormPrivacyNote:
+        String(formData.get("hideFormPrivacyNote") || "").trim() === "hide",
       logoUrl: String(formData.get("logoUrl") || "").trim() || null,
       faviconUrl: String(formData.get("faviconUrl") || "").trim() || null,
       consultationDelaySeconds: safeDelay
