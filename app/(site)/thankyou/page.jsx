@@ -48,10 +48,16 @@ export default async function ThankYouPage({ searchParams }) {
 
   const paragraphs = renderParagraphs(page.content);
   const whatsappNumber = normalizeDigits(footer?.whatsappNumber || "");
-  const phoneHref = general?.phone
-    ? `tel:${general.phone.replace(/[^\d+]/g, "")}`
-    : null;
-  const whatsappHref = footer?.whatsappLink || (whatsappNumber ? `https://wa.me/${whatsappNumber}` : null);
+  const phoneRaw = footer?.phone || general?.phone || "";
+  const phoneDigits = phoneRaw.replace(/[^\d+]/g, "");
+  const phoneHref = phoneDigits ? `tel:${phoneDigits}` : null;
+  const whatsappHref =
+    footer?.whatsappLink ||
+    (whatsappNumber ? `https://wa.me/${whatsappNumber}` : null);
+  const copy = {
+    call: locale === "ru" ? "Позвонить" : "Call",
+    whatsapp: locale === "ru" ? "WhatsApp" : "WhatsApp"
+  };
 
   return (
     <>
@@ -92,6 +98,29 @@ export default async function ThankYouPage({ searchParams }) {
                   : "We'll call you shortly to confirm your details and book the best available time for you."}
               </p>
             )}
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            {phoneHref ? (
+              <a
+                href={phoneHref}
+                className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-medium text-white transition hover:bg-white/20"
+              >
+                <i className="fa-solid fa-phone text-[13px]" />
+                {copy.call}
+              </a>
+            ) : null}
+            {whatsappHref ? (
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 px-5 py-3 text-sm font-medium text-white shadow-[0_10px_30px_rgba(0,0,0,0.2)] transition hover:from-copper-700 hover:to-copper-500"
+              >
+                <i className="fa-brands fa-whatsapp text-[15px]" />
+                {copy.whatsapp}
+              </a>
+            ) : null}
           </div>
         </section>
       </main>
