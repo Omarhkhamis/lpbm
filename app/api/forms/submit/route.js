@@ -111,9 +111,12 @@ const buildWhatsappText = (fields) => {
     "text"
   ]);
   const lines = [];
-  if (name) lines.push(`Name: ${name}`);
-  if (prize) lines.push(`Prize: ${prize}`);
-  if (message) lines.push(`Message: ${message}`);
+  if (name) lines.push(name);
+  if (message) {
+    lines.push(message);
+  } else if (prize) {
+    lines.push(prize);
+  }
   return lines.join("\n");
 };
 
@@ -294,6 +297,7 @@ export async function POST(request) {
     cleaned.redirectTo ||
     "https://wa.me/+905382112583";
   const redirectTo = buildWhatsappRedirect(baseRedirect, cleaned) || baseRedirect;
+  const thankYouUrl = `/thankyou?site=${encodeURIComponent(site)}&locale=${encodeURIComponent(locale)}`;
   const transport = createTransport();
   if (transport) {
     try {
@@ -352,5 +356,5 @@ export async function POST(request) {
     }
   }
 
-  return Response.json({ ok: true, redirectTo });
+  return Response.json({ ok: true, redirectTo, thankYouUrl });
 }
