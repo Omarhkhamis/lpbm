@@ -49,12 +49,24 @@ model GeneralSettings {
   formRecipientEmail String?
   address        String?
   whatsappNumber String?
+  whatsappLink   String?
   consultationDelaySeconds Int?
   logoUrl        String?
   faviconUrl     String?
   social         Json?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+model FooterSettings {
+  id        String   @id @default(cuid())
+  site      String   @default("hollywood-smile")
+  locale    String   @default("en")
+  data      Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([site, locale])
 }
 
 model SeoSettings {

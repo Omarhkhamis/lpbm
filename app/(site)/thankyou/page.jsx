@@ -4,6 +4,7 @@ import HollywoodFooter from "../hollywood-smile/en/components/Footer";
 import HollywoodHeader from "../hollywood-smile/en/components/Header";
 import CustomHeadSnippet from "../../components/CustomHeadSnippet";
 import { getCustomHeader } from "../../../lib/customHeader";
+import { getFooterSettings } from "../../../lib/footerSettings";
 import { getGeneralSettings } from "../../../lib/generalSettings";
 import { getPageBySlug } from "../../../lib/pages";
 import { normalizeLocale, normalizeSite } from "../../../lib/sites";
@@ -34,8 +35,9 @@ export default async function ThankYouPage({ searchParams }) {
   const { Header, Footer } =
     SITE_COMPONENTS[site] || SITE_COMPONENTS["hollywood-smile"];
 
-  const [general, page, customHeader] = await Promise.all([
+  const [general, footer, page, customHeader] = await Promise.all([
     getGeneralSettings(site),
+    getFooterSettings(site, locale),
     getPageBySlug("thankyou", locale),
     getCustomHeader(site)
   ]);
@@ -45,16 +47,16 @@ export default async function ThankYouPage({ searchParams }) {
   }
 
   const paragraphs = renderParagraphs(page.content);
-  const whatsappNumber = normalizeDigits(general?.whatsappNumber || "");
+  const whatsappNumber = normalizeDigits(footer?.whatsappNumber || "");
   const phoneHref = general?.phone
     ? `tel:${general.phone.replace(/[^\d+]/g, "")}`
     : null;
-  const whatsappHref = whatsappNumber ? `https://wa.me/${whatsappNumber}` : null;
+  const whatsappHref = footer?.whatsappLink || (whatsappNumber ? `https://wa.me/${whatsappNumber}` : null);
 
   return (
     <>
       <CustomHeadSnippet html={customHeader?.content} />
-      <Header general={general} locale={locale} />
+      <Header general={general} footer={footer} locale={locale} />
       <main className="relative overflow-hidden bg-gradient-to-br from-main-950 via-main-900 to-main-800 text-white pt-24">
         <div className="absolute inset-0">
           <div className="absolute left-[-20%] top-[-10%] h-64 w-64 rounded-full bg-copper-600/20 blur-[100px]" />
@@ -93,7 +95,7 @@ export default async function ThankYouPage({ searchParams }) {
           </div>
         </section>
       </main>
-      <Footer general={general} locale={locale} site={site} />
+      <Footer general={general} footer={footer} locale={locale} site={site} />
       {customHeader?.bodyContent ? (
         <div dangerouslySetInnerHTML={{ __html: customHeader.bodyContent }} />
       ) : null}

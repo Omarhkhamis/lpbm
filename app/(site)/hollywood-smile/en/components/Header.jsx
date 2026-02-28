@@ -5,21 +5,25 @@ import { useEffect } from "react";
 import { DEFAULT_GENERAL_SETTINGS } from "../../../../../lib/generalSettings";
 import LocaleDropdown from "./LocaleDropdown";
 
-export default function Header({ general, locale = "en" }) {
+export default function Header({ general, footer, locale = "en" }) {
   const settings = general || DEFAULT_GENERAL_SETTINGS;
-  const phoneLink = settings.phone
-    ? `tel:${settings.phone.replace(/\s+/g, "")}`
-    : "tel:+905465266449";
-  const whatsappNumber = settings.whatsappNumber
-    ? settings.whatsappNumber.replace(/\s+/g, "")
+  const footerPhone = footer?.phone || settings.phone;
+  const phoneLink = footerPhone
+    ? `tel:${footerPhone.replace(/\s+/g, "")}`
+    : "tel:+905382112583";
+  const whatsappNumber = footer?.whatsappNumber
+    ? footer.whatsappNumber.replace(/\s+/g, "")
+    : settings.whatsappNumber
+      ? settings.whatsappNumber.replace(/\s+/g, "")
     : null;
-  const whatsappLink = whatsappNumber
-    ? `https://wa.me/${whatsappNumber}`
-    : "https://wa.me/+905465266449";
+  const whatsappLink =
+    settings.whatsappLink ||
+    footer?.whatsappLink ||
+    (whatsappNumber ? `https://wa.me/${whatsappNumber}` : "https://wa.me/+905382112583");
   const logoSrc = settings.logoUrl || "/uploads/bm-logo-brown.svg";
-  const instagramLink = settings.social?.instagram || "#";
-  const facebookLink = settings.social?.facebook || "#";
-  const youtubeLink = settings.social?.youtube || "#";
+  const instagramLink = footer?.instagram || settings.social?.instagram || "#";
+  const facebookLink = footer?.facebook || settings.social?.facebook || "#";
+  const youtubeLink = footer?.youtube || settings.social?.youtube || "#";
   const handleConsultationOpen = () => {
     if (typeof window === "undefined") return;
     window.dispatchEvent(new CustomEvent("open-book-consultation"));
@@ -109,7 +113,7 @@ export default function Header({ general, locale = "en" }) {
                   href={phoneLink}
                   className="font-normal text-sm tracking-[0.06em] hover:text-copper-500 transition"
                 >
-                  {settings.phone}
+                  {footerPhone}
                 </a>
               </div>
 

@@ -168,21 +168,13 @@ export const updateGeneralSettingsAction = async (site, formData) => {
         ? Math.round(parsedDelay)
         : null;
     const data = {
-      phone: String(formData.get("phone") || "").trim() || null,
-      email: String(formData.get("email") || "").trim() || null,
       formRecipientEmail:
         String(formData.get("formRecipientEmail") || "").trim() || null,
-      address: String(formData.get("address") || "").trim() || null,
-      whatsappNumber:
-        String(formData.get("whatsappNumber") || "").trim() || null,
+      whatsappLink:
+        String(formData.get("whatsappLink") || "").trim() || null,
       logoUrl: String(formData.get("logoUrl") || "").trim() || null,
       faviconUrl: String(formData.get("faviconUrl") || "").trim() || null,
-      consultationDelaySeconds: safeDelay,
-      social: {
-        instagram: String(formData.get("instagram") || "").trim() || null,
-        facebook: String(formData.get("facebook") || "").trim() || null,
-        youtube: String(formData.get("youtube") || "").trim() || null
-      }
+      consultationDelaySeconds: safeDelay
     };
 
     await prisma.generalSettings.upsert({
@@ -198,6 +190,58 @@ export const updateGeneralSettingsAction = async (site, formData) => {
   revalidatePublic(siteId, "en");
   revalidatePublic(siteId, "ru");
   redirect(`/admin90/general?site=${siteId}&saved=1`);
+};
+
+export const updateFooterSettingsAction = async (site, formData) => {
+  const siteId = safeSite(site);
+  const locale = normalizeLocale(formData.get("locale") || "en");
+
+  try {
+    const data = {
+      description: String(formData.get("description") || "").trim() || null,
+      badge: String(formData.get("badge") || "").trim() || null,
+      note: String(formData.get("note") || "").trim() || null,
+      navTreatments: String(formData.get("navTreatments") || "").trim() || null,
+      navPopularTreatments:
+        String(formData.get("navPopularTreatments") || "").trim() || null,
+      navBeforeAfter:
+        String(formData.get("navBeforeAfter") || "").trim() || null,
+      navTestimonials:
+        String(formData.get("navTestimonials") || "").trim() || null,
+      navFaqs: String(formData.get("navFaqs") || "").trim() || null,
+      navHealthTourism:
+        String(formData.get("navHealthTourism") || "").trim() || null,
+      phoneLabel: String(formData.get("phoneLabel") || "").trim() || null,
+      whatsappLabel: String(formData.get("whatsappLabel") || "").trim() || null,
+      emailLabel: String(formData.get("emailLabel") || "").trim() || null,
+      addressLabel: String(formData.get("addressLabel") || "").trim() || null,
+      phone: String(formData.get("phone") || "").trim() || null,
+      whatsappNumber:
+        String(formData.get("whatsappNumber") || "").trim() || null,
+      whatsappLink: String(formData.get("whatsappLink") || "").trim() || null,
+      email: String(formData.get("email") || "").trim() || null,
+      address: String(formData.get("address") || "").trim() || null,
+      footerLogoUrl: String(formData.get("footerLogoUrl") || "").trim() || null,
+      copyright: String(formData.get("copyright") || "").trim() || null,
+      privacy: String(formData.get("privacy") || "").trim() || null,
+      terms: String(formData.get("terms") || "").trim() || null,
+      instagram: String(formData.get("instagram") || "").trim() || null,
+      facebook: String(formData.get("facebook") || "").trim() || null,
+      youtube: String(formData.get("youtube") || "").trim() || null
+    };
+
+    await prisma.footerSettings.upsert({
+      where: { site_locale: { site: siteId, locale } },
+      update: { data },
+      create: { site: siteId, locale, data }
+    });
+  } catch (error) {
+    redirect(`/admin90/footer?site=${siteId}&error=1&locale=${locale}`);
+  }
+
+  revalidatePath(`/admin90/footer`);
+  revalidatePublic(siteId, locale);
+  redirect(`/admin90/footer?site=${siteId}&saved=1&locale=${locale}`);
 };
 
 export const updateSeoSettingsAction = async (site, formData) => {

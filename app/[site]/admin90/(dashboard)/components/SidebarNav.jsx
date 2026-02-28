@@ -15,6 +15,7 @@ export default function SidebarNav({ site, sections, locale = "en" }) {
   const isSettings =
     pathname.startsWith(`${prefix}/overview`) ||
     pathname.startsWith(`${prefix}/general`) ||
+    pathname.startsWith(`${prefix}/footer`) ||
     pathname.startsWith(`${prefix}/seo`) ||
     pathname.startsWith(`${prefix}/media`) ||
     pathname.startsWith(`${prefix}/admin-users`) ||
@@ -54,6 +55,7 @@ export default function SidebarNav({ site, sections, locale = "en" }) {
         items={[
           { label: "Overview", href: `${prefix}/overview?locale=${locale}` },
           { label: "General", href: `${prefix}/general` },
+          { label: "Footer", href: `${prefix}/footer?locale=${locale}` },
           { label: "Reorder Sections", href: `${prefix}/sections?locale=${locale}` },
           { label: "Custom Codes", href: `${prefix}/custom-header` },
           { label: "SEO", href: `${prefix}/seo?locale=${locale}` },

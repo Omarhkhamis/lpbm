@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import Footer from "../en/components/Footer";
 import Header from "../en/components/Header";
 import Overlays from "../en/components/Overlays";
+import { getFooterSettings } from "@lib/footerSettings";
 import { getGeneralSettings } from "@lib/generalSettings";
 import { getSectionsMap } from "@lib/sections";
 import { getSeoSettings } from "@lib/seoSettings";
@@ -134,20 +135,22 @@ export default async function HollywoodSmilePage({ params }) {
     notFound();
   }
 
-  const [sectionsMap, general] = await Promise.all([
+  const [sectionsMap, general, footer] = await Promise.all([
     getSectionsMap(SITE, locale),
-    getGeneralSettings(SITE)
+    getGeneralSettings(SITE),
+    getFooterSettings(SITE, locale)
   ]);
-  const whatsappNumber = general?.whatsappNumber
-    ? general.whatsappNumber.replace(/\s+/g, "")
+  const whatsappNumber = footer?.whatsappNumber
+    ? footer.whatsappNumber.replace(/\s+/g, "")
     : null;
-  const whatsappLink = whatsappNumber
-    ? `https://wa.me/${whatsappNumber}`
-    : "https://wa.me/+905465266449";
+  const whatsappLink =
+    general?.whatsappLink ||
+    footer?.whatsappLink ||
+    (whatsappNumber ? `https://wa.me/${whatsappNumber}` : "https://wa.me/+905382112583");
 
   return (
     <>
-      <Header general={general} locale={locale} />
+      <Header general={general} footer={footer} locale={locale} />
       <main>
         {sectionsMap.hero?.enabled ? (
           <HeroSlide data={sectionsMap.hero?.data} whatsappLink={whatsappLink} />
@@ -226,7 +229,7 @@ export default async function HollywoodSmilePage({ params }) {
           <Faqs data={sectionsMap.faqs?.data} />
         ) : null}
       </main>
-      <Footer general={general} locale={locale} site={SITE} />
+      <Footer general={general} footer={footer} locale={locale} site={SITE} />
       <Overlays
         heroData={sectionsMap.hero?.data}
         consultationDelaySeconds={general?.consultationDelaySeconds}

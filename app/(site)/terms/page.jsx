@@ -4,6 +4,7 @@ import HollywoodFooter from "../hollywood-smile/en/components/Footer";
 import HollywoodHeader from "../hollywood-smile/en/components/Header";
 import CustomHeadSnippet from "../../components/CustomHeadSnippet";
 import { getCustomHeader } from "../../../lib/customHeader";
+import { getFooterSettings } from "../../../lib/footerSettings";
 import { getGeneralSettings } from "../../../lib/generalSettings";
 import { getPageBySlug } from "../../../lib/pages";
 import { normalizeLocale, normalizeSite } from "../../../lib/sites";
@@ -32,8 +33,9 @@ export default async function TermsPage({ searchParams }) {
   const { Header, Footer } =
     SITE_COMPONENTS[site] || SITE_COMPONENTS["hollywood-smile"];
 
-  const [general, page, customHeader] = await Promise.all([
+  const [general, footer, page, customHeader] = await Promise.all([
     getGeneralSettings(site),
+    getFooterSettings(site, locale),
     getPageBySlug("terms", locale),
     getCustomHeader(site)
   ]);
@@ -45,7 +47,7 @@ export default async function TermsPage({ searchParams }) {
   return (
     <>
       <CustomHeadSnippet html={customHeader?.content} />
-      <Header general={general} locale={locale} />
+      <Header general={general} footer={footer} locale={locale} />
       <main className="mx-auto min-h-[70vh] max-w-screen-md px-6 lg:px-10 py-16 lg:py-20 pt-24 flex items-center">
         <div className="w-full">
           <h1 className="mt-2 text-3xl sm:text-4xl font-extralight text-main-900">
@@ -58,7 +60,7 @@ export default async function TermsPage({ searchParams }) {
           </div>
         </div>
       </main>
-      <Footer general={general} locale={locale} site={site} />
+      <Footer general={general} footer={footer} locale={locale} site={site} />
       {customHeader?.bodyContent ? (
         <div dangerouslySetInnerHTML={{ __html: customHeader.bodyContent }} />
       ) : null}

@@ -3,23 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 
 import LuckySpinFormSec from "./sections/LuckySpinFormSec";
-import ConsultationFormCard from "./ConsultationFormCard";
-import { heroDefaults } from "../../../../../lib/sectionDefaults";
 
 const BODY_LOCK_CLASS = "overflow-hidden";
 
 export default function Overlays({
-  heroData,
-  consultationDelaySeconds,
   whatsappLink,
   luckySpinData,
   locale,
   site
 }) {
   const [isLuckyOpen, setIsLuckyOpen] = useState(false);
-  const [isConsultationOpen, setIsConsultationOpen] = useState(false);
   const spinButtonRef = useRef(null);
-  const resolvedForm = heroData?.form || heroDefaults.form;
   const isRu = locale === "ru";
   const copy = {
     close: isRu ? "Закрыть" : "Close",
@@ -30,48 +24,39 @@ export default function Overlays({
     tryChance: isRu ? "Испытай удачу!" : "Try your chance!"
   };
 
+  const openWhatsapp = () => {
+    if (typeof window === "undefined" || !whatsappLink) return;
+    window.open(whatsappLink, "_blank", "noopener,noreferrer");
+  };
+
   useEffect(() => {
     const handleLuckyOpen = () => setIsLuckyOpen(true);
     const handleLuckyClose = () => setIsLuckyOpen(false);
-    const handleConsultationOpen = () => setIsConsultationOpen(true);
-    const handleConsultationClose = () => setIsConsultationOpen(false);
+    const handleConsultationOpen = () => openWhatsapp();
     const handleKeyDown = (event) => {
       if (event.key !== "Escape") return;
       setIsLuckyOpen(false);
-      setIsConsultationOpen(false);
     };
 
     window.addEventListener("open-luckyspin", handleLuckyOpen);
     window.addEventListener("close-luckyspin", handleLuckyClose);
     window.addEventListener("open-book-consultation", handleConsultationOpen);
-    window.addEventListener(
-      "close-book-consultation",
-      handleConsultationClose
-    );
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("open-luckyspin", handleLuckyOpen);
       window.removeEventListener("close-luckyspin", handleLuckyClose);
-      window.removeEventListener(
-        "open-book-consultation",
-        handleConsultationOpen
-      );
-      window.removeEventListener(
-        "close-book-consultation",
-        handleConsultationClose
-      );
+      window.removeEventListener("open-book-consultation", handleConsultationOpen);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+  }, [whatsappLink]);
 
   useEffect(() => {
-    const isAnyOpen = isLuckyOpen || isConsultationOpen;
-    document.body.classList.toggle(BODY_LOCK_CLASS, isAnyOpen);
+    document.body.classList.toggle(BODY_LOCK_CLASS, isLuckyOpen);
     return () => {
       document.body.classList.remove(BODY_LOCK_CLASS);
     };
-  }, [isLuckyOpen, isConsultationOpen]);
+  }, [isLuckyOpen]);
 
   useEffect(() => {
     const button = spinButtonRef.current;
@@ -96,62 +81,11 @@ export default function Overlays({
     };
   }, []);
 
-  useEffect(() => {
-    const delayMs =
-      typeof consultationDelaySeconds === "number" && consultationDelaySeconds >= 0
-        ? consultationDelaySeconds * 1000
-        : 10000;
-    const timeoutId = window.setTimeout(() => {
-      setIsConsultationOpen(true);
-    }, delayMs);
-
-    return () => clearTimeout(timeoutId);
-  }, [consultationDelaySeconds]);
-
   const handleOpen = () => setIsLuckyOpen(true);
   const handleClose = () => setIsLuckyOpen(false);
-  const handleConsultationClose = () => setIsConsultationOpen(false);
-  const handleConsultationOpen = () => {
-    if (typeof window === "undefined") return;
-    window.dispatchEvent(new CustomEvent("open-book-consultation"));
-  };
 
   return (
     <>
-      {isConsultationOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-[9998] bg-black/55 backdrop-blur-sm"
-            onClick={handleConsultationClose}
-          ></div>
-          <div
-            className="fixed inset-0 z-[99999] flex items-center justify-center px-3 sm:px-5 py-4 sm:py-5 overflow-y-auto"
-            role="dialog"
-            aria-modal="true"
-            onClick={handleConsultationClose}
-          >
-            <div
-              className="relative w-full max-w-lg"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <button
-                type="button"
-                className="absolute -top-4 right-3 z-50 h-9.5 w-9.5 inline-flex items-center justify-center rounded-full border bg-white/90 text-gray-700 border-1 border-gray-200 backdrop-blur hover:bg-gray-50 hover:border-copper-200 hover:text-copper-700 cursor-pointer"
-                onClick={handleConsultationClose}
-                aria-label={copy.close}
-              >
-                X
-              </button>
-              <ConsultationFormCard
-                form={resolvedForm}
-                idPrefix="consultation-modal"
-                className="w-full"
-              />
-            </div>
-          </div>
-        </>
-      )}
-
       {isLuckyOpen && (
         <>
           <div
@@ -191,7 +125,7 @@ export default function Overlays({
         type="button"
         aria-label={copy.whatsappCta}
         className="fixed bottom-6 lg:hover:-translate-y-0.5  transition left-4 lg:bottom-7 sm:left-7 z-[9999]"
-        onClick={handleConsultationOpen}
+        onClick={openWhatsapp}
       >
         <div className="relative rounded-xl p-[1.2px] wa-shimmer-border">
           <div className="flex items-center gap-3 rounded-xl bg-white px-3.5 py-2.5 border border-main-200/60">

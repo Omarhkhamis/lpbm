@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
 const isMediaField = (path) =>
-  /image|video|background|poster|url/i.test(path);
+  /image|video|background|poster|url|logo|favicon|icon/i.test(path);
 
 const isVideo = (url) => url.endsWith(".mp4");
 

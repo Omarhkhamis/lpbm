@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import Footer from "../en/components/Footer";
 import Header from "../en/components/Header";
 import Overlays from "../en/components/Overlays";
+import { getFooterSettings } from "@lib/footerSettings";
 import { getGeneralSettings } from "@lib/generalSettings";
 import { getSectionsByLocale, getSectionsMap } from "@lib/sections";
 import { getSeoSettings } from "@lib/seoSettings";
@@ -135,21 +136,23 @@ export async function generateMetadata({ params }) {
 
 export default async function DentalImplantPage({ params }) {
   const locale = normalizeLocale(params?.locale);
-  const [sectionsMap, orderedSections, general] = await Promise.all([
+  const [sectionsMap, orderedSections, general, footer] = await Promise.all([
     getSectionsMap(SITE, locale),
     getSectionsByLocale(SITE, locale),
-    getGeneralSettings(SITE)
+    getGeneralSettings(SITE),
+    getFooterSettings(SITE, locale)
   ]);
-  const whatsappNumber = general?.whatsappNumber
-    ? general.whatsappNumber.replace(/\s+/g, "")
+  const whatsappNumber = footer?.whatsappNumber
+    ? footer.whatsappNumber.replace(/\s+/g, "")
     : null;
-  const whatsappLink = whatsappNumber
-    ? `https://wa.me/${whatsappNumber}`
-    : "https://wa.me/+905465266449";
+  const whatsappLink =
+    general?.whatsappLink ||
+    footer?.whatsappLink ||
+    (whatsappNumber ? `https://wa.me/${whatsappNumber}` : "https://wa.me/+905382112583");
 
   return (
     <>
-      <Header general={general} locale={locale} />
+      <Header general={general} footer={footer} locale={locale} />
       <main>
         {orderedSections
           .filter((section) => sectionsMap[section.key]?.enabled)
@@ -247,7 +250,7 @@ export default async function DentalImplantPage({ params }) {
             }
           })}
       </main>
-      <Footer general={general} locale={locale} site={SITE} />
+      <Footer general={general} footer={footer} locale={locale} site={SITE} />
       <Overlays
         heroData={sectionsMap.hero?.data}
         consultationDelaySeconds={general?.consultationDelaySeconds}

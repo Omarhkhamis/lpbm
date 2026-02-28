@@ -29,41 +29,10 @@ export default async function GeneralSettingsPage({ params }) {
       <form action={action} className="space-y-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-            Contact Information
+            Lead Handling
           </p>
 
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                Phone
-              </label>
-              <input
-                name="phone"
-                defaultValue={settings.phone || ""}
-                className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
-              />
-            </div>
-            <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                WhatsApp Number
-              </label>
-              <input
-                name="whatsappNumber"
-                defaultValue={settings.whatsappNumber || ""}
-                className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
-              />
-            </div>
-            <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                Email
-              </label>
-              <input
-                name="email"
-                type="email"
-                defaultValue={settings.email || ""}
-                className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
-              />
-            </div>
             <div>
               <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
                 Form Recipient Email
@@ -75,18 +44,20 @@ export default async function GeneralSettingsPage({ params }) {
                 className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
               />
             </div>
-          </div>
-
-          <div className="mt-4">
-            <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
-              Address
-            </label>
-            <textarea
-              name="address"
-              defaultValue={settings.address || ""}
-              rows={3}
-              className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
-            />
+            <div className="sm:col-span-2">
+              <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                WhatsApp Buttons Link
+              </label>
+              <input
+                name="whatsappLink"
+                defaultValue={settings.whatsappLink || ""}
+                placeholder="https://wa.me/905xxxxxxxxx?text=..."
+                className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
+              />
+              <p className="mt-1 text-xs text-slate-500">
+                All WhatsApp/contact buttons will use this link.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -104,45 +75,6 @@ export default async function GeneralSettingsPage({ params }) {
                 type="number"
                 min="0"
                 defaultValue={settings.consultationDelaySeconds ?? 10}
-                className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-            Social Links
-          </p>
-
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                Instagram
-              </label>
-              <input
-                name="instagram"
-                defaultValue={settings.social?.instagram || ""}
-                className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
-              />
-            </div>
-            <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                Facebook
-              </label>
-              <input
-                name="facebook"
-                defaultValue={settings.social?.facebook || ""}
-                className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
-              />
-            </div>
-            <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                YouTube
-              </label>
-              <input
-                name="youtube"
-                defaultValue={settings.social?.youtube || ""}
                 className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
               />
             </div>

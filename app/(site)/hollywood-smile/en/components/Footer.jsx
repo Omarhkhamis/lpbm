@@ -1,52 +1,33 @@
 import { DEFAULT_GENERAL_SETTINGS } from "../../../../../lib/generalSettings";
+import { getDefaultFooterSettings } from "../../../../../lib/footerDefaults";
 
-export default function Footer({ general, locale, site }) {
+export default function Footer({ general, footer, locale, site }) {
   const settings = general || DEFAULT_GENERAL_SETTINGS;
-  const isRu = locale === "ru";
-  const copy = {
-    description: isRu
-      ? "В BM TÜRKIEY мы заботимся о здоровье ваших зубов. Опытная команда, современные технологии и индивидуальный подход помогают сохранить здоровую и уверенную улыбку. Давайте вместе изменим ваше стоматологическое впечатление. Свяжитесь с нами уже сегодня — для более яркой и здоровой улыбки."
-      : "At BM TÜRKIEY, we're dedicated to your dental well-being. Our experienced team, advanced technology, and personalized care ensure a healthy, confident smile. Let us redefine your dental experience. Contact us today for a brighter, healthier smile.",
-    badge: isRu
-      ? "Современная стоматология • Индивидуальный подход"
-      : "Advanced dentistry • Personalised care",
-    nav: {
-      treatments: isRu ? "Процедуры" : "Treatments",
-      popularTreatments: isRu ? "Популярные процедуры" : "Popular Treatments",
-      beforeAfter: isRu ? "До и после" : "Before & After",
-      testimonials: isRu ? "Отзывы" : "Testimonials",
-      faqs: isRu ? "Вопросы и ответы" : "FAQs",
-      healthTourism: isRu ? "Медицинский туризм" : "Health Tourism"
-    },
-    note: isRu
-      ? "Комфортный опыт, понятный план и премиальные результаты."
-      : "Comfortable experience, clear planning, and premium results.",
-    labels: {
-      phone: isRu ? "Телефон" : "Phone",
-      whatsapp: "WhatsApp",
-      email: isRu ? "мейл" : "E-mail",
-      address: isRu ? "Адрес" : "Address"
-    },
-    copyright: isRu
-      ? "© 2025 BM TÜRKIEY. Все права защищены."
-      : "© 2025 BM TÜRKIEY. All Rights Reserved.",
-    privacy: isRu ? "Политика конфиденциальности" : "Privacy Policy",
-    terms: isRu ? "Условия" : "Terms"
+  const defaults = getDefaultFooterSettings(site, locale);
+  const footerData = {
+    ...defaults,
+    ...(footer || {})
   };
-  const phoneLink = settings.phone
-    ? `tel:${settings.phone.replace(/\s+/g, "")}`
-    : "tel:+905465266449";
-  const whatsappNumber = settings.whatsappNumber
-    ? settings.whatsappNumber.replace(/\s+/g, "")
+  const footerPhone = footerData.phone || settings.phone;
+  const phoneLink = footerPhone
+    ? `tel:${footerPhone.replace(/\s+/g, "")}`
+    : "tel:+905382112583";
+  const whatsappNumber = footerData.whatsappNumber
+    ? footerData.whatsappNumber.replace(/\s+/g, "")
+    : settings.whatsappNumber
+      ? settings.whatsappNumber.replace(/\s+/g, "")
     : null;
-  const whatsappLink = whatsappNumber
-    ? `https://wa.me/${whatsappNumber}`
-    : "https://wa.me/+905465266449";
-  const logoSrc = settings.logoUrl || "/uploads/bm-logo-brown.svg";
-  const emailLink = settings.email ? `mailto:${settings.email}` : "mailto:info@atomclinic.com";
-  const instagramLink = settings.social?.instagram || "#";
-  const facebookLink = settings.social?.facebook || "#";
-  const youtubeLink = settings.social?.youtube || "#";
+  const whatsappLink =
+    settings.whatsappLink ||
+    footerData.whatsappLink ||
+    (whatsappNumber ? `https://wa.me/${whatsappNumber}` : "https://wa.me/+905382112583");
+  const logoSrc = footerData.footerLogoUrl || settings.logoUrl || "/uploads/bm-logo-brown.svg";
+  const footerEmail = footerData.email || settings.email;
+  const footerAddress = footerData.address || settings.address;
+  const emailLink = footerEmail ? `mailto:${footerEmail}` : "mailto:info@bmturkiye.com";
+  const instagramLink = footerData.instagram || settings.social?.instagram || "#";
+  const facebookLink = footerData.facebook || settings.social?.facebook || "#";
+  const youtubeLink = footerData.youtube || settings.social?.youtube || "#";
   const buildPageLink = (path) => {
     const params = new URLSearchParams();
     if (locale) params.set("locale", locale);
@@ -72,7 +53,7 @@ export default function Footer({ general, locale, site }) {
 
               <div className="space-y-2 mt-4 sm:mt-0">
                 <p className="text-sm font-light text-gray-600 leading-relaxed lg:max-w-md">
-                  {copy.description}
+                  {footerData.description}
                 </p>
               </div>
             </div>
@@ -110,7 +91,7 @@ export default function Footer({ general, locale, site }) {
 
               <div className="inline-flex ml-4 items-center gap-2 rounded-full border border-copper-200/60 bg-white/60 px-3 py-1 text-[11px] text-gray-600">
                 <span className="h-1.5 w-1.5 rounded-full bg-copper-400"></span>
-                {copy.badge}
+                {footerData.badge}
               </div>
             </div>
           </div>
@@ -122,7 +103,7 @@ export default function Footer({ general, locale, site }) {
                 className="group inline-flex items-center gap-2 text-gray-600 hover:text-copper-900 transition"
               >
                 <span className="h-1 w-1 rounded-full bg-gray-300 group-hover:bg-copper-400 transition"></span>
-                {copy.nav.treatments}
+                {footerData.navTreatments}
               </a>
 
               <a
@@ -130,7 +111,7 @@ export default function Footer({ general, locale, site }) {
                 className="group inline-flex items-center gap-2 text-gray-600 hover:text-copper-900 transition"
               >
                 <span className="h-1 w-1 rounded-full bg-gray-300 group-hover:bg-copper-400 transition"></span>
-                {copy.nav.popularTreatments}
+                {footerData.navPopularTreatments}
               </a>
 
               <a
@@ -138,7 +119,7 @@ export default function Footer({ general, locale, site }) {
                 className="group inline-flex items-center gap-2 text-gray-600 hover:text-copper-900 transition"
               >
                 <span className="h-1 w-1 rounded-full bg-gray-300 group-hover:bg-copper-400 transition"></span>
-                {copy.nav.beforeAfter}
+                {footerData.navBeforeAfter}
               </a>
 
               <a
@@ -146,7 +127,7 @@ export default function Footer({ general, locale, site }) {
                 className="group inline-flex items-center gap-2 text-gray-600 hover:text-copper-900 transition"
               >
                 <span className="h-1 w-1 rounded-full bg-gray-300 group-hover:bg-copper-400 transition"></span>
-                {copy.nav.testimonials}
+                {footerData.navTestimonials}
               </a>
 
               <a
@@ -154,7 +135,7 @@ export default function Footer({ general, locale, site }) {
                 className="group inline-flex items-center gap-2 text-gray-600 hover:text-copper-900 transition"
               >
                 <span className="h-1 w-1 rounded-full bg-gray-300 group-hover:bg-copper-400 transition"></span>
-                {copy.nav.faqs}
+                {footerData.navFaqs}
               </a>
 
               <a
@@ -162,52 +143,52 @@ export default function Footer({ general, locale, site }) {
                 className="group inline-flex items-center gap-2 text-gray-600 hover:text-copper-900 transition"
               >
                 <span className="h-1 w-1 rounded-full bg-gray-300 group-hover:bg-copper-400 transition"></span>
-                {copy.nav.healthTourism}
+                {footerData.navHealthTourism}
               </a>
             </div>
 
             <p className="mt-6 text-xs text-gray-500 font-light leading-relaxed max-w-sm">
-              {copy.note}
+              {footerData.note}
             </p>
           </div>
 
           <div className="lg:col-span-3 sm:max-w-80 ">
             <div className="space-y-2 text-sm font-light text-gray-600">
               <p>
-                <span className="font-medium text-copper-900">{copy.labels.phone}:</span>
+                <span className="font-medium text-copper-900">{footerData.phoneLabel}:</span>
                 <a
                   className="hover:text-copper-900 transition"
                   href={phoneLink}
                 >
-                  {settings.phone}
+                  {footerPhone}
                 </a>
               </p>
 
               <p>
-                <span className="font-medium text-copper-900">{copy.labels.whatsapp}:</span>
+                <span className="font-medium text-copper-900">{footerData.whatsappLabel}:</span>
                 <a
                   className="hover:text-copper-900 transition"
                   target="_blank"
                   rel="noreferrer"
                   href={whatsappLink}
                 >
-                  {settings.whatsappNumber}
+                  {footerData.whatsappNumber}
                 </a>
               </p>
 
               <p>
-                <span className="font-medium text-copper-900">{copy.labels.email}:</span>
+                <span className="font-medium text-copper-900">{footerData.emailLabel}:</span>
                 <a
                   className="hover:text-copper-900 transition"
                   href={emailLink}
                 >
-                  {settings.email}
+                  {footerEmail}
                 </a>
               </p>
 
               <p className="leading-relaxed">
-                <span className="font-medium text-copper-900">{copy.labels.address}:</span>
-                {settings.address}
+                <span className="font-medium text-copper-900">{footerData.addressLabel}:</span>
+                {footerAddress}
               </p>
             </div>
           </div>
@@ -216,21 +197,21 @@ export default function Footer({ general, locale, site }) {
         <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
 
         <div className="mb-20 xl:mb-0 mx-auto flex w-full md:max-w-max flex-col md:flex-row items-start md:items-center md:justify-between gap-6 xl:gap-23 py-6 text-xs text-gray-500">
-          <p>{copy.copyright}</p>
+          <p>{footerData.copyright}</p>
 
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a
               href={buildPageLink("/privacy-policy")}
               className="bg-transparent p-0 border-0 hover:text-gray-800 transition"
             >
-              {copy.privacy}
+              {footerData.privacy}
             </a>
             <span className="text-gray-300">|</span>
             <a
               href={buildPageLink("/terms")}
               className="bg-transparent p-0 border-0 hover:text-gray-800 transition"
             >
-              {copy.terms}
+              {footerData.terms}
             </a>
           </div>
         </div>

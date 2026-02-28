@@ -91,6 +91,62 @@ const pickReplyTo = (fields) => {
   return email || undefined;
 };
 
+const pickFirstFilled = (fields, keys) => {
+  for (const key of keys) {
+    const value = asString(fields?.[key]).trim();
+    if (value) return value;
+  }
+  return "";
+};
+
+const buildWhatsappText = (fields) => {
+  const name = pickFirstFilled(fields, ["fullName", "name", "full_name"]);
+  const prize = pickFirstFilled(fields, ["prize", "result", "spinPrize"]);
+  const message = pickFirstFilled(fields, [
+    "message",
+    "comment",
+    "notes",
+    "details",
+    "inquiry",
+    "text"
+  ]);
+  const lines = [];
+  if (name) lines.push(`Name: ${name}`);
+  if (prize) lines.push(`Prize: ${prize}`);
+  if (message) lines.push(`Message: ${message}`);
+  return lines.join("\n");
+};
+
+const isWhatsappHost = (host) => {
+  const normalized = String(host || "").toLowerCase();
+  return (
+    normalized === "wa.me" ||
+    normalized.endsWith(".wa.me") ||
+    normalized.includes("whatsapp.com")
+  );
+};
+
+const buildWhatsappRedirect = (baseLink, fields) => {
+  const base = String(baseLink || "").trim();
+  if (!base) return "";
+
+  const text = buildWhatsappText(fields);
+  if (!text) return base;
+
+  try {
+    const url = new URL(base);
+    if (!isWhatsappHost(url.hostname)) return base;
+    const existingText = url.searchParams.get("text");
+    url.searchParams.set(
+      "text",
+      existingText ? `${existingText}\n\n${text}` : text
+    );
+    return url.toString();
+  } catch {
+    return base;
+  }
+};
+
 const pickFrom = () => {
   const candidates = [
     process.env.EMAIL_FROM,
@@ -165,11 +221,13 @@ export async function POST(request) {
   const source = cleaned.source || "website";
   const isSpin = source === "lucky-spin" || Boolean(cleaned.prize);
   const subject = `New form submission (${source})`;
+  let settings = null;
   let settingsRecipient = "";
   try {
-    const settings = await getGeneralSettings(site);
+    settings = await getGeneralSettings(site);
     settingsRecipient = settings?.formRecipientEmail || "";
   } catch {
+    settings = null;
     settingsRecipient = "";
   }
 
@@ -231,8 +289,11 @@ export async function POST(request) {
     }
   }
 
-  const redirectTo =
-    cleaned.redirectTo || `/thankyou?site=${site}&locale=${locale}`;
+  const baseRedirect =
+    settings?.whatsappLink ||
+    cleaned.redirectTo ||
+    "https://wa.me/+905382112583";
+  const redirectTo = buildWhatsappRedirect(baseRedirect, cleaned) || baseRedirect;
   const transport = createTransport();
   if (transport) {
     try {

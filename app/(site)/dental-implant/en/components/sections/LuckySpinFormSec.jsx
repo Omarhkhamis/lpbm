@@ -277,8 +277,9 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
       setIsSpinning(false);
       setSelectedPrize(chosenPrize);
       (async () => {
+        let submissionResult = null;
         try {
-          await submitSpin({
+          submissionResult = await submitSpin({
             fullName: trimmedName,
             phone: trimmedPhone,
             prize: chosenPrize
@@ -301,11 +302,9 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
             result?.isConfirmed ||
             result?.dismiss === Swal.DismissReason.timer
           ) {
-            const params = new URLSearchParams();
-            if (site) params.set("site", site);
-            if (locale) params.set("locale", locale);
-            const query = params.toString();
-            window.location.assign(query ? `/thankyou?${query}` : "/thankyou");
+            if (submissionResult?.redirectTo) {
+              window.location.assign(submissionResult.redirectTo);
+            }
           }
         }
       })();
