@@ -305,6 +305,9 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
             if (submissionResult?.redirectTo) {
               window.open(submissionResult.redirectTo, "_blank", "noopener,noreferrer");
             }
+            if (submissionResult?.thankYouUrl) {
+              window.location.assign(submissionResult.thankYouUrl);
+            }
           }
         }
       })();

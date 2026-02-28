@@ -67,11 +67,25 @@ export default function ConsultationFormCard({ form, idPrefix, className }) {
         setFieldErrors(validationErrors);
         return;
       }
-      const result = await submitFormPayload(payload, { showError: false });
+      const result = await submitFormPayload(payload, {
+        showError: false,
+        skipRedirect: true
+      });
       if (!result?.ok) {
         setFieldErrors(result.fieldErrors || {});
         return;
       }
+      if (result?.redirectTo) {
+        window.open(result.redirectTo, "_blank", "noopener,noreferrer");
+      }
+      const site = pathname?.startsWith("/dental-implant")
+        ? "dental-implant"
+        : "hollywood-smile";
+      const locale = pathname?.includes("/ru") ? "ru" : "en";
+      const thankYouUrl =
+        result?.thankYouUrl ||
+        `/thankyou?site=${encodeURIComponent(site)}&locale=${encodeURIComponent(locale)}`;
+      window.location.assign(thankYouUrl);
       event.currentTarget.reset();
       setPhoneValue("");
     } finally {
