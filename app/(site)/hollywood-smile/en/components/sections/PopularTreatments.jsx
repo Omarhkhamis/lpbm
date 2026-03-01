@@ -43,13 +43,16 @@ export default function PopularTreatments({ data, whatsappLink }) {
           {item.description}
         </p>
 
-        <button
-          type="button"
+        <a
+          href="#"
           className="mt-7 inline-flex items-center gap-2 text-[15px] font-light cursor-pointer text-copper-700 hover:text-copper-900 transition"
-          onClick={handleConsultationOpen}
+          onClick={(event) => {
+            event.preventDefault();
+            handleConsultationOpen();
+          }}
         >
           {content.ctaText}
-        </button>
+        </a>
       </div>
     </article>
   );

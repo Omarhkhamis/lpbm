@@ -253,14 +253,15 @@ export default function Treatments({ data }) {
 
             </div>
 
-            <button
-              type="button"
+            <a
+              href="#"
               className="rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 text-white shadow-[0_10px_10px_rgba(0,0,0,0.09)] hover:from-copper-700 hover:to-copper-500 px-4 py-3 text-[11.5px] font-medium uppercase tracking-[0.13em] inline-flex items-center justify-center cursor-pointer transition-transform duration-200 ease-out disabled:opacity-60 disabled:pointer-events-none"
-              onClick={() =>
-                window.dispatchEvent(new CustomEvent("open-book-consultation"))
-              }
+              onClick={(event) => {
+                event.preventDefault();
+                  window.dispatchEvent(new CustomEvent("open-book-consultation"));
+              }}
             >
-              {content.ctaText}</button>
+              {content.ctaText}</a>
           </div>
 
           <div className="lg:col-span-5">

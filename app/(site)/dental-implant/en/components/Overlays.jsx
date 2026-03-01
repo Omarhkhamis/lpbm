@@ -121,11 +121,15 @@ export default function Overlays({
         </>
       )}
 
-      <button
-        type="button"
+      <a
+        href={whatsappLink || "#"}
+        target="_blank"
+        rel="noreferrer"
         aria-label={copy.whatsappCta}
         className="fixed bottom-6 lg:hover:-translate-y-0.5  transition left-4 lg:bottom-7 sm:left-7 z-[9999]"
-        onClick={openWhatsapp}
+        onClick={(event) => {
+          if (!whatsappLink) event.preventDefault();
+        }}
       >
         <div className="relative rounded-xl p-[1.2px] wa-shimmer-border">
           <div className="flex items-center gap-3 rounded-xl bg-white px-3.5 py-2.5 border border-main-200/60">
@@ -143,7 +147,7 @@ export default function Overlays({
             <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-green-500/80"></span>
           </div>
         </div>
-      </button>
+      </a>
 
       <button
         type="button"
