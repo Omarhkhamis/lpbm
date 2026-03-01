@@ -42,11 +42,6 @@ export default function StepFormSec({ data }) {
     (option) => option.key === toothModel
   );
 
-  const handleFinish = () => {
-    if (typeof window === "undefined") return;
-    window.dispatchEvent(new CustomEvent("open-book-consultation"));
-  };
-
   const handleGenderSelect = (value) => {
     setGender(value);
     setStep((prev) => Math.max(prev, 2));
@@ -86,7 +81,6 @@ export default function StepFormSec({ data }) {
         setFieldErrors(result.fieldErrors || {});
         return;
       }
-      handleFinish();
     } finally {
       setIsSubmitting(false);
     }

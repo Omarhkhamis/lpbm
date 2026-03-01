@@ -169,7 +169,13 @@ export default async function DentalImplantPage({ params }) {
                   />
                 );
               case "dentalImplant":
-                return <DentalImplantSec key={section.key} data={data} />;
+                return (
+                  <DentalImplantSec
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
               case "popularTreatments":
                 return (
                   <PopularTreatments
@@ -186,7 +192,13 @@ export default async function DentalImplantPage({ params }) {
                   />
                 );
               case "beforeAfter":
-                return <BeforeAfter key={section.key} data={data} />;
+                return (
+                  <BeforeAfter
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
               case "certificatesGallery":
                 return <CertificatesGallery key={section.key} data={data} />;
               case "fullWidthCampaign":
@@ -194,7 +206,13 @@ export default async function DentalImplantPage({ params }) {
               case "stepForm":
                 return <StepFormSec key={section.key} data={data} />;
               case "treatments":
-                return <Treatments key={section.key} data={data} />;
+                return (
+                  <Treatments
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
               case "bookAppointmentSecondary":
                 return (
                   <BookAppointmentFormSec2
@@ -204,7 +222,11 @@ export default async function DentalImplantPage({ params }) {
                 );
               case "internationalPatients":
                 return (
-                  <InternationalPatientsSec key={section.key} data={data} />
+                  <InternationalPatientsSec
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
                 );
               case "teamMembers":
                 return <TeamMembers key={section.key} data={data} />;
@@ -241,9 +263,21 @@ export default async function DentalImplantPage({ params }) {
               case "techniquesUsed":
                 return <TechniquesUsed key={section.key} data={data} />;
               case "googleReviews":
-                return <GoogleReviews key={section.key} data={data} />;
+                return (
+                  <GoogleReviews
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
               case "trustpilotReviews":
-                return <TrustpilotReviews key={section.key} data={data} />;
+                return (
+                  <TrustpilotReviews
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
               case "faqs":
                 return <Faqs key={section.key} data={data} />;
               default:

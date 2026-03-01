@@ -7,12 +7,7 @@ export default function PopularTreatments({ data, whatsappLink }) {
   const content = data || popularTreatmentsDefaults;
   const treatments = content.items || [];
   const [current, setCurrent] = useState(0);
-  const total = treatments.length || 1;
-  const handleConsultationOpen = () => {
-    if (typeof window === "undefined") return;
-    window.dispatchEvent(new CustomEvent("open-book-consultation"));
-  };
-  const goTo = (direction) => {
+  const total = treatments.length || 1;  const goTo = (direction) => {
     setCurrent((prev) => {
       const next = (prev + direction + total) % total;
       return next;
@@ -44,12 +39,10 @@ export default function PopularTreatments({ data, whatsappLink }) {
         </p>
 
         <a
-          href="#"
+          href={whatsappLink}
+          target="_blank"
+          rel="noreferrer"
           className="mt-7 inline-flex items-center gap-2 text-[15px] font-light cursor-pointer text-copper-700 hover:text-copper-900 transition"
-          onClick={(event) => {
-            event.preventDefault();
-            handleConsultationOpen();
-          }}
         >
           {content.ctaText}
         </a>

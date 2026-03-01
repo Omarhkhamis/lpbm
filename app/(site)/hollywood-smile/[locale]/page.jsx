@@ -160,7 +160,10 @@ export default async function HollywoodSmilePage({ params }) {
           <TeamMembers data={sectionsMap.teamMembers?.data} />
         ) : null}
         {sectionsMap.hollywoodSmile?.enabled ? (
-          <HollywoodSmileSec data={sectionsMap.hollywoodSmile?.data} />
+          <HollywoodSmileSec
+            data={sectionsMap.hollywoodSmile?.data}
+            whatsappLink={whatsappLink}
+          />
         ) : null}
         {sectionsMap.popularTreatments?.enabled ? (
           <PopularTreatments
@@ -174,7 +177,10 @@ export default async function HollywoodSmilePage({ params }) {
           />
         ) : null}
         {sectionsMap.beforeAfter?.enabled ? (
-          <BeforeAfter data={sectionsMap.beforeAfter?.data} />
+          <BeforeAfter
+            data={sectionsMap.beforeAfter?.data}
+            whatsappLink={whatsappLink}
+          />
         ) : null}
         {sectionsMap.certificatesGallery?.enabled ? (
           <CertificatesGallery data={sectionsMap.certificatesGallery?.data} />
@@ -188,7 +194,10 @@ export default async function HollywoodSmilePage({ params }) {
           <StepFormSec data={sectionsMap.stepForm?.data} />
         ) : null}
         {sectionsMap.treatments?.enabled ? (
-          <Treatments data={sectionsMap.treatments?.data} />
+          <Treatments
+            data={sectionsMap.treatments?.data}
+            whatsappLink={whatsappLink}
+          />
         ) : null}
         {sectionsMap.bookAppointmentSecondary?.enabled ? (
           <BookAppointmentFormSec2
@@ -198,6 +207,7 @@ export default async function HollywoodSmilePage({ params }) {
         {sectionsMap.internationalPatients?.enabled ? (
           <InternationalPatientsSec
             data={sectionsMap.internationalPatients?.data}
+            whatsappLink={whatsappLink}
           />
         ) : null}
         {sectionsMap.clinic?.enabled ? (
@@ -221,10 +231,16 @@ export default async function HollywoodSmilePage({ params }) {
           />
         ) : null}
         {sectionsMap.googleReviews?.enabled ? (
-          <GoogleReviews data={sectionsMap.googleReviews?.data} />
+          <GoogleReviews
+            data={sectionsMap.googleReviews?.data}
+            whatsappLink={whatsappLink}
+          />
         ) : null}
         {sectionsMap.trustpilotReviews?.enabled ? (
-          <TrustpilotReviews data={sectionsMap.trustpilotReviews?.data} />
+          <TrustpilotReviews
+            data={sectionsMap.trustpilotReviews?.data}
+            whatsappLink={whatsappLink}
+          />
         ) : null}
         {sectionsMap.faqs?.enabled ? (
           <Faqs data={sectionsMap.faqs?.data} />

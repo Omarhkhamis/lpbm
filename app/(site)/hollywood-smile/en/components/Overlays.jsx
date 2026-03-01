@@ -24,15 +24,9 @@ export default function Overlays({
     tryChance: isRu ? "Испытай удачу!" : "Try your chance!"
   };
 
-  const openWhatsapp = () => {
-    if (typeof window === "undefined" || !whatsappLink) return;
-    window.open(whatsappLink, "_blank", "noopener,noreferrer");
-  };
-
   useEffect(() => {
     const handleLuckyOpen = () => setIsLuckyOpen(true);
     const handleLuckyClose = () => setIsLuckyOpen(false);
-    const handleConsultationOpen = () => openWhatsapp();
     const handleKeyDown = (event) => {
       if (event.key !== "Escape") return;
       setIsLuckyOpen(false);
@@ -40,16 +34,14 @@ export default function Overlays({
 
     window.addEventListener("open-luckyspin", handleLuckyOpen);
     window.addEventListener("close-luckyspin", handleLuckyClose);
-    window.addEventListener("open-book-consultation", handleConsultationOpen);
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("open-luckyspin", handleLuckyOpen);
       window.removeEventListener("close-luckyspin", handleLuckyClose);
-      window.removeEventListener("open-book-consultation", handleConsultationOpen);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [whatsappLink]);
+  }, []);
 
   useEffect(() => {
     document.body.classList.toggle(BODY_LOCK_CLASS, isLuckyOpen);
