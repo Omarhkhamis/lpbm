@@ -243,17 +243,20 @@ export default function LuckySpinFormSec({
         } else {
           setFormError(copy.submitError);
         }
-        return;
+        return null;
       }
+      return result;
     } catch (error) {
       setFormError(copy.submitError);
+      return null;
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleSpin = () => {
-    if (isSpinning) return;
+  const handleSpin = (event) => {
+    if (event?.preventDefault) event.preventDefault();
+    if (isSpinning || isSubmitting) return;
     const trimmedName = fullName.trim();
     const trimmedPhone = phone.trim();
     if (!trimmedName || !trimmedPhone) {
@@ -283,38 +286,22 @@ export default function LuckySpinFormSec({
       setIsSpinning(false);
       setSelectedPrize(chosenPrize);
       (async () => {
-        let submissionResult = null;
         try {
-          submissionResult = await submitSpin({
+          const submissionResult = await submitSpin({
             fullName: trimmedName,
             phone: trimmedPhone,
             prize: chosenPrize
           }, { skipRedirect: true });
-        } finally {
-          const { default: Swal } = await import("sweetalert2");
-          const result = await Swal.fire({
-            title: content.resultLabel || copy.swalTitle,
-            text: chosenPrize,
-            confirmButtonText: copy.swalConfirm,
-            allowOutsideClick: false,
-            customClass: {
-              container: "swal-over-modal"
-            },
-            zIndex: 1000000,
-            timer: 5000,
-            timerProgressBar: true
-          });
-          if (
-            result?.isConfirmed ||
-            result?.dismiss === Swal.DismissReason.timer
-          ) {
-            if (submissionResult?.redirectTo) {
-              window.open(submissionResult.redirectTo, "_blank", "noopener,noreferrer");
-            }
-            if (submissionResult?.thankYouUrl) {
-              window.location.assign(submissionResult.thankYouUrl);
-            }
+          if (submissionResult?.redirectTo) {
+            window.open(submissionResult.redirectTo, "_blank", "noopener,noreferrer");
           }
+          const fallbackThankYouUrl = `/thankyou?site=${encodeURIComponent(site || "hollywood-smile")}&locale=${encodeURIComponent(isRu ? "ru" : "en")}`;
+          const thankYouUrl = submissionResult?.thankYouUrl || fallbackThankYouUrl;
+          window.setTimeout(() => {
+            window.location.assign(thankYouUrl);
+          }, 4000);
+        } finally {
+          // No-op: redirect handled after successful submission.
         }
       })();
     }, 3200);
@@ -553,17 +540,19 @@ export default function LuckySpinFormSec({
                   </div>
 
                   <div className="mt-0  pt-6 flex justify-start">
-                    <button
-                      type="button"
-                      className="rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 text-white shadow-[0_10px_10px_rgba(0,0,0,0.09)] hover:from-copper-700 hover:to-copper-500 px-4 py-3 text-[11.5px] font-medium uppercase tracking-[0.13em] inline-flex items-center justify-center cursor-pointer transition-transform duration-200 ease-out disabled:opacity-60 disabled:pointer-events-none pr-5 pl-6"
+                    <a
+                      href="#"
+                      className={`rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 text-white shadow-[0_10px_10px_rgba(0,0,0,0.09)] hover:from-copper-700 hover:to-copper-500 px-4 py-3 text-[11.5px] font-medium uppercase tracking-[0.13em] inline-flex items-center justify-center cursor-pointer transition-transform duration-200 ease-out pr-5 pl-6 ${
+                        isSpinning || isSubmitting ? "pointer-events-none opacity-60" : ""
+                      }`}
                       onClick={handleSpin}
-                      disabled={isSpinning || isSubmitting}
+                      aria-disabled={isSpinning || isSubmitting}
                     >
                       {isSpinning
                         ? content.spinLoadingLabel
                         : content.spinLabel}
                       <span className="text-white/90">{isSpinning ? "" : " →"}</span>
-                    </button>
+                    </a>
                   </div>
 
                   <input type="hidden" name="spinPrize" value={selectedPrize} />
