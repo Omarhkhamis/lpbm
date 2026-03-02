@@ -5,7 +5,7 @@ import Header from "../en/components/Header";
 import Overlays from "../en/components/Overlays";
 import { getFooterSettings } from "@lib/footerSettings";
 import { getGeneralSettings } from "@lib/generalSettings";
-import { getSectionsMap } from "@lib/sections";
+import { getSectionsByLocale, getSectionsMap } from "@lib/sections";
 import { getSeoSettings } from "@lib/seoSettings";
 import { normalizeLocale } from "@lib/sites";
 import {
@@ -136,8 +136,9 @@ export default async function HollywoodSmilePage({ params }) {
     notFound();
   }
 
-  const [sectionsMap, general, footer] = await Promise.all([
+  const [sectionsMap, orderedSections, general, footer] = await Promise.all([
     getSectionsMap(SITE, locale),
+    getSectionsByLocale(SITE, locale),
     getGeneralSettings(SITE),
     getFooterSettings(SITE, locale)
   ]);
@@ -154,109 +155,141 @@ export default async function HollywoodSmilePage({ params }) {
     <div className={pageClassName}>
       <Header general={general} footer={footer} locale={locale} />
       <main>
-        {sectionsMap.hero?.enabled ? (
-          <HeroSlide data={sectionsMap.hero?.data} whatsappLink={whatsappLink} />
-        ) : null}
-        {sectionsMap.teamMembers?.enabled ? (
-          <TeamMembers
-            data={sectionsMap.teamMembers?.data}
-            whatsappLink={whatsappLink}
-          />
-        ) : null}
-        {sectionsMap.hollywoodSmile?.enabled ? (
-          <HollywoodSmileSec
-            data={sectionsMap.hollywoodSmile?.data}
-            whatsappLink={whatsappLink}
-          />
-        ) : null}
-        {sectionsMap.costDifference?.enabled ? (
-          <CostDifferenceSec
-            data={sectionsMap.costDifference?.data}
-            whatsappLink={whatsappLink}
-          />
-        ) : null}
-        {sectionsMap.popularTreatments?.enabled ? (
-          <PopularTreatments
-            data={sectionsMap.popularTreatments?.data}
-            whatsappLink={whatsappLink}
-            locale={locale}
-          />
-        ) : null}
-        {sectionsMap.bookAppointmentPrimary?.enabled ? (
-          <BookAppointmentFormSec
-            data={sectionsMap.bookAppointmentPrimary?.data}
-          />
-        ) : null}
-        {sectionsMap.beforeAfter?.enabled ? (
-          <BeforeAfter
-            data={sectionsMap.beforeAfter?.data}
-            whatsappLink={whatsappLink}
-          />
-        ) : null}
-        {sectionsMap.certificatesGallery?.enabled ? (
-          <CertificatesGallery data={sectionsMap.certificatesGallery?.data} />
-        ) : null}
-        {sectionsMap.fullWidthCampaign?.enabled ? (
-          <FullWidthCampaignBanner
-            data={sectionsMap.fullWidthCampaign?.data}
-          />
-        ) : null}
-        {sectionsMap.stepForm?.enabled ? (
-          <StepFormSec data={sectionsMap.stepForm?.data} />
-        ) : null}
-        {sectionsMap.treatments?.enabled ? (
-          <Treatments
-            data={sectionsMap.treatments?.data}
-            whatsappLink={whatsappLink}
-          />
-        ) : null}
-        {sectionsMap.bookAppointmentSecondary?.enabled ? (
-          <BookAppointmentFormSec2
-            data={sectionsMap.bookAppointmentSecondary?.data}
-          />
-        ) : null}
-        {sectionsMap.internationalPatients?.enabled ? (
-          <InternationalPatientsSec
-            data={sectionsMap.internationalPatients?.data}
-            whatsappLink={whatsappLink}
-          />
-        ) : null}
-        {sectionsMap.clinic?.enabled ? (
-          <ClinicSec data={sectionsMap.clinic?.data} whatsappLink={whatsappLink} />
-        ) : null}
-        {sectionsMap.healthTourism?.enabled ? (
-          <HealthTourism data={sectionsMap.healthTourism?.data} />
-        ) : null}
-        {sectionsMap.luckySpin?.enabled ? (
-          <LuckySpinFormSec
-            idPrefix="lucky-section"
-            sectionId="lucky-spin-section"
-            data={sectionsMap.luckySpin?.data}
-            locale={locale}
-            site={SITE}
-          />
-        ) : null}
-        {sectionsMap.localAttractions?.enabled ? (
-          <LocalAttractions
-            data={sectionsMap.localAttractions?.data}
-            whatsappLink={whatsappLink}
-          />
-        ) : null}
-        {sectionsMap.googleReviews?.enabled ? (
-          <GoogleReviews
-            data={sectionsMap.googleReviews?.data}
-            whatsappLink={whatsappLink}
-          />
-        ) : null}
-        {sectionsMap.trustpilotReviews?.enabled ? (
-          <TrustpilotReviews
-            data={sectionsMap.trustpilotReviews?.data}
-            whatsappLink={whatsappLink}
-          />
-        ) : null}
-        {sectionsMap.faqs?.enabled ? (
-          <Faqs data={sectionsMap.faqs?.data} />
-        ) : null}
+        {orderedSections
+          .filter((section) => sectionsMap[section.key]?.enabled)
+          .map((section) => {
+            const data = sectionsMap[section.key]?.data;
+            switch (section.key) {
+              case "hero":
+                return (
+                  <HeroSlide
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
+              case "teamMembers":
+                return (
+                  <TeamMembers
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
+              case "hollywoodSmile":
+                return (
+                  <HollywoodSmileSec
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
+              case "costDifference":
+                return (
+                  <CostDifferenceSec
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
+              case "popularTreatments":
+                return (
+                  <PopularTreatments
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                    locale={locale}
+                  />
+                );
+              case "bookAppointmentPrimary":
+                return (
+                  <BookAppointmentFormSec key={section.key} data={data} />
+                );
+              case "beforeAfter":
+                return (
+                  <BeforeAfter
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
+              case "certificatesGallery":
+                return <CertificatesGallery key={section.key} data={data} />;
+              case "fullWidthCampaign":
+                return <FullWidthCampaignBanner key={section.key} data={data} />;
+              case "stepForm":
+                return <StepFormSec key={section.key} data={data} />;
+              case "treatments":
+                return (
+                  <Treatments
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
+              case "bookAppointmentSecondary":
+                return (
+                  <BookAppointmentFormSec2 key={section.key} data={data} />
+                );
+              case "internationalPatients":
+                return (
+                  <InternationalPatientsSec
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
+              case "clinic":
+                return (
+                  <ClinicSec
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
+              case "healthTourism":
+                return <HealthTourism key={section.key} data={data} />;
+              case "luckySpin":
+                return (
+                  <LuckySpinFormSec
+                    key={section.key}
+                    idPrefix="lucky-section"
+                    sectionId="lucky-spin-section"
+                    data={data}
+                    locale={locale}
+                    site={SITE}
+                  />
+                );
+              case "localAttractions":
+                return (
+                  <LocalAttractions
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
+              case "googleReviews":
+                return (
+                  <GoogleReviews
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
+              case "trustpilotReviews":
+                return (
+                  <TrustpilotReviews
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
+              case "faqs":
+                return <Faqs key={section.key} data={data} />;
+              default:
+                return null;
+            }
+          })}
       </main>
       <Footer general={general} footer={footer} locale={locale} site={SITE} />
       <Overlays
