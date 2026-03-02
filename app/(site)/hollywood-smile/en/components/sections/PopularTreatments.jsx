@@ -157,7 +157,7 @@ export default function PopularTreatments({ data, whatsappLink, locale = "en" })
           <div
             role="dialog"
             aria-modal="true"
-            className="relative w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-[0_35px_100px_rgba(0,0,0,0.32)]"
+            className="relative w-full max-w-xl overflow-hidden rounded-3xl bg-white shadow-[0_35px_100px_rgba(0,0,0,0.32)]"
             onClick={(event) => event.stopPropagation()}
           >
             <button
@@ -169,7 +169,14 @@ export default function PopularTreatments({ data, whatsappLink, locale = "en" })
               ×
             </button>
 
-            <div className="max-h-[80svh] overflow-y-auto p-6 md:p-8">
+            <div className="max-h-[85svh] overflow-y-auto p-5 md:p-6">
+              <div className="relative mb-5 aspect-[16/10] overflow-hidden rounded-2xl bg-main-50">
+                <img
+                  src={activeTreatment.image}
+                  alt={activeTreatment.alt || activeTreatment.title}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              </div>
               <h3 className="pr-10 text-2xl font-light text-main-900">
                 {activeTreatment.title}
               </h3>
