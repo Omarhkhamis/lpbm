@@ -172,6 +172,7 @@ export default async function HollywoodSmilePage({ params }) {
           <PopularTreatments
             data={sectionsMap.popularTreatments?.data}
             whatsappLink={whatsappLink}
+            locale={locale}
           />
         ) : null}
         {sectionsMap.bookAppointmentPrimary?.enabled ? (

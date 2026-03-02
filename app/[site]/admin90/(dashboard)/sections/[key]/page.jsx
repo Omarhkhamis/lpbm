@@ -15,6 +15,7 @@ import SaveToast from "../../components/SaveToast";
 import GoogleReviewsEditor from "../../components/GoogleReviewsEditor";
 import TreatmentsMediaEditor from "../../components/TreatmentsMediaEditor";
 import TeamMembersEditor from "../../components/TeamMembersEditor";
+import PopularTreatmentsEditor from "../../components/PopularTreatmentsEditor";
 import ImplantMatrixEditor from "../../components/ImplantMatrixEditor";
 import TechniquesUsedEditor from "../../components/TechniquesUsedEditor";
 import CertificatesGalleryEditor from "../../components/CertificatesGalleryEditor";
@@ -39,6 +40,7 @@ export default async function SectionEditorPage({ params, searchParams }) {
   const isReviewsSection =
     section.key === "googleReviews" || section.key === "trustpilotReviews";
   const isTeamMembers = section.key === "teamMembers";
+  const isPopularTreatments = section.key === "popularTreatments";
   const isImplantMatrix = section.key === "implantMatrix";
   const isTechniquesUsed = section.key === "techniquesUsed";
   const isCertificatesGallery = section.key === "certificatesGallery";
@@ -60,6 +62,9 @@ export default async function SectionEditorPage({ params, searchParams }) {
     }
     if (isTeamMembers) {
       return !field.path.startsWith("items.") && !field.path.startsWith("cta");
+    }
+    if (isPopularTreatments) {
+      return !field.path.startsWith("items.");
     }
     if (isCertificatesGallery) {
       return !field.path.startsWith("items.");
@@ -168,6 +173,11 @@ export default async function SectionEditorPage({ params, searchParams }) {
           ) : null}
           {isTeamMembers ? (
             <TeamMembersEditor
+              initialItems={Array.isArray(data.items) ? data.items : []}
+            />
+          ) : null}
+          {isPopularTreatments ? (
+            <PopularTreatmentsEditor
               initialItems={Array.isArray(data.items) ? data.items : []}
             />
           ) : null}

@@ -1,18 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { popularTreatmentsDefaults } from "../../../../../../lib/sectionDefaults";
 
-export default function PopularTreatments({ data, whatsappLink }) {
+const normalizeFaqs = (faqs) =>
+  Array.isArray(faqs)
+    ? faqs
+        .map((item) => ({
+          question: String(item?.question || "").trim(),
+          answer: String(item?.answer || "").trim()
+        }))
+        .filter((item) => item.question || item.answer)
+    : [];
+
+export default function PopularTreatments({ data, whatsappLink, locale = "en" }) {
   const content = data || popularTreatmentsDefaults;
   const treatments = content.items || [];
+  const isRu = locale === "ru";
+  const labels = {
+    readMoreLabel: content.readMoreLabel || (isRu ? "Подробнее" : "Read more"),
+    faqTitle: content.faqTitle || (isRu ? "Часто задаваемые вопросы" : "Frequently Asked Questions"),
+    consultationText:
+      content.consultationText ||
+      (isRu
+        ? "Если у вас есть вопросы, свяжитесь с нами."
+        : "If you have any questions, contact us."),
+    contactButtonLabel:
+      content.contactButtonLabel || (isRu ? "Свяжитесь с нами" : "Contact us"),
+    closeLabel: content.closeLabel || (isRu ? "Закрыть" : "Close")
+  };
   const [current, setCurrent] = useState(0);
-  const total = treatments.length || 1;  const goTo = (direction) => {
+  const [activeTreatment, setActiveTreatment] = useState(null);
+  const total = treatments.length || 1;
+  const activeFaqs = useMemo(
+    () => normalizeFaqs(activeTreatment?.faqs),
+    [activeTreatment]
+  );
+
+  useEffect(() => {
+    if (!activeTreatment) return undefined;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setActiveTreatment(null);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeTreatment]);
+
+  const goTo = (direction) => {
     setCurrent((prev) => {
       const next = (prev + direction + total) % total;
       return next;
     });
   };
+
   const renderCard = (item) => (
     <article
       key={item.title}
@@ -38,14 +78,13 @@ export default function PopularTreatments({ data, whatsappLink }) {
           {item.description}
         </p>
 
-        <a
-          href={whatsappLink}
-          target="_blank"
-          rel="noreferrer"
+        <button
+          type="button"
+          onClick={() => setActiveTreatment(item)}
           className="mt-7 inline-flex items-center gap-2 text-[15px] font-light cursor-pointer text-copper-700 hover:text-copper-900 transition"
         >
-          {content.ctaText}
-        </a>
+          {labels.readMoreLabel}
+        </button>
       </div>
     </article>
   );
@@ -110,6 +149,73 @@ export default function PopularTreatments({ data, whatsappLink }) {
           </div>
         </div>
       </div>
+      {activeTreatment ? (
+        <div
+          className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/55 px-4 py-6 backdrop-blur-sm"
+          onClick={() => setActiveTreatment(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="relative w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-[0_35px_100px_rgba(0,0,0,0.32)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              aria-label={labels.closeLabel}
+              onClick={() => setActiveTreatment(null)}
+              className="absolute right-4 top-4 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition hover:border-copper-200 hover:text-copper-700"
+            >
+              ×
+            </button>
+
+            <div className="max-h-[80svh] overflow-y-auto p-6 md:p-8">
+              <h3 className="pr-10 text-2xl font-light text-main-900">
+                {activeTreatment.title}
+              </h3>
+              <p className="mt-4 text-sm leading-relaxed text-main-600">
+                {activeTreatment.description}
+              </p>
+
+              <div className="mt-6">
+                <p className="text-[11px] font-semibold tracking-[0.2em] uppercase text-main-500">
+                  {labels.faqTitle}
+                </p>
+                {activeFaqs.length ? (
+                  <div className="mt-4 space-y-4">
+                    {activeFaqs.map((faq, index) => (
+                      <div key={`${activeTreatment.title}-faq-${index}`}>
+                        <p className="text-sm font-medium text-main-900">
+                          {faq.question}
+                        </p>
+                        <p className="mt-1 text-sm leading-relaxed text-main-600">
+                          {faq.answer}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mt-4 text-sm text-main-500">-</p>
+                )}
+              </div>
+
+              <p className="mt-8 text-sm text-main-600">{labels.consultationText}</p>
+              <a
+                href={whatsappLink || "#"}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(event) => {
+                  if (!whatsappLink) event.preventDefault();
+                }}
+                className="mt-3 inline-flex items-center rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-white transition hover:from-copper-700 hover:to-copper-600"
+              >
+                <i className="fa-brands fa-whatsapp mr-2" aria-hidden="true"></i>
+                {labels.contactButtonLabel}
+              </a>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

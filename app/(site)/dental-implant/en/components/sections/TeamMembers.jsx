@@ -219,7 +219,10 @@ export default function TeamMembers({ data, whatsappLink }) {
                   }}
                   className="mt-3 inline-flex items-center rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-white transition hover:from-copper-700 hover:to-copper-600"
                 >
-                  {labels.contactButtonLabel}
+                  <>
+                    <i className="fa-brands fa-whatsapp mr-2" aria-hidden="true"></i>
+                    {labels.contactButtonLabel}
+                  </>
                 </a>
               </div>
             </div>

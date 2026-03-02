@@ -32,6 +32,7 @@ export const updateSectionAction = async (site, key, formData) => {
     const casesLengthRaw = formData.get("casesLength");
     const mediaItemsLengthRaw = formData.get("mediaItemsLength");
     const reviewsLengthRaw = formData.get("reviewsLength");
+    const popularTreatmentsLengthRaw = formData.get("popularTreatmentsLength");
     const columnsLengthRaw = formData.get("columnsLength");
     const rowsLengthRaw = formData.get("rowsLength");
     const slidesLengthRaw = formData.get("slidesLength");
@@ -41,6 +42,9 @@ export const updateSectionAction = async (site, key, formData) => {
       ? Number(mediaItemsLengthRaw)
       : null;
     const reviewsLength = reviewsLengthRaw ? Number(reviewsLengthRaw) : null;
+    const popularTreatmentsLength = popularTreatmentsLengthRaw
+      ? Number(popularTreatmentsLengthRaw)
+      : null;
     const columnsLength = columnsLengthRaw ? Number(columnsLengthRaw) : null;
     const rowsLength = rowsLengthRaw ? Number(rowsLengthRaw) : null;
     const slidesLength = slidesLengthRaw ? Number(slidesLengthRaw) : null;
@@ -63,6 +67,20 @@ export const updateSectionAction = async (site, key, formData) => {
           ? updatedData.items.slice(0, teamLength)
           : [];
       }
+    }
+    if (key === "popularTreatments" && Number.isFinite(popularTreatmentsLength)) {
+      updatedData.items = Array.isArray(updatedData.items)
+        ? updatedData.items.slice(0, popularTreatmentsLength)
+        : [];
+      updatedData.items = updatedData.items.map((item, index) => {
+        const faqLengthRaw = formData.get(`popularTreatmentFaqLength.${index}`);
+        const faqLength = faqLengthRaw ? Number(faqLengthRaw) : null;
+        if (!Number.isFinite(faqLength)) return item;
+        return {
+          ...item,
+          faqs: Array.isArray(item?.faqs) ? item.faqs.slice(0, faqLength) : []
+        };
+      });
     }
 
     if (key === "treatments" && Number.isFinite(mediaItemsLength)) {

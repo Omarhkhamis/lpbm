@@ -75,7 +75,10 @@ export default function Overlays({
 
             <span className="flex flex-col leading-tight">
               <span className="text-[11px] font-medium uppercase tracking-[0.24em] text-main-900">
-                {copy.whatsappLabel}
+                <span className="inline-flex items-center">
+                  <i className="fa-brands fa-whatsapp mr-1.5 text-[12px]" aria-hidden="true"></i>
+                  {copy.whatsappLabel}
+                </span>
               </span>
               <span className="text-[9.5px] mt-0.5 uppercase tracking-[0.32em] text-copper-700">
                 {copy.consultationLabel}

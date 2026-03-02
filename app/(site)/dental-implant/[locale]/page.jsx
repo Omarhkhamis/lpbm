@@ -182,6 +182,7 @@ export default async function DentalImplantPage({ params }) {
                     key={section.key}
                     data={data}
                     whatsappLink={whatsappLink}
+                    locale={locale}
                   />
                 );
               case "bookAppointmentPrimary":

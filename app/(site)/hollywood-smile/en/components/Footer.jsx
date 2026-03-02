@@ -172,6 +172,7 @@ export default function Footer({ general, footer, locale, site }) {
                   rel="noreferrer"
                   href={whatsappLink}
                 >
+                  <i className="fa-brands fa-whatsapp mr-1.5" aria-hidden="true"></i>
                   {footerData.whatsappNumber}
                 </a>
               </p>
