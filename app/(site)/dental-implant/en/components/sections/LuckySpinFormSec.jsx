@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useRef, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import { luckySpinDefaults, SECTION_DEFAULTS_RU } from "../../../../../../lib/sectionDefaults";
@@ -168,7 +168,8 @@ export default function LuckySpinFormSec({
   idPrefix,
   locale,
   site,
-  sectionId
+  sectionId,
+  whatsappLink
 } = {}) {
   const isRu = locale === "ru";
   const ruDefaults = SECTION_DEFAULTS_RU?.luckySpin;
@@ -216,8 +217,7 @@ export default function LuckySpinFormSec({
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const pendingWhatsappWindow = useRef(null);
-  const pendingRedirectToken = useRef("");
+  const [whatsappHref, setWhatsappHref] = useState("");
   const pathname = usePathname();
   const privacyLink = useMemo(
     () => buildPrivacyPolicyLink(pathname),
@@ -256,27 +256,44 @@ export default function LuckySpinFormSec({
     }
   };
 
-  const handleSpin = (event) => {
-    if (event?.preventDefault) event.preventDefault();
-    if (isSpinning || isSubmitting) return;
-    if (typeof window !== "undefined" && !pendingWhatsappWindow.current) {
-      const token = `${safeId}-${Date.now()}`;
-      pendingRedirectToken.current = token;
-      const redirectUrl = `/spin-redirect?token=${encodeURIComponent(token)}`;
-      pendingWhatsappWindow.current = window.open(
-        redirectUrl,
-        "_blank",
-        "noopener,noreferrer"
+  const isWhatsappHost = (host) => {
+    const normalized = String(host || "").toLowerCase();
+    return (
+      normalized === "wa.me" ||
+      normalized.endsWith(".wa.me") ||
+      normalized.includes("whatsapp.com")
+    );
+  };
+
+  const buildWhatsappLink = (baseLink, text) => {
+    const base = String(baseLink || "").trim();
+    if (!base || !text) return base;
+    try {
+      const url = new URL(base);
+      if (!isWhatsappHost(url.hostname)) return base;
+      const existing = url.searchParams.get("text");
+      url.searchParams.set(
+        "text",
+        existing ? `${existing}\n\n${text}` : text
       );
+      return url.toString();
+    } catch {
+      return base;
     }
+  };
+
+  const stopClick = (event) => {
+    if (!event) return;
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  const handleSpin = (event) => {
+    stopClick(event);
+    if (isSpinning || isSubmitting) return;
     const trimmedName = fullName.trim();
     const trimmedPhone = phone.trim();
     if (!trimmedName || !trimmedPhone) {
-      if (pendingWhatsappWindow.current && !pendingWhatsappWindow.current.closed) {
-        pendingWhatsappWindow.current.close();
-      }
-      pendingWhatsappWindow.current = null;
-      pendingRedirectToken.current = "";
       setFieldErrors({
         name: !trimmedName ? "This field is required." : undefined,
         phone: !trimmedPhone ? "This field is required." : undefined
@@ -309,19 +326,12 @@ export default function LuckySpinFormSec({
             phone: trimmedPhone,
             prize: chosenPrize
           }, { skipRedirect: true });
-          if (submissionResult?.redirectTo) {
-            const targetUrl = submissionResult.redirectTo;
-            const token = pendingRedirectToken.current;
-            if (token) {
-              window.localStorage.setItem(`spinRedirect:${token}`, targetUrl);
-            }
-            if (pendingWhatsappWindow.current && !pendingWhatsappWindow.current.closed) {
-              try {
-                pendingWhatsappWindow.current.location = targetUrl;
-              } catch {
-                // Fallback to localStorage + redirect page.
-              }
-            }
+          const baseLink = whatsappLink || "https://wa.me/+905382112583";
+          const textLines = [trimmedName, chosenPrize].filter(Boolean).join("\n");
+          const directLink = buildWhatsappLink(baseLink, textLines);
+          if (directLink) {
+            setWhatsappHref(directLink);
+            window.open(directLink, "_blank", "noopener,noreferrer");
           }
           const fallbackThankYouUrl = `/thankyou?site=${encodeURIComponent(site || "hollywood-smile")}&locale=${encodeURIComponent(isRu ? "ru" : "en")}`;
           const thankYouUrl = submissionResult?.thankYouUrl || fallbackThankYouUrl;
@@ -329,8 +339,6 @@ export default function LuckySpinFormSec({
             window.location.assign(thankYouUrl);
           }, 4000);
         } finally {
-          pendingWhatsappWindow.current = null;
-          pendingRedirectToken.current = "";
           // No-op: redirect handled after successful submission.
         }
       })();
@@ -571,10 +579,11 @@ export default function LuckySpinFormSec({
 
                   <div className="mt-0  pt-6 flex justify-start">
                     <a
-                      href="#"
+                      href={whatsappHref || whatsappLink || "https://wa.me/+905382112583"}
                       className={`rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 text-white shadow-[0_10px_10px_rgba(0,0,0,0.09)] hover:from-copper-700 hover:to-copper-500 px-4 py-3 text-[11.5px] font-medium uppercase tracking-[0.13em] inline-flex items-center justify-center cursor-pointer transition-transform duration-200 ease-out pr-5 pl-6 ${
                         isSpinning || isSubmitting ? "pointer-events-none opacity-60" : ""
                       }`}
+                      onClickCapture={stopClick}
                       onClick={handleSpin}
                       aria-disabled={isSpinning || isSubmitting}
                     >

@@ -265,6 +265,7 @@ export default async function DentalImplantPage({ params }) {
                     data={data}
                     locale={locale}
                     site={SITE}
+                    whatsappLink={whatsappLink}
                   />
                 );
               case "localAttractions":

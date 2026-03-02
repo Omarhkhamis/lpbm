@@ -258,6 +258,7 @@ export default async function HollywoodSmilePage({ params }) {
                     data={data}
                     locale={locale}
                     site={SITE}
+                    whatsappLink={whatsappLink}
                   />
                 );
               case "localAttractions":
