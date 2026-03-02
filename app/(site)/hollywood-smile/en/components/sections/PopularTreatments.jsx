@@ -31,14 +31,24 @@ export default function PopularTreatments({ data, whatsappLink, locale = "en" })
   };
   const [current, setCurrent] = useState(0);
   const [activeTreatment, setActiveTreatment] = useState(null);
+  const [imageFailed, setImageFailed] = useState(false);
   const total = treatments.length || 1;
   const activeFaqs = useMemo(
     () => normalizeFaqs(activeTreatment?.faqs),
     [activeTreatment]
   );
+  const activeImage = useMemo(
+    () =>
+      activeTreatment?.image ||
+      activeTreatment?.poster ||
+      activeTreatment?.src ||
+      "",
+    [activeTreatment]
+  );
 
   useEffect(() => {
     if (!activeTreatment) return undefined;
+    setImageFailed(false);
     const handleKeyDown = (event) => {
       if (event.key === "Escape") setActiveTreatment(null);
     };
@@ -170,12 +180,19 @@ export default function PopularTreatments({ data, whatsappLink, locale = "en" })
             </button>
 
             <div className="max-h-[85svh] overflow-y-auto p-5 md:p-6">
-              <div className="relative mb-5 aspect-[16/10] overflow-hidden rounded-2xl bg-main-50">
-                <img
-                  src={activeTreatment.image}
-                  alt={activeTreatment.alt || activeTreatment.title}
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
+              <div className="relative mb-5 h-56 sm:h-64 overflow-hidden rounded-2xl border border-main-200 bg-main-50">
+                {activeImage && !imageFailed ? (
+                  <img
+                    src={activeImage}
+                    alt={activeTreatment.alt || activeTreatment.title}
+                    onError={() => setImageFailed(true)}
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-sm text-main-500">
+                    Image unavailable
+                  </div>
+                )}
               </div>
               <h3 className="pr-10 text-2xl font-light text-main-900">
                 {activeTreatment.title}
