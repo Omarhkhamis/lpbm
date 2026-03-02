@@ -217,6 +217,7 @@ export default function LuckySpinFormSec({
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const pendingWhatsappWindow = useRef(null);
+  const pendingRedirectToken = useRef("");
   const pathname = usePathname();
   const privacyLink = useMemo(
     () => buildPrivacyPolicyLink(pathname),
@@ -259,8 +260,11 @@ export default function LuckySpinFormSec({
     if (event?.preventDefault) event.preventDefault();
     if (isSpinning || isSubmitting) return;
     if (typeof window !== "undefined" && !pendingWhatsappWindow.current) {
+      const token = `${safeId}-${Date.now()}`;
+      pendingRedirectToken.current = token;
+      const redirectUrl = `/spin-redirect?token=${encodeURIComponent(token)}`;
       pendingWhatsappWindow.current = window.open(
-        "about:blank",
+        redirectUrl,
         "_blank",
         "noopener,noreferrer"
       );
@@ -272,6 +276,7 @@ export default function LuckySpinFormSec({
         pendingWhatsappWindow.current.close();
       }
       pendingWhatsappWindow.current = null;
+      pendingRedirectToken.current = "";
       setFieldErrors({
         name: !trimmedName ? "This field is required." : undefined,
         phone: !trimmedPhone ? "This field is required." : undefined
@@ -306,14 +311,16 @@ export default function LuckySpinFormSec({
           }, { skipRedirect: true });
           if (submissionResult?.redirectTo) {
             const targetUrl = submissionResult.redirectTo;
+            const token = pendingRedirectToken.current;
+            if (token) {
+              window.localStorage.setItem(`spinRedirect:${token}`, targetUrl);
+            }
             if (pendingWhatsappWindow.current && !pendingWhatsappWindow.current.closed) {
               try {
                 pendingWhatsappWindow.current.location = targetUrl;
               } catch {
-                window.open(targetUrl, "_blank", "noopener,noreferrer");
+                // Fallback to localStorage + redirect page.
               }
-            } else {
-              window.open(targetUrl, "_blank", "noopener,noreferrer");
             }
           }
           const fallbackThankYouUrl = `/thankyou?site=${encodeURIComponent(site || "hollywood-smile")}&locale=${encodeURIComponent(isRu ? "ru" : "en")}`;
@@ -323,6 +330,7 @@ export default function LuckySpinFormSec({
           }, 4000);
         } finally {
           pendingWhatsappWindow.current = null;
+          pendingRedirectToken.current = "";
           // No-op: redirect handled after successful submission.
         }
       })();
