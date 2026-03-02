@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import { bookAppointmentDefaults } from "../../../../../../lib/sectionDefaults";
@@ -20,6 +20,18 @@ export default function BookAppointmentFormSec({ data }) {
   const pathname = usePathname();
   const privacyLink = buildPrivacyPolicyLink(pathname);
   const privacyText = getPrivacyConsentText(pathname);
+  const isRu = pathname?.includes("/ru");
+  const formBenefits = isRu
+    ? [
+        "Бесплатная консультация",
+        "Персональный план лечения",
+        "Ответ в течение 5 минут"
+      ]
+    : [
+        "Free consultation",
+        "Personalized treatment plan",
+        "Reply within 5 minutes"
+      ];
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -124,6 +136,22 @@ export default function BookAppointmentFormSec({ data }) {
                 {privacyText}
               </a>
             </p>
+
+            <ul className="mt-4 flex flex-wrap items-center gap-3 text-[12px] text-main-100/85">
+              {formBenefits.map((item, index) => (
+                <Fragment key={item}>
+                  <li className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-black"></span>
+                    {item}
+                  </li>
+                  {index < formBenefits.length - 1 ? (
+                    <li aria-hidden="true" className="text-main-100/60">
+                      |
+                    </li>
+                  ) : null}
+                </Fragment>
+              ))}
+            </ul>
           </div>
 
           <div className="flex-1 space-y-3">

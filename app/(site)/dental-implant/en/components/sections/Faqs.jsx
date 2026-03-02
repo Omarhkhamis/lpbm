@@ -24,6 +24,18 @@ export default function Faqs({ data }) {
   const pathname = usePathname();
   const privacyLink = buildPrivacyPolicyLink(pathname);
   const privacyText = getPrivacyConsentText(pathname);
+  const isRu = pathname?.includes("/ru");
+  const formBenefits = isRu
+    ? [
+        "Бесплатная консультация",
+        "Персональный план лечения",
+        "Ответ в течение 5 минут"
+      ]
+    : [
+        "Free consultation",
+        "Personalized treatment plan",
+        "Reply within 5 minutes"
+      ];
 
   const toggle = (index) => {
     setOpenIndex((current) => (current === index ? null : index));
@@ -353,6 +365,14 @@ export default function Faqs({ data }) {
                       {privacyText}
                     </a>
                   </p>
+                  <ul className="mt-4 space-y-2 text-[12px] text-main-600">
+                    {formBenefits.map((item) => (
+                      <li key={item} className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-black"></span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </form>
             </div>

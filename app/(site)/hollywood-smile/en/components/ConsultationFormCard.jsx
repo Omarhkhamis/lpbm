@@ -287,16 +287,14 @@ export default function ConsultationFormCard({ form, idPrefix, className }) {
                 </a>
               </p>
 
-              <div className="mt-4 space-y-1.5 text-[12px] text-main-100/85">
-                {formBenefits.map((item, index) => (
-                  <p key={`hero-form-benefit-${index}`} className="flex items-center gap-2">
-                    <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-copper-500/25 text-[10px] text-copper-200">
-                      {index + 1}
-                    </span>
+              <ul className="mt-4 space-y-2 text-[12px] text-main-100/85">
+                {formBenefits.map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-black"></span>
                     {item}
-                  </p>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           </form>
         </div>
