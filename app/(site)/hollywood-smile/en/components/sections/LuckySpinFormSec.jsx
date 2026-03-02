@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useMemo, useState } from "react";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { usePathname } from "next/navigation";
 
 import { luckySpinDefaults, SECTION_DEFAULTS_RU } from "../../../../../../lib/sectionDefaults";
@@ -265,17 +266,29 @@ export default function LuckySpinFormSec({
     );
   };
 
+  const normalizePhone = (value) => {
+    const digits = String(value || "")
+      .replace(/\D/g, "")
+      .replace(/^0+/, "")
+      .slice(0, 15);
+    return digits ? `+${digits}` : "";
+  };
+
+  const isValidPhoneByCountry = (value) => {
+    const normalized = normalizePhone(value);
+    if (!normalized) return false;
+    const parsed = parsePhoneNumberFromString(normalized);
+    if (!parsed) return false;
+    return parsed.isValid();
+  };
+
   const buildWhatsappLink = (baseLink, text) => {
     const base = String(baseLink || "").trim();
     if (!base || !text) return base;
     try {
       const url = new URL(base);
       if (!isWhatsappHost(url.hostname)) return base;
-      const existing = url.searchParams.get("text");
-      url.searchParams.set(
-        "text",
-        existing ? `${existing}\n\n${text}` : text
-      );
+      url.searchParams.set("text", text);
       return url.toString();
     } catch {
       return base;
@@ -287,10 +300,15 @@ export default function LuckySpinFormSec({
     if (isSpinning || isSubmitting) return;
     const trimmedName = fullName.trim();
     const trimmedPhone = phone.trim();
-    if (!trimmedName || !trimmedPhone) {
+    const phoneValid = isValidPhoneByCountry(trimmedPhone);
+    if (!trimmedName || !trimmedPhone || !phoneValid) {
       setFieldErrors({
         name: !trimmedName ? "This field is required." : undefined,
-        phone: !trimmedPhone ? "This field is required." : undefined
+        phone: !trimmedPhone
+          ? "This field is required."
+          : !phoneValid
+            ? "Please enter a valid phone number."
+            : undefined
       });
       return;
     }
@@ -575,7 +593,11 @@ export default function LuckySpinFormSec({
                     <a
                       href={whatsappHref || whatsappLink || "https://wa.me/+905382112583"}
                       className={`rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 text-white shadow-[0_10px_10px_rgba(0,0,0,0.09)] hover:from-copper-700 hover:to-copper-500 px-4 py-3 text-[11.5px] font-medium uppercase tracking-[0.13em] inline-flex items-center justify-center cursor-pointer transition-transform duration-200 ease-out pr-5 pl-6 ${
-                        isSpinning || isSubmitting || !fullName.trim() || !phone.trim()
+                        isSpinning ||
+                        isSubmitting ||
+                        !fullName.trim() ||
+                        !phone.trim() ||
+                        !isValidPhoneByCountry(phone)
                           ? "pointer-events-none opacity-60"
                           : ""
                       }`}
@@ -584,7 +606,8 @@ export default function LuckySpinFormSec({
                         isSpinning ||
                         isSubmitting ||
                         !fullName.trim() ||
-                        !phone.trim()
+                        !phone.trim() ||
+                        !isValidPhoneByCountry(phone)
                       }
                     >
                       {isSpinning
