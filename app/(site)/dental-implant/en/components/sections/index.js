@@ -1,5 +1,6 @@
 export { default as HeroSlide } from './HeroSlide';
 export { default as DentalImplantSec } from './DentalImplantSec';
+export { default as CostDifferenceSec } from './CostDifferenceSec';
 export { default as PopularTreatments } from './PopularTreatments';
 export { default as BookAppointmentFormSec } from './BookAppointmentFormSec';
 export { default as BeforeAfter } from './BeforeAfter';

@@ -11,6 +11,7 @@ import { normalizeLocale } from "@lib/sites";
 import {
   HeroSlide,
   HollywoodSmileSec,
+  CostDifferenceSec,
   PopularTreatments,
   BookAppointmentFormSec,
   BeforeAfter,
@@ -165,6 +166,12 @@ export default async function HollywoodSmilePage({ params }) {
         {sectionsMap.hollywoodSmile?.enabled ? (
           <HollywoodSmileSec
             data={sectionsMap.hollywoodSmile?.data}
+            whatsappLink={whatsappLink}
+          />
+        ) : null}
+        {sectionsMap.costDifference?.enabled ? (
+          <CostDifferenceSec
+            data={sectionsMap.costDifference?.data}
             whatsappLink={whatsappLink}
           />
         ) : null}

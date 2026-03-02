@@ -10,6 +10,7 @@ import { getSeoSettings } from "@lib/seoSettings";
 import {
   HeroSlide,
   DentalImplantSec,
+  CostDifferenceSec,
   PopularTreatments,
   BookAppointmentFormSec,
   BeforeAfter,
@@ -171,6 +172,14 @@ export default async function DentalImplantPage({ params }) {
               case "dentalImplant":
                 return (
                   <DentalImplantSec
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
+              case "costDifference":
+                return (
+                  <CostDifferenceSec
                     key={section.key}
                     data={data}
                     whatsappLink={whatsappLink}
