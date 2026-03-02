@@ -163,7 +163,13 @@ const buildWheelSvg = (prefix, labels) => {
   return svg;
 };
 
-export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) {
+export default function LuckySpinFormSec({
+  data,
+  idPrefix,
+  locale,
+  site,
+  sectionId
+} = {}) {
   const isRu = locale === "ru";
   const ruDefaults = SECTION_DEFAULTS_RU?.luckySpin;
   const content = isRu && ruDefaults
@@ -326,7 +332,10 @@ export default function LuckySpinFormSec({ data, idPrefix, locale, site } = {}) 
   );
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-100 py-16 lg:py-24">
+    <section
+      id={sectionId}
+      className="relative overflow-hidden bg-gradient-to-b from-gray-50 via-white to-gray-100 py-16 lg:py-24"
+    >
       <div className="pointer-events-none absolute -left-40 top-20 h-px w-[120%] rotate-[-8deg] bg-gradient-to-r from-transparent via-copper-400/45 to-transparent"></div>
       <div className="pointer-events-none absolute -left-40 bottom-24 h-px w-[120%] rotate-[6deg] bg-gradient-to-r from-transparent via-copper-400/25 to-transparent"></div>
 

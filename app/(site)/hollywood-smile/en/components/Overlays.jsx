@@ -1,22 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-import LuckySpinFormSec from "./sections/LuckySpinFormSec";
-
-const BODY_LOCK_CLASS = "overflow-hidden";
+const LUCKY_SPIN_SECTION_ID = "lucky-spin-section";
 
 export default function Overlays({
   whatsappLink,
-  luckySpinData,
-  locale,
-  site
+  locale
 }) {
-  const [isLuckyOpen, setIsLuckyOpen] = useState(false);
   const spinButtonRef = useRef(null);
   const isRu = locale === "ru";
   const copy = {
-    close: isRu ? "Закрыть" : "Close",
     whatsappCta: isRu ? "Бесплатная консультация" : "Free Consultation",
     whatsappLabel: isRu ? "Бесплатная" : "Free",
     consultationLabel: isRu ? "Консультация" : "Consultation",
@@ -24,31 +18,21 @@ export default function Overlays({
     tryChance: isRu ? "Испытай удачу!" : "Try your chance!"
   };
 
+  const scrollToLuckySpin = () => {
+    const section = document.getElementById(LUCKY_SPIN_SECTION_ID);
+    if (!section) return;
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   useEffect(() => {
-    const handleLuckyOpen = () => setIsLuckyOpen(true);
-    const handleLuckyClose = () => setIsLuckyOpen(false);
-    const handleKeyDown = (event) => {
-      if (event.key !== "Escape") return;
-      setIsLuckyOpen(false);
-    };
+    const handleLuckyOpen = () => scrollToLuckySpin();
 
     window.addEventListener("open-luckyspin", handleLuckyOpen);
-    window.addEventListener("close-luckyspin", handleLuckyClose);
-    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("open-luckyspin", handleLuckyOpen);
-      window.removeEventListener("close-luckyspin", handleLuckyClose);
-      window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-
-  useEffect(() => {
-    document.body.classList.toggle(BODY_LOCK_CLASS, isLuckyOpen);
-    return () => {
-      document.body.classList.remove(BODY_LOCK_CLASS);
-    };
-  }, [isLuckyOpen]);
 
   useEffect(() => {
     const button = spinButtonRef.current;
@@ -73,46 +57,8 @@ export default function Overlays({
     };
   }, []);
 
-  const handleOpen = () => setIsLuckyOpen(true);
-  const handleClose = () => setIsLuckyOpen(false);
-
   return (
     <>
-      {isLuckyOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-[9998] bg-black/55 backdrop-blur-sm"
-            onClick={handleClose}
-          ></div>
-          <div
-            className="fixed inset-0 z-[99999] flex items-center justify-center px-3 sm:px-5 py-4 sm:py-5 overflow-y-auto"
-            role="dialog"
-            aria-modal="true"
-            onClick={handleClose}
-          >
-            <div
-              className="relative w-full max-w-7xl rounded-3xl overflow-auto shadow-[0_30px_90px_rgba(0,0,0,0.32)] max-h-[calc(100svh-2rem)] sm:max-h-none"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <button
-                type="button"
-                className="absolute top-5 right-6 z-50 h-9.5 w-9.5 inline-flex items-center justify-center rounded-full border bg-white/85 text-gray-700 border-1 border-gray-200 backdrop-blur hover:bg-gray-50 hover:border-copper-200 hover:text-copper-700 cursor-pointer"
-                onClick={handleClose}
-                aria-label={copy.close}
-              >
-                X
-              </button>
-              <LuckySpinFormSec
-                idPrefix="lucky-modal"
-                data={luckySpinData}
-                locale={locale}
-                site={site}
-              />
-            </div>
-          </div>
-        </>
-      )}
-
       <a
         href={whatsappLink || "#"}
         target="_blank"
@@ -144,7 +90,7 @@ export default function Overlays({
       <button
         type="button"
         className="hidden md:block wheel-toggle fixed small-spin z-[999] spin-enter bottom-8 right-9 cursor-pointer bg-transparent border-0 p-0"
-        onClick={handleOpen}
+        onClick={scrollToLuckySpin}
         ref={spinButtonRef}
         aria-label={copy.openLuckySpin}
       >
@@ -158,7 +104,7 @@ export default function Overlays({
       <button
         type="button"
         className="hidden md:block md:fixed bottom-8 md:right-16 z-[99] cursor-pointer select-none cta-after-spin bg-transparent border-0 p-0"
-        onClick={handleOpen}
+        onClick={scrollToLuckySpin}
         aria-label={copy.openLuckySpin}
       >
         <div

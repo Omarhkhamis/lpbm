@@ -8,6 +8,8 @@ const emptyMember = {
   name: "",
   role: "",
   description: "",
+  bio: "",
+  expertise: "",
   image: ""
 };
 
@@ -53,6 +55,18 @@ export default function TeamMembersEditor({ initialItems }) {
               name={`field.items.${index}.description`}
               label={buildLabel(index, "Description")}
               defaultValue={member?.description ?? ""}
+              isTextarea
+            />
+            <FieldInput
+              name={`field.items.${index}.bio`}
+              label={buildLabel(index, "Extra Info")}
+              defaultValue={member?.bio ?? ""}
+              isTextarea
+            />
+            <FieldInput
+              name={`field.items.${index}.expertise`}
+              label={buildLabel(index, "Experience (one per line)")}
+              defaultValue={Array.isArray(member?.expertise) ? member.expertise.join("\n") : (member?.expertise ?? "")}
               isTextarea
             />
             <FieldInput

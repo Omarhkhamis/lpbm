@@ -157,7 +157,10 @@ export default async function HollywoodSmilePage({ params }) {
           <HeroSlide data={sectionsMap.hero?.data} whatsappLink={whatsappLink} />
         ) : null}
         {sectionsMap.teamMembers?.enabled ? (
-          <TeamMembers data={sectionsMap.teamMembers?.data} />
+          <TeamMembers
+            data={sectionsMap.teamMembers?.data}
+            whatsappLink={whatsappLink}
+          />
         ) : null}
         {sectionsMap.hollywoodSmile?.enabled ? (
           <HollywoodSmileSec
@@ -219,6 +222,7 @@ export default async function HollywoodSmilePage({ params }) {
         {sectionsMap.luckySpin?.enabled ? (
           <LuckySpinFormSec
             idPrefix="lucky-section"
+            sectionId="lucky-spin-section"
             data={sectionsMap.luckySpin?.data}
             locale={locale}
             site={SITE}

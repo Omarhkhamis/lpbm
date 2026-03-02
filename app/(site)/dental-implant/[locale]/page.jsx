@@ -229,7 +229,13 @@ export default async function DentalImplantPage({ params }) {
                   />
                 );
               case "teamMembers":
-                return <TeamMembers key={section.key} data={data} />;
+                return (
+                  <TeamMembers
+                    key={section.key}
+                    data={data}
+                    whatsappLink={whatsappLink}
+                  />
+                );
               case "clinic":
                 return (
                   <ClinicSec
@@ -245,6 +251,7 @@ export default async function DentalImplantPage({ params }) {
                   <LuckySpinFormSec
                     key={section.key}
                     idPrefix="lucky-section"
+                    sectionId="lucky-spin-section"
                     data={data}
                     locale={locale}
                     site={SITE}
