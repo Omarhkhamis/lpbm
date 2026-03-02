@@ -20,6 +20,18 @@ export default function BookAppointmentFormSec2({ data }) {
   const pathname = usePathname();
   const privacyLink = buildPrivacyPolicyLink(pathname);
   const privacyText = getPrivacyConsentText(pathname);
+  const isRu = pathname?.includes("/ru");
+  const formBenefits = isRu
+    ? [
+        "Бесплатная консультация",
+        "Персональный план лечения",
+        "Ответ в течение 5 минут"
+      ]
+    : [
+        "Free consultation",
+        "Personalized treatment plan",
+        "Reply within 5 minutes"
+      ];
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -127,6 +139,17 @@ export default function BookAppointmentFormSec2({ data }) {
                 {privacyText}
               </a>
             </p>
+
+            <div className="mt-4 space-y-1.5 text-[12px] text-main-100/85">
+              {formBenefits.map((item, index) => (
+                <p key={`footer-form-benefit-${index}`} className="flex items-center gap-2">
+                  <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-copper-500/25 text-[10px] text-copper-200">
+                    {index + 1}
+                  </span>
+                  {item}
+                </p>
+              ))}
+            </div>
           </div>
 
           <div className="flex-1 space-y-3">
