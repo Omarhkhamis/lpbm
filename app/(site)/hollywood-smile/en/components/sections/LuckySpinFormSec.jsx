@@ -349,11 +349,6 @@ export default function LuckySpinFormSec({
             setWhatsappHref(directLink);
             window.open(directLink, "_blank", "noopener,noreferrer");
           }
-          const fallbackThankYouUrl = `/thankyou?site=${encodeURIComponent(site || "hollywood-smile")}&locale=${encodeURIComponent(isRu ? "ru" : "en")}`;
-          const thankYouUrl = submissionResult?.thankYouUrl || fallbackThankYouUrl;
-          window.setTimeout(() => {
-            window.location.assign(thankYouUrl);
-          }, 4000);
         } finally {
           // No-op: redirect handled after successful submission.
         }
