@@ -342,9 +342,11 @@ export default function LuckySpinFormSec({
             phone: trimmedPhone,
             prize: chosenPrize
           }, { skipRedirect: true });
+          if (!submissionResult?.ok) return;
           const baseLink = whatsappLink || "https://wa.me/+905382112583";
           const textLines = [trimmedName, chosenPrize].filter(Boolean).join("\n");
-          const directLink = buildWhatsappLink(baseLink, textLines);
+          const directLink =
+            submissionResult.redirectTo || buildWhatsappLink(baseLink, textLines);
           if (directLink) {
             setWhatsappHref(directLink);
             window.open(directLink, "_blank", "noopener,noreferrer");

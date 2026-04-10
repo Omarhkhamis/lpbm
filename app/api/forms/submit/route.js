@@ -99,7 +99,7 @@ const pickFirstFilled = (fields, keys) => {
   return "";
 };
 
-const buildWhatsappText = (fields) => {
+const buildWhatsappText = (fields, { isSpin = false } = {}) => {
   const name = pickFirstFilled(fields, ["fullName", "name", "full_name"]);
   const prize = pickFirstFilled(fields, ["prize", "result", "spinPrize"]);
   const message = pickFirstFilled(fields, [
@@ -112,10 +112,10 @@ const buildWhatsappText = (fields) => {
   ]);
   const lines = [];
   if (name) lines.push(name);
-  if (message) {
+  if (isSpin) {
+    if (prize) lines.push(prize);
+  } else if (message) {
     lines.push(message);
-  } else if (prize) {
-    lines.push(prize);
   }
   return lines.join("\n");
 };
@@ -129,21 +129,17 @@ const isWhatsappHost = (host) => {
   );
 };
 
-const buildWhatsappRedirect = (baseLink, fields) => {
+const buildWhatsappRedirect = (baseLink, fields, options = {}) => {
   const base = String(baseLink || "").trim();
   if (!base) return "";
 
-  const text = buildWhatsappText(fields);
+  const text = buildWhatsappText(fields, options);
   if (!text) return base;
 
   try {
     const url = new URL(base);
     if (!isWhatsappHost(url.hostname)) return base;
-    const existingText = url.searchParams.get("text");
-    url.searchParams.set(
-      "text",
-      existingText ? `${existingText}\n\n${text}` : text
-    );
+    url.searchParams.set("text", text);
     return url.toString();
   } catch {
     return base;
@@ -296,7 +292,8 @@ export async function POST(request) {
     settings?.whatsappLink ||
     cleaned.redirectTo ||
     "https://wa.me/+905382112583";
-  const redirectTo = buildWhatsappRedirect(baseRedirect, cleaned) || baseRedirect;
+  const redirectTo =
+    buildWhatsappRedirect(baseRedirect, cleaned, { isSpin }) || baseRedirect;
   const thankYouUrl = `/thankyou?site=${encodeURIComponent(site)}&locale=${encodeURIComponent(locale)}`;
   const transport = createTransport();
   if (transport) {
