@@ -16,6 +16,10 @@ const renderParagraphs = (content) =>
     .split(/\n\s*\n/)
     .filter(Boolean);
 
+const readSearchValue = (value) => {
+  if (Array.isArray(value)) return String(value[0] || "").trim();
+  return String(value || "").trim();
+};
 
 const SITE_COMPONENTS = {
   "dental-implant": {
@@ -31,6 +35,7 @@ const SITE_COMPONENTS = {
 export default async function ThankYouPage({ searchParams }) {
   const site = normalizeSite(searchParams?.site) || "hollywood-smile";
   const locale = normalizeLocale(searchParams?.locale);
+  const prize = readSearchValue(searchParams?.prize);
   const { Header, Footer } =
     SITE_COMPONENTS[site] || SITE_COMPONENTS["hollywood-smile"];
 
@@ -73,6 +78,22 @@ export default async function ThankYouPage({ searchParams }) {
               {page.title}
             </h1>
           </div>
+
+          {prize ? (
+            <div className="mx-auto w-full max-w-2xl rounded-[28px] border border-copper-300/30 bg-white/10 px-6 py-6 text-center shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur">
+              <p className="text-[11px] uppercase tracking-[0.26em] text-copper-100/80">
+                {locale === "ru" ? "Ваш приз" : "Your Prize"}
+              </p>
+              <p className="mt-3 text-2xl font-semibold tracking-[0.01em] text-white sm:text-3xl">
+                {prize}
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-main-100/80">
+                {locale === "ru"
+                  ? "Мы уже получили ваш результат и скоро свяжемся с вами, чтобы подтвердить детали."
+                  : "We have received your result and will contact you shortly to confirm the details."}
+              </p>
+            </div>
+          ) : null}
 
           <div className="mx-auto mt-2 max-w-3xl space-y-3 text-[15px] leading-relaxed text-main-100/85">
             {paragraphs.length ? (

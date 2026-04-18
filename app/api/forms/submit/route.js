@@ -218,7 +218,8 @@ export async function POST(request) {
   const locale =
     String(cleaned.locale || "").toLowerCase() === "ru" ? "ru" : "en";
   const source = cleaned.source || "website";
-  const isSpin = source === "lucky-spin" || Boolean(cleaned.prize);
+  const prize = pickFirstFilled(cleaned, ["prize", "result", "spinPrize"]);
+  const isSpin = source === "lucky-spin" || Boolean(prize);
   const subject = `New form submission (${source})`;
   let settings = null;
   let settingsRecipient = "";
@@ -253,13 +254,13 @@ export async function POST(request) {
   };
 
   // Save spin submissions separately and do it early so email failures don't block storage.
-  if (cleaned.fullName && cleaned.phone && cleaned.prize) {
+  if (cleaned.fullName && cleaned.phone && prize) {
     try {
       await prisma.spinData.create({
         data: {
           fullName: cleaned.fullName,
           phone: cleaned.phone,
-          prize: cleaned.prize,
+          prize,
           site
         }
       });
@@ -292,9 +293,17 @@ export async function POST(request) {
     settings?.whatsappLink ||
     cleaned.redirectTo ||
     "https://wa.me/+905382112583";
-  const redirectTo =
-    buildWhatsappRedirect(baseRedirect, cleaned, { isSpin }) || baseRedirect;
-  const thankYouUrl = `/thankyou?site=${encodeURIComponent(site)}&locale=${encodeURIComponent(locale)}`;
+  const redirectTo = isSpin
+    ? ""
+    : buildWhatsappRedirect(baseRedirect, cleaned, { isSpin }) || baseRedirect;
+  const thankYouParams = new URLSearchParams({
+    site,
+    locale
+  });
+  if (prize) {
+    thankYouParams.set("prize", prize);
+  }
+  const thankYouUrl = `/thankyou?${thankYouParams.toString()}`;
   const transport = createTransport();
   if (transport) {
     try {

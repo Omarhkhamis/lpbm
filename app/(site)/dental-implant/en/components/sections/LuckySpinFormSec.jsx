@@ -168,9 +168,7 @@ export default function LuckySpinFormSec({
   data,
   idPrefix,
   locale,
-  site,
-  sectionId,
-  whatsappLink
+  sectionId
 } = {}) {
   const isRu = locale === "ru";
   const ruDefaults = SECTION_DEFAULTS_RU?.luckySpin;
@@ -188,12 +186,7 @@ export default function LuckySpinFormSec({
   const copy = {
     submitError: isRu
       ? "Пожалуйста, попробуйте еще раз. Мы не смогли сохранить ваш результат."
-      : "Please try again. We could not save your spin.",
-    missingFields: isRu
-      ? "Пожалуйста, введите имя и номер телефона."
-      : "Please enter your name and phone number.",
-    swalTitle: isRu ? "Ваш приз" : "You get",
-    swalConfirm: isRu ? "ОК" : "OK"
+      : "Please try again. We could not save your spin."
   };
   const prizes = content.prizes || [];
   const reactId = useId();
@@ -218,8 +211,10 @@ export default function LuckySpinFormSec({
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [whatsappHref, setWhatsappHref] = useState("");
   const pathname = usePathname();
+  const fallbackSite = pathname?.startsWith("/dental-implant")
+    ? "dental-implant"
+    : "hollywood-smile";
   const privacyLink = useMemo(
     () => buildPrivacyPolicyLink(pathname),
     [pathname]
@@ -257,15 +252,6 @@ export default function LuckySpinFormSec({
     }
   };
 
-  const isWhatsappHost = (host) => {
-    const normalized = String(host || "").toLowerCase();
-    return (
-      normalized === "wa.me" ||
-      normalized.endsWith(".wa.me") ||
-      normalized.includes("whatsapp.com")
-    );
-  };
-
   const normalizePhone = (value) => {
     const digits = String(value || "")
       .replace(/\D/g, "")
@@ -280,19 +266,6 @@ export default function LuckySpinFormSec({
     const parsed = parsePhoneNumberFromString(normalized);
     if (!parsed) return false;
     return parsed.isValid();
-  };
-
-  const buildWhatsappLink = (baseLink, text) => {
-    const base = String(baseLink || "").trim();
-    if (!base || !text) return base;
-    try {
-      const url = new URL(base);
-      if (!isWhatsappHost(url.hostname)) return base;
-      url.searchParams.set("text", text);
-      return url.toString();
-    } catch {
-      return base;
-    }
   };
 
   const canSpin =
@@ -343,14 +316,14 @@ export default function LuckySpinFormSec({
             prize: chosenPrize
           }, { skipRedirect: true });
           if (!submissionResult?.ok) return;
-          const baseLink = whatsappLink || "https://wa.me/+905382112583";
-          const textLines = [trimmedName, chosenPrize].filter(Boolean).join("\n");
-          const directLink =
-            submissionResult.redirectTo || buildWhatsappLink(baseLink, textLines);
-          if (directLink) {
-            setWhatsappHref(directLink);
-            window.open(directLink, "_blank", "noopener,noreferrer");
-          }
+          const thankYouParams = new URLSearchParams({
+            site: fallbackSite,
+            locale: isRu ? "ru" : "en",
+            prize: chosenPrize
+          });
+          window.location.assign(
+            submissionResult.thankYouUrl || `/thankyou?${thankYouParams.toString()}`
+          );
         } finally {
           // No-op: redirect handled after successful submission.
         }
@@ -591,27 +564,23 @@ export default function LuckySpinFormSec({
                   </div>
 
                   <div className="mt-0  pt-6 flex justify-start">
-                    <a
-                      href={whatsappHref || whatsappLink || "https://wa.me/+905382112583"}
+                    <button
+                      type="button"
                       className={`rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 text-white shadow-[0_10px_10px_rgba(0,0,0,0.09)] hover:from-copper-700 hover:to-copper-500 px-4 py-3 text-[11.5px] font-medium uppercase tracking-[0.13em] inline-flex items-center justify-center cursor-pointer transition-transform duration-200 ease-out pr-5 pl-6 ${
                         isSpinning || isSubmitting || !canSpin
                           ? "pointer-events-none opacity-60"
                           : ""
                       }`}
-                      onClickCapture={(event) => event.preventDefault()}
                       onClick={handleSpin}
-                      aria-disabled={
-                        isSpinning || isSubmitting || !canSpin
-                      }
+                      disabled={isSpinning || isSubmitting || !canSpin}
                     >
                       {isSpinning
                         ? content.spinLoadingLabel
                         : content.spinLabel}
                       <span className="text-white/90">{isSpinning ? "" : " →"}</span>
-                    </a>
+                    </button>
                   </div>
 
-                  <input type="hidden" name="spinPrize" value={selectedPrize} />
                   {formError ? (
                     <p className="mt-2 text-[12px] text-red-600">{formError}</p>
                   ) : null}

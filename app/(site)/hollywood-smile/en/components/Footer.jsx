@@ -25,9 +25,6 @@ export default function Footer({ general, footer, locale, site }) {
   const footerEmail = footerData.email || settings.email;
   const footerAddress = footerData.address || settings.address;
   const emailLink = footerEmail ? `mailto:${footerEmail}` : "mailto:info@bmturkiye.com";
-  const instagramLink = footerData.instagram || settings.social?.instagram || "#";
-  const facebookLink = footerData.facebook || settings.social?.facebook || "#";
-  const youtubeLink = footerData.youtube || settings.social?.youtube || "#";
   const buildPageLink = (path) => {
     const params = new URLSearchParams();
     if (locale) params.set("locale", locale);
@@ -58,42 +55,14 @@ export default function Footer({ general, footer, locale, site }) {
               </div>
             </div>
 
-            <div className="flex items-center gap-1 pt-1">
-              <a
-                href={instagramLink}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Instagram"
-                className="group inline-flex h-8 w-8 items-center justify-center rounded-full border border-gray-200/80 bg-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur transition hover:border-copper-200 hover:shadow-[0_10px_40px_rgba(176,122,90,0.18)] focus:outline-none focus:ring-2 focus:ring-copper-200/60 focus:ring-offset-2"
-              >
-                <i className="fa-brands fa-instagram text-[12px] text-gray-700 transition group-hover:text-copper-900"></i>
-              </a>
-
-              <a
-                href={facebookLink}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Facebook"
-                className="group inline-flex h-8 w-8 items-center justify-center rounded-full border border-gray-200/80 bg-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur transition hover:border-copper-200 hover:shadow-[0_10px_40px_rgba(176,122,90,0.18)] focus:outline-none focus:ring-2 focus:ring-copper-200/60 focus:ring-offset-2"
-              >
-                <i className="fa-brands fa-facebook-f text-[12px] text-gray-700 transition group-hover:text-copper-900"></i>
-              </a>
-
-              <a
-                href={youtubeLink}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="YouTube"
-                className="group inline-flex h-8 w-8 items-center justify-center rounded-full border border-gray-200/80 bg-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur transition hover:border-copper-200 hover:shadow-[0_10px_40px_rgba(176,122,90,0.18)] focus:outline-none focus:ring-2 focus:ring-copper-200/60 focus:ring-offset-2"
-              >
-                <i className="fa-brands fa-youtube text-[12px] text-gray-700 transition group-hover:text-copper-900"></i>
-              </a>
-
-              <div className="inline-flex ml-4 items-center gap-2 rounded-full border border-copper-200/60 bg-white/60 px-3 py-1 text-[11px] text-gray-600">
-                <span className="h-1.5 w-1.5 rounded-full bg-copper-400"></span>
-                {footerData.badge}
+            {footerData.badge ? (
+              <div className="pt-1">
+                <div className="inline-flex items-center gap-2 rounded-full border border-copper-200/60 bg-white/60 px-3 py-1 text-[11px] text-gray-600">
+                  <span className="h-1.5 w-1.5 rounded-full bg-copper-400"></span>
+                  {footerData.badge}
+                </div>
               </div>
-            </div>
+            ) : null}
           </div>
 
           <div className="lg:col-span-4">
