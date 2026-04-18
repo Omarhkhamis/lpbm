@@ -212,6 +212,34 @@ export const updateGeneralSettingsAction = async (site, formData) => {
   redirect(`/admin90/general?site=${siteId}&saved=1`);
 };
 
+export const updatePopupFormSettingsAction = async (site, formData) => {
+  const siteId = safeSite(site);
+
+  try {
+    const data = {
+      popupFormTitle:
+        String(formData.get("popupFormTitle") || "").trim() || null,
+      popupFormBody:
+        String(formData.get("popupFormBody") || "").trim() || null,
+      popupWhatsappMessage:
+        String(formData.get("popupWhatsappMessage") || "").trim() || null
+    };
+
+    await prisma.generalSettings.upsert({
+      where: { site: siteId },
+      update: data,
+      create: { site: siteId, ...data }
+    });
+  } catch (error) {
+    redirect(`/admin90/popup-form?site=${siteId}&error=1`);
+  }
+
+  revalidatePath(`/admin90/popup-form`);
+  revalidatePublic(siteId, "en");
+  revalidatePublic(siteId, "ru");
+  redirect(`/admin90/popup-form?site=${siteId}&saved=1`);
+};
+
 export const updateFooterSettingsAction = async (site, formData) => {
   const siteId = safeSite(site);
   const locale = normalizeLocale(formData.get("locale") || "en");

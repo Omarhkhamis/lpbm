@@ -50,6 +50,9 @@ model GeneralSettings {
   address        String?
   whatsappNumber String?
   whatsappLink   String?
+  popupFormTitle String?
+  popupFormBody  String?
+  popupWhatsappMessage String?
   hideFormPrivacyNote Boolean @default(false)
   consultationDelaySeconds Int?
   logoUrl        String?

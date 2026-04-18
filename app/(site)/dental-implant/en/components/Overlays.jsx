@@ -63,6 +63,7 @@ export default function Overlays({
         href={whatsappLink || "#"}
         target="_blank"
         rel="noreferrer"
+        data-whatsapp-modal="skip"
         aria-label={copy.whatsappCta}
         className="fixed bottom-6 lg:hover:-translate-y-0.5  transition left-4 lg:bottom-7 sm:left-7 z-[9999]"
         onClick={(event) => {
