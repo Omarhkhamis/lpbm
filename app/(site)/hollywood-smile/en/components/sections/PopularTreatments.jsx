@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { popularTreatmentsDefaults } from "../../../../../../lib/sectionDefaults";
+import WhatsAppTriggerButton from "../../../../components/WhatsAppTriggerButton";
 
 const normalizeFaqs = (faqs) =>
   Array.isArray(faqs)
@@ -224,18 +225,14 @@ export default function PopularTreatments({ data, whatsappLink, locale = "en" })
               </div>
 
               <p className="mt-8 text-sm text-main-600">{labels.consultationText}</p>
-              <a
+              <WhatsAppTriggerButton
                 href={whatsappLink || "#"}
-                target="_blank"
-                rel="noreferrer"
-                onClick={(event) => {
-                  if (!whatsappLink) event.preventDefault();
-                }}
+                trackingName="hollywood_smile_popular_treatments_cta"
                 className="mt-3 inline-flex items-center rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-white transition hover:from-copper-700 hover:to-copper-600"
               >
                 <i className="fa-brands fa-whatsapp mr-2" aria-hidden="true"></i>
                 {labels.contactButtonLabel}
-              </a>
+                            </WhatsAppTriggerButton>
             </div>
           </div>
         </div>

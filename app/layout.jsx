@@ -54,26 +54,45 @@ export default function RootLayout({ children }) {
 
                 var target = event.target;
                 var anchor = target instanceof Element ? target.closest("a[href]") : null;
-                if (!anchor) return;
-                if (anchor.dataset.whatsappModal === "skip") return;
-                if (anchor.closest("form")) return;
+                if (anchor) {
+                  if (anchor.dataset.whatsappModal === "skip") return;
+                  if (anchor.closest("form")) return;
 
-                var href = String(anchor.getAttribute("href") || "").trim();
-                if (!href || href === "#") return;
+                  var href = String(anchor.getAttribute("href") || "").trim();
+                  if (!href || href === "#") return;
 
-                var url;
-                try {
-                  url = new URL(anchor.href);
-                } catch (error) {
+                  var url;
+                  try {
+                    url = new URL(anchor.href);
+                  } catch (error) {
+                    return;
+                  }
+
+                  if (!isWhatsappHost(url.hostname)) return;
+
+                  event.preventDefault();
+                  store.open({
+                    href: url.toString(),
+                    target: resolveTarget(anchor.getAttribute("target")),
+                    source: String(anchor.dataset.whatsappSource || "").trim()
+                  });
                   return;
                 }
 
-                if (!isWhatsappHost(url.hostname)) return;
+                var button = target instanceof Element ? target.closest("button[data-whatsapp-trigger]") : null;
+                if (!button) return;
+                if (button.dataset.whatsappModal === "skip") return;
+                if (button.closest("form")) return;
+                if (button.disabled) return;
+
+                var buttonHref = String(button.dataset.whatsappHref || "").trim();
+                if (!buttonHref || buttonHref === "#") return;
 
                 event.preventDefault();
                 store.open({
-                  href: url.toString(),
-                  target: resolveTarget(anchor.getAttribute("target"))
+                  href: buttonHref,
+                  target: resolveTarget(button.dataset.whatsappTarget),
+                  source: String(button.dataset.whatsappSource || "").trim()
                 });
               }, true);
             })();

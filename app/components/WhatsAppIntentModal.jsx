@@ -96,11 +96,28 @@ export default function WhatsAppIntentModal() {
     const store = window.__WHATSAPP_INTENT_MODAL__;
     if (!store) return undefined;
 
+    const pushPopupOpenEvent = (linkData) => {
+      if (typeof window === "undefined") return;
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "whatsapp_popup_open",
+        popup_type: "whatsapp_intent",
+        popup_site: site,
+        whatsapp_source: String(linkData?.source || "").trim() || "unspecified",
+        whatsapp_href: String(linkData?.href || "").trim(),
+        whatsapp_target: resolveTarget(linkData?.target),
+        page_path: window.location.pathname,
+        page_url: window.location.href
+      });
+    };
+
     const openIntentModal = (linkData) => {
       if (!linkData?.href) return;
+      pushPopupOpenEvent(linkData);
       setActiveLink({
         href: String(linkData.href),
-        target: resolveTarget(linkData.target)
+        target: resolveTarget(linkData.target),
+        source: String(linkData.source || "").trim()
       });
     };
 
@@ -118,7 +135,7 @@ export default function WhatsAppIntentModal() {
         store.listener = null;
       }
     };
-  }, []);
+  }, [site]);
 
   useEffect(() => {
     if (!activeLink) return;
@@ -138,21 +155,6 @@ export default function WhatsAppIntentModal() {
     };
   }, [activeLink]);
 
-  const handleContinue = () => {
-    if (!activeLink?.href) return;
-    const finalHref = applyWhatsappMessage(
-      activeLink.href,
-      popupSettings.popupWhatsappMessage
-    );
-
-    if (activeLink.target === "_self") {
-      window.location.assign(finalHref);
-    } else {
-      window.open(finalHref, activeLink.target, "noopener,noreferrer");
-    }
-
-    setActiveLink(null);
-  };
   const modalCopy = {
     eyebrow: "WhatsApp Consultation",
     title: popupSettings.popupFormTitle,
@@ -160,6 +162,10 @@ export default function WhatsAppIntentModal() {
     cancel: "No, close the form",
     confirm: "Yes, I would like to continue"
   };
+  const finalHref = applyWhatsappMessage(
+    activeLink?.href,
+    popupSettings.popupWhatsappMessage
+  );
 
   if (!activeLink) return null;
 
@@ -233,14 +239,17 @@ export default function WhatsAppIntentModal() {
               {modalCopy.cancel}
             </button>
 
-            <button
+            <a
               id={MODAL_CONFIRM_ID}
-              type="button"
+              href={finalHref}
+              target={activeLink.target === "_self" ? "_self" : "_blank"}
+              rel={activeLink.target === "_self" ? undefined : "noreferrer"}
+              data-whatsapp-modal="skip"
               className="inline-flex min-h-12 flex-1 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#16a34a,#22c55e)] px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(34,197,94,0.28)] transition hover:translate-y-[-1px] hover:shadow-[0_22px_55px_rgba(34,197,94,0.34)]"
-              onClick={handleContinue}
+              onClick={() => setActiveLink(null)}
             >
               {modalCopy.confirm}
-            </button>
+            </a>
           </div>
         </div>
       </div>

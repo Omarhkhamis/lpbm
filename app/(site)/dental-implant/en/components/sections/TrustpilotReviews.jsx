@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { trustpilotReviewsDefaults } from "../../../../../../lib/sectionDefaults";
+import WhatsAppTriggerButton from "../../../../components/WhatsAppTriggerButton";
 
 export default function TrustpilotReviews({ data, whatsappLink }) {
   const content = data || trustpilotReviewsDefaults;
@@ -257,16 +258,15 @@ export default function TrustpilotReviews({ data, whatsappLink }) {
         <div className="flex flex-col pt-15 gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <div>
-              <a
+              <WhatsAppTriggerButton
                 href={whatsappLink}
-                target="_blank"
-                rel="noreferrer"
+                trackingName="dental_implant_trustpilot_reviews_cta"
                 className="rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 text-white shadow-[0_10px_10px_rgba(0,0,0,0.09)] hover:from-copper-700 hover:to-copper-500 px-4 py-3 text-[11.5px] font-medium uppercase tracking-[0.13em] inline-flex items-center justify-center cursor-pointer transition-transform duration-200 ease-out disabled:opacity-60 disabled:pointer-events-none"
               >
                 <>
               <i className="fa-brands fa-whatsapp mr-2" aria-hidden="true"></i>
               {content.ctaText}
-            </></a>
+            </>              </WhatsAppTriggerButton>
             </div>
           </div>
         </div>

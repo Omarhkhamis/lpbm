@@ -1,6 +1,7 @@
 "use client";
 
 import { clinicDefaults } from "../../../../../../lib/sectionDefaults";
+import WhatsAppTriggerButton from "../../../../components/WhatsAppTriggerButton";
 
 export default function ClinicSec({ data, whatsappLink }) {
   const content = data || clinicDefaults;
@@ -85,17 +86,16 @@ export default function ClinicSec({ data, whatsappLink }) {
               {content.paragraphs?.[1]}
             </p>
 
-            <a
+            <WhatsAppTriggerButton
               href={whatsappLink}
-              target="_blank"
-              rel="noreferrer"
+              trackingName="hollywood_smile_clinic_cta"
               className="rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 text-white shadow-[0_10px_10px_rgba(0,0,0,0.09)] hover:from-copper-700 hover:to-copper-500 px-4 py-3 text-[11.5px] font-medium uppercase tracking-[0.13em] inline-flex items-center justify-center cursor-pointer transition-transform duration-200 ease-out disabled:opacity-60 disabled:pointer-events-none"
             >
               <>
               <i className="fa-brands fa-whatsapp mr-2" aria-hidden="true"></i>
               {content.ctaText}
             </>
-            </a>
+                        </WhatsAppTriggerButton>
           </div>
         </div>
       </div>
