@@ -211,6 +211,7 @@ export default function LuckySpinFormSec({
   const [fieldErrors, setFieldErrors] = useState({});
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [thankYouUrl, setThankYouUrl] = useState("");
   const pathname = usePathname();
   const fallbackSite = pathname?.startsWith("/dental-implant")
     ? "dental-implant"
@@ -223,6 +224,42 @@ export default function LuckySpinFormSec({
     () => getPrivacyConsentText(pathname),
     [pathname]
   );
+
+  const buildThankYouPath = (prizeValue) => {
+    const thankYouParams = new URLSearchParams({
+      site: fallbackSite,
+      locale: isRu ? "ru" : "en",
+      prize: prizeValue
+    });
+    return `/thankyou?${thankYouParams.toString()}`;
+  };
+
+  const openPendingWindow = () => {
+    if (typeof window === "undefined") return null;
+    const popup = window.open("", "_blank");
+    if (!popup) return null;
+    popup.opener = null;
+    popup.document.write(
+      "<!doctype html><title>Loading...</title><body style=\"font-family:Arial,sans-serif;padding:24px;color:#0f172a\">Loading...</body>"
+    );
+    popup.document.close();
+    return popup;
+  };
+
+  const closePendingWindow = (popup) => {
+    if (popup && !popup.closed) {
+      popup.close();
+    }
+  };
+
+  const openThankYouWindow = (url, popup) => {
+    if (!url || typeof window === "undefined") return;
+    if (popup && !popup.closed) {
+      popup.location.replace(url);
+      return;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
 
   const submitSpin = async (payload, options = {}) => {
     setIsSubmitting(true);
@@ -252,6 +289,31 @@ export default function LuckySpinFormSec({
     }
   };
 
+  const submitSelectedPrize = async ({
+    name,
+    phone: phoneValue,
+    prize,
+    pendingWindow
+  }) => {
+    const fallbackThankYouUrl = buildThankYouPath(prize);
+    const submissionResult = await submitSpin({
+      fullName: name,
+      phone: phoneValue,
+      prize
+    }, { skipRedirect: true });
+
+    if (!submissionResult?.ok) {
+      closePendingWindow(pendingWindow);
+      return null;
+    }
+
+    const resolvedThankYouUrl =
+      submissionResult.thankYouUrl || fallbackThankYouUrl;
+    setThankYouUrl(resolvedThankYouUrl);
+    openThankYouWindow(resolvedThankYouUrl, pendingWindow);
+    return resolvedThankYouUrl;
+  };
+
   const normalizePhone = (value) => {
     const digits = String(value || "")
       .replace(/\D/g, "")
@@ -270,11 +332,22 @@ export default function LuckySpinFormSec({
 
   const canSpin =
     Boolean(fullName.trim()) && Boolean(phone.trim()) && isValidPhoneByCountry(phone);
+  const hasPrizeResult = Boolean(selectedPrize);
+  const actionDisabled =
+    isSpinning || isSubmitting || (!canSpin && !hasPrizeResult);
+  const actionLabel =
+    isSpinning || isSubmitting
+      ? content.spinLoadingLabel
+      : hasPrizeResult
+        ? content.form?.submitText || content.spinLabel
+        : content.spinLabel;
 
   const handleSpin = (event) => {
+    if (selectedPrize && thankYouUrl && !isSpinning && !isSubmitting) {
+      return;
+    }
     if (event?.preventDefault) event.preventDefault();
     if (isSpinning || isSubmitting) return;
-    if (!canSpin) return;
     const trimmedName = fullName.trim();
     const trimmedPhone = phone.trim();
     const phoneValid = isValidPhoneByCountry(trimmedPhone);
@@ -286,6 +359,16 @@ export default function LuckySpinFormSec({
           : !phoneValid
             ? "Please enter a valid phone number."
             : undefined
+      });
+      return;
+    }
+    if (selectedPrize) {
+      const pendingWindow = openPendingWindow();
+      void submitSelectedPrize({
+        name: trimmedName,
+        phone: trimmedPhone,
+        prize: selectedPrize,
+        pendingWindow
       });
       return;
     }
@@ -302,31 +385,21 @@ export default function LuckySpinFormSec({
     const chosenPrize = prizes[index];
 
     setSelectedPrize("");
+    setThankYouUrl("");
     setFormError("");
     setIsSpinning(true);
     setRotation(target);
+    const pendingWindow = openPendingWindow();
     setTimeout(() => {
       setIsSpinning(false);
       setSelectedPrize(chosenPrize);
       (async () => {
-        try {
-          const submissionResult = await submitSpin({
-            fullName: trimmedName,
-            phone: trimmedPhone,
-            prize: chosenPrize
-          }, { skipRedirect: true });
-          if (!submissionResult?.ok) return;
-          const thankYouParams = new URLSearchParams({
-            site: fallbackSite,
-            locale: isRu ? "ru" : "en",
-            prize: chosenPrize
-          });
-          window.location.assign(
-            submissionResult.thankYouUrl || `/thankyou?${thankYouParams.toString()}`
-          );
-        } finally {
-          // No-op: redirect handled after successful submission.
-        }
+        await submitSelectedPrize({
+          name: trimmedName,
+          phone: trimmedPhone,
+          prize: chosenPrize,
+          pendingWindow
+        });
       })();
     }, 3200);
   };
@@ -564,21 +637,24 @@ export default function LuckySpinFormSec({
                   </div>
 
                   <div className="mt-0  pt-6 flex justify-start">
-                    <button
-                      type="button"
+                    <a
+                      href={thankYouUrl || "#"}
+                      target="_blank"
+                      rel="noreferrer"
+                      role="button"
+                      aria-disabled={actionDisabled ? "true" : undefined}
                       className={`rounded-xl bg-gradient-to-r from-copper-600 to-copper-500 text-white shadow-[0_10px_10px_rgba(0,0,0,0.09)] hover:from-copper-700 hover:to-copper-500 px-4 py-3 text-[11.5px] font-medium uppercase tracking-[0.13em] inline-flex items-center justify-center cursor-pointer transition-transform duration-200 ease-out pr-5 pl-6 ${
-                        isSpinning || isSubmitting || !canSpin
+                        actionDisabled
                           ? "pointer-events-none opacity-60"
                           : ""
                       }`}
                       onClick={handleSpin}
-                      disabled={isSpinning || isSubmitting || !canSpin}
                     >
-                      {isSpinning
-                        ? content.spinLoadingLabel
-                        : content.spinLabel}
-                      <span className="text-white/90">{isSpinning ? "" : " →"}</span>
-                    </button>
+                      {actionLabel}
+                      <span className="text-white/90">
+                        {isSpinning || isSubmitting ? "" : " →"}
+                      </span>
+                    </a>
                   </div>
 
                   {formError ? (

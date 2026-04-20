@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import WhatsAppTriggerButton from "../../../components/WhatsAppTriggerButton";
 
 const LUCKY_SPIN_SECTION_ID = "lucky-spin-section";
 
@@ -59,16 +60,11 @@ export default function Overlays({
 
   return (
     <>
-      <a
-        href={whatsappLink || "#"}
+      <WhatsAppTriggerButton
+        href={whatsappLink}
         target="_blank"
-        rel="noreferrer"
-        data-whatsapp-modal="skip"
         aria-label={copy.whatsappCta}
-        className="fixed bottom-6 lg:hover:-translate-y-0.5  transition left-4 lg:bottom-7 sm:left-7 z-[9999]"
-        onClick={(event) => {
-          if (!whatsappLink) event.preventDefault();
-        }}
+        className="fixed bottom-6 left-4 z-[9999] border-0 bg-transparent p-0 text-left transition lg:bottom-7 lg:hover:-translate-y-0.5 sm:left-7"
       >
         <div className="relative rounded-xl p-[1.2px] wa-shimmer-border">
           <div className="flex items-center gap-3 rounded-xl bg-white px-3.5 py-2.5 border border-main-200/60">
@@ -89,7 +85,7 @@ export default function Overlays({
             <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-green-500/80"></span>
           </div>
         </div>
-      </a>
+      </WhatsAppTriggerButton>
 
       <button
         type="button"
