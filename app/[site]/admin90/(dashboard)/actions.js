@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 
 import { clearAdminSession } from "@lib/adminAuth";
-import { DEFAULT_CUSTOM_HEADER } from "@lib/customHeader";
+import { DEFAULT_CUSTOM_HEADER, getSharedCustomHeaderSite } from "@lib/customHeader";
 import { prisma } from "@lib/prisma";
 import { getSectionDefaults } from "@lib/sectionDefaults";
 import { applyFormData, mergeSectionData } from "@lib/sectionForm";
@@ -325,6 +325,7 @@ export const updateSeoSettingsAction = async (site, formData) => {
 
 export const updateCustomHeaderAction = async (site, formData) => {
   const siteId = safeSite(site);
+  const sharedSite = getSharedCustomHeaderSite();
   try {
     const content =
       String(formData.get("customHeader") || "").trim() ||
@@ -332,11 +333,17 @@ export const updateCustomHeaderAction = async (site, formData) => {
     const bodyContent =
       String(formData.get("customBody") || "").trim() ||
       DEFAULT_CUSTOM_HEADER.bodyContent;
+    const bodyContentEn =
+      String(formData.get("customBodyEn") || "").trim() ||
+      DEFAULT_CUSTOM_HEADER.bodyContentEn;
+    const bodyContentRu =
+      String(formData.get("customBodyRu") || "").trim() ||
+      DEFAULT_CUSTOM_HEADER.bodyContentRu;
 
     await prisma.customHeader.upsert({
-      where: { site: siteId },
-      update: { content, bodyContent },
-      create: { site: siteId, content, bodyContent }
+      where: { site: sharedSite },
+      update: { content, bodyContent, bodyContentEn, bodyContentRu },
+      create: { site: sharedSite, content, bodyContent, bodyContentEn, bodyContentRu }
     });
   } catch (error) {
     redirect(`/${siteId}/admin90/custom-header?error=1`);

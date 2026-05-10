@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 
 import CustomHeadSnippet from "../../../components/CustomHeadSnippet";
-import { getCustomHeader } from "../../../../lib/customHeader";
+import {
+  getCustomHeader,
+  getLocalizedCustomBodyContent
+} from "../../../../lib/customHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +16,7 @@ export default async function LocaleLayout({ children, params }) {
   }
 
   const customHeader = await getCustomHeader("dental-implant");
+  const localizedBodyContent = getLocalizedCustomBodyContent(customHeader, locale);
 
   return (
     <html lang={locale}>
@@ -21,6 +25,9 @@ export default async function LocaleLayout({ children, params }) {
         {children}
         {customHeader?.bodyContent ? (
           <div dangerouslySetInnerHTML={{ __html: customHeader.bodyContent }} />
+        ) : null}
+        {localizedBodyContent ? (
+          <div dangerouslySetInnerHTML={{ __html: localizedBodyContent }} />
         ) : null}
       </body>
     </html>

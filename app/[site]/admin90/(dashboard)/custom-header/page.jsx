@@ -48,12 +48,34 @@ export default async function CustomHeaderPage({ params }) {
           <div className="mt-8">
             <FieldInput
               name="customBody"
-              label="Custom Body Snippet"
+              label="Custom Body Snippet (All Languages)"
               defaultValue={customHeader.bodyContent || ""}
               isTextarea
             />
             <p className="mt-2 text-xs text-slate-500">
-              Paste HTML to inject into the page body (e.g., a link or widget).
+              Paste HTML to inject into the page body for all languages.
+            </p>
+          </div>
+          <div className="mt-8">
+            <FieldInput
+              name="customBodyEn"
+              label="Custom Body Snippet (English Only)"
+              defaultValue={customHeader.bodyContentEn || ""}
+              isTextarea
+            />
+            <p className="mt-2 text-xs text-slate-500">
+              This snippet is injected only on English pages, below the global body snippet.
+            </p>
+          </div>
+          <div className="mt-8">
+            <FieldInput
+              name="customBodyRu"
+              label="Custom Body Snippet (Russian Only)"
+              defaultValue={customHeader.bodyContentRu || ""}
+              isTextarea
+            />
+            <p className="mt-2 text-xs text-slate-500">
+              This snippet is injected only on Russian pages, below the global body snippet.
             </p>
           </div>
         </div>

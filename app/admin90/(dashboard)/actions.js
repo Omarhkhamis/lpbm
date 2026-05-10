@@ -337,11 +337,17 @@ export const updateCustomHeaderAction = async (site, formData) => {
     const bodyContent =
       String(formData.get("customBody") || "").trim() ||
       DEFAULT_CUSTOM_HEADER.bodyContent;
+    const bodyContentEn =
+      String(formData.get("customBodyEn") || "").trim() ||
+      DEFAULT_CUSTOM_HEADER.bodyContentEn;
+    const bodyContentRu =
+      String(formData.get("customBodyRu") || "").trim() ||
+      DEFAULT_CUSTOM_HEADER.bodyContentRu;
 
     await prisma.customHeader.upsert({
       where: { site: sharedSite },
-      update: { content, bodyContent },
-      create: { site: sharedSite, content, bodyContent }
+      update: { content, bodyContent, bodyContentEn, bodyContentRu },
+      create: { site: sharedSite, content, bodyContent, bodyContentEn, bodyContentRu }
     });
   } catch (error) {
     redirect(`/admin90/custom-header?site=${siteId}&error=1`);
