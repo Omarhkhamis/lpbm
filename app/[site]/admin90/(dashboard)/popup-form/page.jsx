@@ -34,6 +34,10 @@ export default async function PopupFormSettingsPage({ params }) {
     settings[`${field}${item.suffix}`] ||
     (item.code === "en" ? settings[field] : "") ||
     item.defaults[field];
+  const getWhatsappLinkValue = (item) =>
+    settings[`whatsappLink${item.suffix}`] ||
+    settings.whatsappLink ||
+    "";
 
   return (
     <div className="space-y-6">
@@ -67,6 +71,22 @@ export default async function PopupFormSettingsPage({ params }) {
             </p>
 
             <div className="mt-4 grid gap-4">
+              <div>
+                <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                  WhatsApp Button Link
+                </label>
+                <input
+                  name={`whatsappLink${item.suffix}`}
+                  defaultValue={getWhatsappLinkValue(item)}
+                  placeholder="https://wa.me/905xxxxxxxxx?text=..."
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
+                />
+                <p className="mt-2 text-xs text-slate-500">
+                  This link will be used when visitors continue from the
+                  {` ${item.label.toLowerCase()} `}popup.
+                </p>
+              </div>
+
               <div>
                 <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
                   Popup Title

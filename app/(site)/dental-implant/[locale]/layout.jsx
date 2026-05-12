@@ -19,17 +19,15 @@ export default async function LocaleLayout({ children, params }) {
   const localizedBodyContent = getLocalizedCustomBodyContent(customHeader, locale);
 
   return (
-    <html lang={locale}>
-      <body>
-        <CustomHeadSnippet html={customHeader?.content} />
-        {children}
-        {customHeader?.bodyContent ? (
-          <div dangerouslySetInnerHTML={{ __html: customHeader.bodyContent }} />
-        ) : null}
-        {localizedBodyContent ? (
-          <div dangerouslySetInnerHTML={{ __html: localizedBodyContent }} />
-        ) : null}
-      </body>
-    </html>
+    <>
+      <CustomHeadSnippet html={customHeader?.content} />
+      {children}
+      {customHeader?.bodyContent ? (
+        <div dangerouslySetInnerHTML={{ __html: customHeader.bodyContent }} />
+      ) : null}
+      {localizedBodyContent ? (
+        <div dangerouslySetInnerHTML={{ __html: localizedBodyContent }} />
+      ) : null}
+    </>
   );
 }

@@ -239,7 +239,14 @@ export const updatePopupFormSettingsAction = async (site, formData) => {
   await requireFullAdminAction(siteId);
 
   try {
+    const whatsappLinkEn =
+      String(formData.get("whatsappLinkEn") || "").trim() || null;
+    const whatsappLinkRu =
+      String(formData.get("whatsappLinkRu") || "").trim() || null;
     const data = {
+      whatsappLink: whatsappLinkEn,
+      whatsappLinkEn,
+      whatsappLinkRu,
       popupFormTitle:
         String(formData.get("popupFormTitleEn") || "").trim() || null,
       popupFormTitleEn:

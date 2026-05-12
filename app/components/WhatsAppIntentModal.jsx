@@ -64,10 +64,6 @@ const applyWhatsappMessage = (href, text) => {
 };
 
 export default function WhatsAppIntentModal() {
-  const [activeLink, setActiveLink] = useState(null);
-  const [popupSettings, setPopupSettings] = useState(
-    getDefaultPopupFormSettings("en")
-  );
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const site = useMemo(
@@ -78,11 +74,19 @@ export default function WhatsAppIntentModal() {
     () => resolveLocale(pathname, searchParams),
     [pathname, searchParams]
   );
+  const [activeLink, setActiveLink] = useState(null);
+  const [popupSettings, setPopupSettings] = useState(() => ({
+    ...getDefaultPopupFormSettings(locale),
+    whatsappLink: null
+  }));
 
   useEffect(() => {
     const controller = new AbortController();
     const defaults = getDefaultPopupFormSettings(locale);
-    setPopupSettings(defaults);
+    setPopupSettings({
+      ...defaults,
+      whatsappLink: null
+    });
 
     const loadPopupSettings = async () => {
       try {
@@ -100,11 +104,15 @@ export default function WhatsAppIntentModal() {
         const data = await response.json();
         setPopupSettings({
           ...defaults,
+          whatsappLink: null,
           ...(data || {})
         });
       } catch (error) {
         if (error?.name !== "AbortError") {
-          setPopupSettings(defaults);
+          setPopupSettings({
+            ...defaults,
+            whatsappLink: null
+          });
         }
       }
     };
@@ -189,8 +197,9 @@ export default function WhatsAppIntentModal() {
         ? "Да, продолжить"
         : "Yes, I would like to continue"
   };
+  const localizedHref = String(popupSettings.whatsappLink || "").trim();
   const finalHref = applyWhatsappMessage(
-    activeLink?.href,
+    localizedHref || activeLink?.href,
     popupSettings.popupWhatsappMessage
   );
 

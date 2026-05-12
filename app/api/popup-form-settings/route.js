@@ -1,6 +1,7 @@
 import {
   getGeneralSettings,
-  getLocalizedPopupFormSettings
+  getLocalizedPopupFormSettings,
+  getLocalizedWhatsappLink
 } from "@lib/generalSettings";
 import { getDefaultPopupFormSettings } from "@lib/popupFormDefaults";
 import { normalizeLocale, normalizeSite } from "@lib/sites";
@@ -19,6 +20,7 @@ export async function GET(request) {
       ok: true,
       site,
       locale,
+      whatsappLink: getLocalizedWhatsappLink(settings, locale),
       ...popupSettings
     });
   } catch {
