@@ -4,7 +4,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 
-import { clearAdminSession } from "@lib/adminAuth";
+import { clearAdminSession, getAdminUser } from "@lib/adminAuth";
+import {
+  ADMIN_ROLE,
+  getDataHomePath,
+  isFullAdmin,
+  normalizeAdminRole,
+  normalizeDataLocaleAccess
+} from "@lib/adminPermissions";
 import { DEFAULT_CUSTOM_HEADER, getSharedCustomHeaderSite } from "@lib/customHeader";
 import { prisma } from "@lib/prisma";
 import { getSectionDefaults } from "@lib/sectionDefaults";
@@ -18,8 +25,17 @@ const revalidatePublic = (site, locale) => {
 
 const safeSite = (site) => normalizeSite(site) || "hollywood-smile";
 
+const requireFullAdminAction = async (siteId) => {
+  const user = await getAdminUser();
+  if (!isFullAdmin(user)) {
+    redirect(getDataHomePath(user, siteId));
+  }
+  return user;
+};
+
 export const updateSectionAction = async (site, key, formData) => {
   const siteId = safeSite(site);
+  await requireFullAdminAction(siteId);
   const localeParam = normalizeLocale(formData.get("locale"));
 
   try {
@@ -155,6 +171,7 @@ export const updateSectionAction = async (site, key, formData) => {
 
 export const toggleSectionAction = async (site, key, locale = "en") => {
   const siteId = safeSite(site);
+  await requireFullAdminAction(siteId);
   const lang = normalizeLocale(locale);
   const section = await prisma.section.findUnique({
     where: { key_locale_site: { key, locale: lang, site: siteId } },
@@ -178,6 +195,7 @@ export const toggleSectionAction = async (site, key, locale = "en") => {
 
 export const updateGeneralSettingsAction = async (site, formData) => {
   const siteId = safeSite(site);
+  await requireFullAdminAction(siteId);
   try {
     const rawDelay = String(formData.get("consultationDelaySeconds") || "").trim();
     const parsedDelay = rawDelay ? Number(rawDelay) : null;
@@ -189,7 +207,11 @@ export const updateGeneralSettingsAction = async (site, formData) => {
       formRecipientEmail:
         String(formData.get("formRecipientEmail") || "").trim() || null,
       whatsappLink:
-        String(formData.get("whatsappLink") || "").trim() || null,
+        String(formData.get("whatsappLinkEn") || "").trim() || null,
+      whatsappLinkEn:
+        String(formData.get("whatsappLinkEn") || "").trim() || null,
+      whatsappLinkRu:
+        String(formData.get("whatsappLinkRu") || "").trim() || null,
       hideFormPrivacyNote:
         String(formData.get("hideFormPrivacyNote") || "").trim() === "hide",
       logoUrl: String(formData.get("logoUrl") || "").trim() || null,
@@ -214,15 +236,28 @@ export const updateGeneralSettingsAction = async (site, formData) => {
 
 export const updatePopupFormSettingsAction = async (site, formData) => {
   const siteId = safeSite(site);
+  await requireFullAdminAction(siteId);
 
   try {
     const data = {
       popupFormTitle:
-        String(formData.get("popupFormTitle") || "").trim() || null,
+        String(formData.get("popupFormTitleEn") || "").trim() || null,
+      popupFormTitleEn:
+        String(formData.get("popupFormTitleEn") || "").trim() || null,
+      popupFormTitleRu:
+        String(formData.get("popupFormTitleRu") || "").trim() || null,
       popupFormBody:
-        String(formData.get("popupFormBody") || "").trim() || null,
+        String(formData.get("popupFormBodyEn") || "").trim() || null,
+      popupFormBodyEn:
+        String(formData.get("popupFormBodyEn") || "").trim() || null,
+      popupFormBodyRu:
+        String(formData.get("popupFormBodyRu") || "").trim() || null,
       popupWhatsappMessage:
-        String(formData.get("popupWhatsappMessage") || "").trim() || null
+        String(formData.get("popupWhatsappMessageEn") || "").trim() || null,
+      popupWhatsappMessageEn:
+        String(formData.get("popupWhatsappMessageEn") || "").trim() || null,
+      popupWhatsappMessageRu:
+        String(formData.get("popupWhatsappMessageRu") || "").trim() || null
     };
 
     await prisma.generalSettings.upsert({
@@ -242,6 +277,7 @@ export const updatePopupFormSettingsAction = async (site, formData) => {
 
 export const updateFooterSettingsAction = async (site, formData) => {
   const siteId = safeSite(site);
+  await requireFullAdminAction(siteId);
   const locale = normalizeLocale(formData.get("locale") || "en");
 
   try {
@@ -294,6 +330,7 @@ export const updateFooterSettingsAction = async (site, formData) => {
 
 export const updateSeoSettingsAction = async (site, formData) => {
   const siteId = safeSite(site);
+  await requireFullAdminAction(siteId);
   const locale = normalizeLocale(formData.get("locale") || "en");
 
   try {
@@ -329,6 +366,7 @@ export const updateSeoSettingsAction = async (site, formData) => {
 
 export const updateCustomHeaderAction = async (site, formData) => {
   const siteId = safeSite(site);
+  await requireFullAdminAction(siteId);
   const sharedSite = getSharedCustomHeaderSite();
   try {
     const content =
@@ -362,6 +400,7 @@ export const updateCustomHeaderAction = async (site, formData) => {
 
 export const updatePageAction = async (site, slug, formData) => {
   const siteId = safeSite(site);
+  await requireFullAdminAction(siteId);
   try {
     const title = String(formData.get("title") || "").trim();
     const content = String(formData.get("content") || "").trim();
@@ -383,9 +422,14 @@ export const updatePageAction = async (site, slug, formData) => {
 
 export const createAdminUserAction = async (site, formData) => {
   const siteId = safeSite(site);
+  await requireFullAdminAction(siteId);
   try {
     const email = String(formData.get("email") || "").trim().toLowerCase();
     const password = String(formData.get("password") || "");
+    const role = normalizeAdminRole(formData.get("role"));
+    const dataLocaleAccess = normalizeDataLocaleAccess(
+      formData.get("dataLocaleAccess")
+    );
     if (!email || password.length < 6) {
       redirect(`/admin90/admin-users?site=${siteId}&error=1`);
     }
@@ -397,7 +441,7 @@ export const createAdminUserAction = async (site, formData) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
     await prisma.adminUser.create({
-      data: { email, passwordHash }
+      data: { email, passwordHash, role, dataLocaleAccess }
     });
   } catch (error) {
     redirect(`/admin90/admin-users?site=${siteId}&error=1`);
@@ -409,6 +453,7 @@ export const createAdminUserAction = async (site, formData) => {
 
 export const reorderSectionsAction = async (site, formData) => {
   const siteId = safeSite(site);
+  await requireFullAdminAction(siteId);
   const rawOrder = String(formData.get("order") || "[]");
   const locale = normalizeLocale(formData.get("locale") || "en");
   let keys = [];
@@ -448,16 +493,39 @@ export const reorderSectionsAction = async (site, formData) => {
 
 export const updateAdminUserAction = async (site, formData) => {
   const siteId = safeSite(site);
+  await requireFullAdminAction(siteId);
   try {
     const id = String(formData.get("id") || "").trim();
     const email = String(formData.get("email") || "").trim().toLowerCase();
     const password = String(formData.get("password") || "");
 
-    if (!id || (!email && !password)) {
+    if (!id) {
       redirect(`/admin90/admin-users?site=${siteId}&error=1`);
     }
 
-    const data = {};
+    const existingTarget = await prisma.adminUser.findUnique({ where: { id } });
+    if (!existingTarget) {
+      redirect(`/admin90/admin-users?site=${siteId}&error=1`);
+    }
+
+    const data = {
+      role: normalizeAdminRole(formData.get("role")),
+      dataLocaleAccess: normalizeDataLocaleAccess(
+        formData.get("dataLocaleAccess")
+      )
+    };
+
+    if (data.role === ADMIN_ROLE.DATA_VIEWER) {
+      const remainingFullAdmins = await prisma.adminUser.count({
+        where: {
+          id: { not: id },
+          NOT: { role: ADMIN_ROLE.DATA_VIEWER }
+        }
+      });
+      if (remainingFullAdmins < 1) {
+        redirect(`/admin90/admin-users?site=${siteId}&error=1`);
+      }
+    }
 
     if (email) {
       const existing = await prisma.adminUser.findUnique({ where: { email } });

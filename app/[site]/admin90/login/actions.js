@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createAdminSession, verifyAdminCredentials } from "@lib/adminAuth";
+import { getDataHomePath, isDataViewer } from "@lib/adminPermissions";
 import { normalizeSite } from "@lib/sites";
 
 export const loginAction = async (site, formData) => {
@@ -15,5 +16,8 @@ export const loginAction = async (site, formData) => {
   }
 
   await createAdminSession(user.id);
+  if (isDataViewer(user)) {
+    redirect(getDataHomePath(user, siteId));
+  }
   redirect(`/admin90/overview?site=${siteId}`);
 };

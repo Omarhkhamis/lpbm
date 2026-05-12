@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { requireFullAdmin } from "@lib/adminAccess";
 import { getSeoSettings } from "@lib/seoSettings";
 import { normalizeLocale, normalizeSite } from "@lib/sites";
 import { updateSeoSettingsAction } from "../actions";
@@ -11,6 +12,7 @@ export default async function SeoSettingsPage({ params, searchParams }) {
   if (!site) {
     notFound();
   }
+  await requireFullAdmin(site, { scoped: true });
   const locale = normalizeLocale(searchParams?.locale);
   const seo = await getSeoSettings(site, locale);
   const action = updateSeoSettingsAction.bind(null, site);

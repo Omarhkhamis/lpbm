@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { requireFullAdmin } from "@lib/adminAccess";
 import { getPageBySlug } from "@lib/pages";
 import { normalizeSite } from "@lib/sites";
 import { updatePageAction } from "../../actions";
@@ -9,6 +10,7 @@ export default async function PageEditor({ params, searchParams }) {
   if (!site) {
     notFound();
   }
+  await requireFullAdmin(site, { scoped: true });
   const page = await getPageBySlug(params.slug);
   if (!page) {
     notFound();

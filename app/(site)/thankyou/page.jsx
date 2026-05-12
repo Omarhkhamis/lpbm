@@ -5,7 +5,10 @@ import HollywoodHeader from "../hollywood-smile/en/components/Header";
 import CustomHeadSnippet from "../../components/CustomHeadSnippet";
 import { getCustomHeader } from "../../../lib/customHeader";
 import { getFooterSettings } from "../../../lib/footerSettings";
-import { getGeneralSettings } from "../../../lib/generalSettings";
+import {
+  getGeneralSettings,
+  getLocalizedGeneralSettings
+} from "../../../lib/generalSettings";
 import { getPageBySlug } from "../../../lib/pages";
 import { normalizeLocale, normalizeSite } from "../../../lib/sites";
 
@@ -51,11 +54,12 @@ export default async function ThankYouPage({ searchParams }) {
   }
 
   const paragraphs = renderParagraphs(page.content);
+  const localizedGeneral = getLocalizedGeneralSettings(general, locale);
 
   return (
     <>
       <CustomHeadSnippet html={customHeader?.content} />
-      <Header general={general} footer={footer} locale={locale} />
+      <Header general={localizedGeneral} footer={footer} locale={locale} />
       <main className="relative overflow-hidden bg-gradient-to-br from-main-950 via-main-900 to-main-800 text-white pt-24">
         <div className="absolute inset-0">
           <div className="absolute left-[-20%] top-[-10%] h-64 w-64 rounded-full bg-copper-600/20 blur-[100px]" />
@@ -112,7 +116,12 @@ export default async function ThankYouPage({ searchParams }) {
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3"></div>
         </section>
       </main>
-      <Footer general={general} footer={footer} locale={locale} site={site} />
+      <Footer
+        general={localizedGeneral}
+        footer={footer}
+        locale={locale}
+        site={site}
+      />
       {customHeader?.bodyContent ? (
         <div dangerouslySetInnerHTML={{ __html: customHeader.bodyContent }} />
       ) : null}

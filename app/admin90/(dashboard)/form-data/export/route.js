@@ -1,4 +1,11 @@
 import { prisma } from "@lib/prisma";
+import { getAdminUser } from "@lib/adminAuth";
+import { resolveDataLanguageFilter } from "@lib/adminPermissions";
+import {
+  filterSubmissionsByLocale,
+  getSubmissionLocale,
+  normalizeSubmissionLocale
+} from "@lib/formSubmissionLocale";
 import { normalizeSite } from "@lib/sites";
 
 const normalizeDate = (value, fallback) => {
@@ -73,22 +80,32 @@ export async function GET(request) {
   const month = searchParams.get("month") || "";
   const from = searchParams.get("from") || "";
   const to = searchParams.get("to") || "";
+  const user = await getAdminUser();
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+  const language = resolveDataLanguageFilter(
+    user,
+    normalizeSubmissionLocale(searchParams.get("language"))
+  );
   const createdAt = buildDateRange(month, from, to);
   const where = {
     ...(createdAt ? { createdAt } : {}),
     site
   };
 
-  const records = await prisma.formSubmission.findMany({
+  const allRecords = await prisma.formSubmission.findMany({
     where,
     orderBy: { createdAt: order }
   });
+  const records = filterSubmissionsByLocale(allRecords, language);
 
   const header = [
     "id",
     "source",
     "formName",
     "page",
+    "locale",
     "fullName",
     "email",
     "emailStatus",
@@ -117,6 +134,7 @@ export async function GET(request) {
       escapeCsv(record.source || payload.source || "form"),
       escapeCsv(formName),
       escapeCsv(record.page || payload.page || ""),
+      escapeCsv(getSubmissionLocale(record)),
       escapeCsv(fullName),
       escapeCsv(email),
       escapeCsv(emailDelivery.status || ""),

@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 
 import { getAdminUser } from "@lib/adminAuth";
+import { isDataViewer } from "@lib/adminPermissions";
 import { getSectionsByLocale } from "@lib/sections";
 import { normalizeLocale, normalizeSite } from "@lib/sites";
 import { logoutAction } from "./actions";
@@ -25,7 +26,8 @@ export default async function AdminLayout({ children, searchParams, params }) {
   }
 
   const locale = normalizeLocale(searchParams?.locale);
-  const sections = await getSectionsByLocale(site, locale);
+  const dataOnly = isDataViewer(user);
+  const sections = dataOnly ? [] : await getSectionsByLocale(site, locale);
   const logout = logoutAction.bind(null, site);
 
   return (
@@ -41,11 +43,17 @@ export default async function AdminLayout({ children, searchParams, params }) {
             </div>
             <div className="flex flex-col items-end gap-2">
               <SiteSwitcher />
-              <LocaleSwitcher site={site} />
+              {!dataOnly ? <LocaleSwitcher site={site} /> : null}
             </div>
           </div>
 
-          <SidebarNav site={site} sections={sections} locale={locale} />
+          <SidebarNav
+            site={site}
+            sections={sections}
+            locale={locale}
+            isDataViewer={dataOnly}
+            dataLocaleAccess={user.dataLocaleAccess}
+          />
 
           <form action={logout} className="mt-10">
             <button

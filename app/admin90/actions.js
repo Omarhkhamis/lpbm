@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createAdminSession, verifyAdminCredentials } from "@lib/adminAuth";
+import { getDataHomePath, isDataViewer } from "@lib/adminPermissions";
 import { normalizeSite } from "@lib/sites";
 
 const DEFAULT_SITE = "hollywood-smile";
@@ -17,5 +18,8 @@ export const loginUnifiedAction = async (formData) => {
   }
 
   await createAdminSession(user.id);
+  if (isDataViewer(user)) {
+    redirect(getDataHomePath(user, site));
+  }
   redirect(`/admin90/overview?site=${site}`);
 };

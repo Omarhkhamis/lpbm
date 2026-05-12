@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
-import { DEFAULT_POPUP_FORM_SETTINGS } from "../../lib/popupFormDefaults";
+import { getDefaultPopupFormSettings } from "../../lib/popupFormDefaults";
 import { normalizeSite } from "../../lib/sites";
 
 const MODAL_CANCEL_ID = "whatsapp-consultation-modal-cancel";
@@ -35,6 +35,19 @@ const resolveSite = (pathname, searchParams) => {
   return "hollywood-smile";
 };
 
+const resolveLocale = (pathname, searchParams) => {
+  const queryLocale = String(searchParams?.get("locale") || "").toLowerCase();
+  if (queryLocale === "ru" || queryLocale === "en") return queryLocale;
+
+  const segments = String(pathname || "")
+    .split("/")
+    .filter(Boolean);
+  const pathLocale = segments.find(
+    (segment) => segment === "ru" || segment === "en"
+  );
+  return pathLocale || "en";
+};
+
 const applyWhatsappMessage = (href, text) => {
   const link = String(href || "").trim();
   const message = String(text || "").trim();
@@ -53,7 +66,7 @@ const applyWhatsappMessage = (href, text) => {
 export default function WhatsAppIntentModal() {
   const [activeLink, setActiveLink] = useState(null);
   const [popupSettings, setPopupSettings] = useState(
-    DEFAULT_POPUP_FORM_SETTINGS
+    getDefaultPopupFormSettings("en")
   );
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -61,14 +74,23 @@ export default function WhatsAppIntentModal() {
     () => resolveSite(pathname, searchParams),
     [pathname, searchParams]
   );
+  const locale = useMemo(
+    () => resolveLocale(pathname, searchParams),
+    [pathname, searchParams]
+  );
 
   useEffect(() => {
     const controller = new AbortController();
+    const defaults = getDefaultPopupFormSettings(locale);
+    setPopupSettings(defaults);
 
     const loadPopupSettings = async () => {
       try {
+        const endpoint = `/api/popup-form-settings?site=${encodeURIComponent(
+          site
+        )}&locale=${encodeURIComponent(locale)}`;
         const response = await fetch(
-          `/api/popup-form-settings?site=${encodeURIComponent(site)}`,
+          endpoint,
           {
             cache: "no-store",
             signal: controller.signal
@@ -77,12 +99,12 @@ export default function WhatsAppIntentModal() {
         if (!response.ok) return;
         const data = await response.json();
         setPopupSettings({
-          ...DEFAULT_POPUP_FORM_SETTINGS,
+          ...defaults,
           ...(data || {})
         });
       } catch (error) {
         if (error?.name !== "AbortError") {
-          setPopupSettings(DEFAULT_POPUP_FORM_SETTINGS);
+          setPopupSettings(defaults);
         }
       }
     };
@@ -90,7 +112,7 @@ export default function WhatsAppIntentModal() {
     loadPopupSettings();
 
     return () => controller.abort();
-  }, [site]);
+  }, [site, locale]);
 
   useEffect(() => {
     const store = window.__WHATSAPP_INTENT_MODAL__;
@@ -99,12 +121,13 @@ export default function WhatsAppIntentModal() {
     const pushPopupOpenEvent = (linkData) => {
       if (typeof window === "undefined") return;
       window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({
-        event: "whatsapp_popup_open",
-        popup_type: "whatsapp_intent",
-        popup_site: site,
-        whatsapp_source: String(linkData?.source || "").trim() || "unspecified",
-        whatsapp_href: String(linkData?.href || "").trim(),
+        window.dataLayer.push({
+          event: "whatsapp_popup_open",
+          popup_type: "whatsapp_intent",
+          popup_site: site,
+          popup_locale: locale,
+          whatsapp_source: String(linkData?.source || "").trim() || "unspecified",
+          whatsapp_href: String(linkData?.href || "").trim(),
         whatsapp_target: resolveTarget(linkData?.target),
         page_path: window.location.pathname,
         page_url: window.location.href
@@ -135,7 +158,7 @@ export default function WhatsAppIntentModal() {
         store.listener = null;
       }
     };
-  }, [site]);
+  }, [site, locale]);
 
   useEffect(() => {
     if (!activeLink) return;
@@ -156,11 +179,15 @@ export default function WhatsAppIntentModal() {
   }, [activeLink]);
 
   const modalCopy = {
-    eyebrow: "WhatsApp Consultation",
+    eyebrow:
+      locale === "ru" ? "Консультация в WhatsApp" : "WhatsApp Consultation",
     title: popupSettings.popupFormTitle,
     body: popupSettings.popupFormBody,
-    cancel: "No, close the form",
-    confirm: "Yes, I would like to continue"
+    cancel: locale === "ru" ? "Нет, закрыть" : "No, close the form",
+    confirm:
+      locale === "ru"
+        ? "Да, продолжить"
+        : "Yes, I would like to continue"
   };
   const finalHref = applyWhatsappMessage(
     activeLink?.href,
@@ -178,7 +205,11 @@ export default function WhatsAppIntentModal() {
         type="button"
         className="absolute inset-0 bg-main-950/72 backdrop-blur-[6px]"
         onClick={() => setActiveLink(null)}
-        aria-label="Close WhatsApp confirmation"
+        aria-label={
+          locale === "ru"
+            ? "Закрыть подтверждение WhatsApp"
+            : "Close WhatsApp confirmation"
+        }
       />
 
       <div
@@ -205,7 +236,7 @@ export default function WhatsAppIntentModal() {
               type="button"
               className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/6 text-white/75 transition hover:bg-white/10 hover:text-white"
               onClick={() => setActiveLink(null)}
-              aria-label="Close"
+              aria-label={locale === "ru" ? "Закрыть" : "Close"}
             >
               <i className="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
             </button>

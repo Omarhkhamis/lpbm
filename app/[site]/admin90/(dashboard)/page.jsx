@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { requireFullAdmin } from "@lib/adminAccess";
 import { getSectionsByLocale } from "@lib/sections";
 import { normalizeLocale, normalizeSite } from "@lib/sites";
 
@@ -8,6 +9,7 @@ export default async function AdminHomePage({ searchParams, params }) {
   if (!site) {
     notFound();
   }
+  await requireFullAdmin(site, { scoped: true });
   const locale = normalizeLocale(searchParams?.locale);
   const sections = await getSectionsByLocale(site, locale);
   const enabledCount = sections.filter((section) => section.enabled).length;

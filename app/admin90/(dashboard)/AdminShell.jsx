@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { getAdminUser } from "@lib/adminAuth";
+import { getDataHomePath, isDataViewer } from "@lib/adminPermissions";
 import { getSectionsByLocale } from "@lib/sections";
 import { normalizeLocale, normalizeSite } from "@lib/sites";
 import { logoutAction } from "./actions";
@@ -9,7 +10,12 @@ import GlobalSaveNotifier from "./components/GlobalSaveNotifier";
 import LocaleSwitcher from "./components/LocaleSwitcher";
 import SiteSwitcher from "./components/SiteSwitcher";
 
-export default async function AdminShell({ children, site, locale }) {
+export default async function AdminShell({
+  children,
+  site,
+  locale,
+  allowDataViewer = false
+}) {
   const siteId = normalizeSite(site) || "hollywood-smile";
   const lang = normalizeLocale(locale);
 
@@ -17,8 +23,12 @@ export default async function AdminShell({ children, site, locale }) {
   if (!user) {
     redirect(`/admin90?site=${siteId}`);
   }
+  const dataOnly = isDataViewer(user);
+  if (dataOnly && !allowDataViewer) {
+    redirect(getDataHomePath(user, siteId));
+  }
 
-  const sections = await getSectionsByLocale(siteId, lang);
+  const sections = dataOnly ? [] : await getSectionsByLocale(siteId, lang);
   const logout = logoutAction.bind(null, siteId);
 
   return (
@@ -35,12 +45,20 @@ export default async function AdminShell({ children, site, locale }) {
             <div className="flex flex-col gap-2">
               <SiteSwitcher site={siteId} />
             </div>
-            <div className="flex flex-col gap-2">
-              <LocaleSwitcher site={siteId} locale={lang} />
-            </div>
+            {!dataOnly ? (
+              <div className="flex flex-col gap-2">
+                <LocaleSwitcher site={siteId} locale={lang} />
+              </div>
+            ) : null}
           </div>
 
-          <SidebarNav site={siteId} sections={sections} locale={lang} />
+          <SidebarNav
+            site={siteId}
+            sections={sections}
+            locale={lang}
+            isDataViewer={dataOnly}
+            dataLocaleAccess={user.dataLocaleAccess}
+          />
 
           <form action={logout} className="mt-10">
             <button

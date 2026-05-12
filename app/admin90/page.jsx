@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 
 import { getAdminUser } from "@lib/adminAuth";
+import { getDataHomePath, isDataViewer } from "@lib/adminPermissions";
 import { SITES } from "@lib/sites";
 import { loginUnifiedAction } from "./actions";
 
@@ -97,10 +98,14 @@ export default async function AdminRootPage({ searchParams }) {
           {SITES.map((item) => (
             <Link
               key={item.id}
-              href={`/admin90/overview?site=${item.id}`}
+              href={
+                isDataViewer(user)
+                  ? getDataHomePath(user, item.id)
+                  : `/admin90/overview?site=${item.id}`
+              }
               className="rounded-lg border border-white/10 bg-slate-900/60 px-4 py-3 text-sm font-semibold text-white hover:border-copper-300 hover:bg-slate-800 transition"
             >
-              Open {item.label} Admin
+              Open {item.label} {isDataViewer(user) ? "Data" : "Admin"}
             </Link>
           ))}
         </div>

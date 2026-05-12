@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 
+import { requireFullAdmin } from "@lib/adminAccess";
 import { getGeneralSettings } from "@lib/generalSettings";
-import { DEFAULT_POPUP_FORM_SETTINGS } from "@lib/popupFormDefaults";
+import { getDefaultPopupFormSettings } from "@lib/popupFormDefaults";
 import { normalizeSite } from "@lib/sites";
 import { updatePopupFormSettingsAction } from "../actions";
 import SaveToast from "../components/SaveToast";
@@ -11,9 +12,28 @@ export default async function PopupFormSettingsPage({ params }) {
   if (!site) {
     notFound();
   }
+  await requireFullAdmin(site, { scoped: true });
 
   const settings = await getGeneralSettings(site);
   const action = updatePopupFormSettingsAction.bind(null, site);
+  const popupLocales = [
+    {
+      code: "en",
+      label: "English",
+      suffix: "En",
+      defaults: getDefaultPopupFormSettings("en")
+    },
+    {
+      code: "ru",
+      label: "Russian",
+      suffix: "Ru",
+      defaults: getDefaultPopupFormSettings("ru")
+    }
+  ];
+  const getPopupValue = (field, item) =>
+    settings[`${field}${item.suffix}`] ||
+    (item.code === "en" ? settings[field] : "") ||
+    item.defaults[field];
 
   return (
     <div className="space-y-6">
@@ -37,69 +57,58 @@ export default async function PopupFormSettingsPage({ params }) {
       </div>
 
       <form action={action} className="space-y-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-            Popup Content
-          </p>
-
-          <div className="mt-4 grid gap-4">
-            <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                Popup Title
-              </label>
-              <textarea
-                name="popupFormTitle"
-                rows="4"
-                defaultValue={
-                  settings.popupFormTitle ||
-                  DEFAULT_POPUP_FORM_SETTINGS.popupFormTitle
-                }
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                Popup Description
-              </label>
-              <textarea
-                name="popupFormBody"
-                rows="3"
-                defaultValue={
-                  settings.popupFormBody ||
-                  DEFAULT_POPUP_FORM_SETTINGS.popupFormBody
-                }
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
-            WhatsApp Ready Message
-          </p>
-
-          <div className="mt-4">
-            <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
-              Message Inserted Into WhatsApp
-            </label>
-            <textarea
-              name="popupWhatsappMessage"
-              rows="6"
-              defaultValue={
-                settings.popupWhatsappMessage ||
-                DEFAULT_POPUP_FORM_SETTINGS.popupWhatsappMessage
-              }
-              className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
-            />
-            <p className="mt-2 text-xs text-slate-500">
-              This text will replace the <code>text=</code> part in the
-              WhatsApp link after the visitor clicks the green continue
-              button.
+        {popupLocales.map((item) => (
+          <div
+            key={item.code}
+            className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+          >
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-400">
+              {item.label} Popup
             </p>
+
+            <div className="mt-4 grid gap-4">
+              <div>
+                <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                  Popup Title
+                </label>
+                <textarea
+                  name={`popupFormTitle${item.suffix}`}
+                  rows="4"
+                  defaultValue={getPopupValue("popupFormTitle", item)}
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                  Popup Description
+                </label>
+                <textarea
+                  name={`popupFormBody${item.suffix}`}
+                  rows="3"
+                  defaultValue={getPopupValue("popupFormBody", item)}
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                  Message Inserted Into WhatsApp
+                </label>
+                <textarea
+                  name={`popupWhatsappMessage${item.suffix}`}
+                  rows="6"
+                  defaultValue={getPopupValue("popupWhatsappMessage", item)}
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
+                />
+                <p className="mt-2 text-xs text-slate-500">
+                  This text will replace the <code>text=</code> part in the
+                  WhatsApp link for {item.label.toLowerCase()} pages.
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        ))}
 
         <div className="flex items-center justify-end">
           <button

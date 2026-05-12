@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { requireFullAdmin } from "@lib/adminAccess";
 import { getFooterSettings } from "@lib/footerSettings";
 import { normalizeLocale, normalizeSite } from "@lib/sites";
 import { updateFooterSettingsAction } from "../actions";
@@ -11,6 +12,7 @@ export default async function FooterSettingsPage({ params, searchParams }) {
   if (!site) {
     notFound();
   }
+  await requireFullAdmin(site, { scoped: true });
   const locale = normalizeLocale(searchParams?.locale);
   const settings = await getFooterSettings(site, locale);
   const action = updateFooterSettingsAction.bind(null, site);

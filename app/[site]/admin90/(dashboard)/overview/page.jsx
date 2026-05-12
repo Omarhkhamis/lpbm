@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { requireFullAdmin } from "@lib/adminAccess";
 import { getSections } from "@lib/sections";
 import { normalizeSite } from "@lib/sites";
 
@@ -8,6 +9,7 @@ export default async function OverviewPage({ params }) {
   if (!site) {
     notFound();
   }
+  await requireFullAdmin(site, { scoped: true });
   const sections = await getSections(site);
 
   return (

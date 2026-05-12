@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { requireFullAdmin } from "@lib/adminAccess";
 import ReorderSections from "../components/ReorderSections";
 import { getSectionsByLocale } from "@lib/sections";
 import { normalizeLocale, normalizeSite } from "@lib/sites";
@@ -11,6 +12,7 @@ export default async function SectionsReorderPage({ searchParams, params }) {
   if (!site) {
     notFound();
   }
+  await requireFullAdmin(site, { scoped: true });
   const locale = normalizeLocale(searchParams?.locale);
   const sections = await getSectionsByLocale(site, locale);
   const reordered = searchParams?.reordered === "1";

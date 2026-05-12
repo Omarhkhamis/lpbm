@@ -1,4 +1,7 @@
 import { prisma } from "@lib/prisma";
+import { getAdminUser } from "@lib/adminAuth";
+import { resolveDataLanguageFilter } from "@lib/adminPermissions";
+import { normalizeSubmissionLocale } from "@lib/formSubmissionLocale";
 import { normalizeSite } from "@lib/sites";
 
 const normalizeDate = (value, fallback) => {
@@ -48,9 +51,18 @@ export async function GET(request) {
   const month = searchParams.get("month") || "";
   const from = searchParams.get("from") || "";
   const to = searchParams.get("to") || "";
+  const user = await getAdminUser();
+  if (!user) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+  const language = resolveDataLanguageFilter(
+    user,
+    normalizeSubmissionLocale(searchParams.get("language"))
+  );
   const createdAt = buildDateRange(month, from, to);
   const where = {
     ...(createdAt ? { createdAt } : {}),
+    ...(language ? { locale: language } : {}),
     site
   };
 
@@ -59,7 +71,7 @@ export async function GET(request) {
     orderBy: { createdAt: order }
   });
 
-  const header = ["id", "fullName", "phone", "prize", "createdAt"];
+  const header = ["id", "fullName", "phone", "prize", "locale", "createdAt"];
 
   const rows = records.map((record) =>
     [
@@ -67,6 +79,7 @@ export async function GET(request) {
       escapeCsv(record.fullName),
       escapeCsv(record.phone),
       escapeCsv(record.prize),
+      escapeCsv(record.locale || "en"),
       escapeCsv(record.createdAt?.toISOString?.() || "")
     ].join(",")
   );

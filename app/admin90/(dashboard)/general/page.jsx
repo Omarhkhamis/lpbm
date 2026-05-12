@@ -41,19 +41,40 @@ export default async function GeneralSettingsPage({ searchParams }) {
                 className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
               />
             </div>
-            <div className="sm:col-span-2">
-              <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                WhatsApp Buttons Link
-              </label>
-              <input
-                name="whatsappLink"
-                defaultValue={settings.whatsappLink || ""}
-                placeholder="https://wa.me/905xxxxxxxxx?text=..."
-                className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
-              />
-              <p className="mt-1 text-xs text-slate-500">
-                All WhatsApp/contact buttons will use this link.
-              </p>
+            <div className="sm:col-span-2 grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                  WhatsApp Buttons Link - English
+                </label>
+                <input
+                  name="whatsappLinkEn"
+                  defaultValue={
+                    settings.whatsappLinkEn || settings.whatsappLink || ""
+                  }
+                  placeholder="https://wa.me/905xxxxxxxxx?text=..."
+                  className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
+                />
+                <p className="mt-1 text-xs text-slate-500">
+                  English pages will use this WhatsApp link.
+                </p>
+              </div>
+
+              <div>
+                <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                  WhatsApp Buttons Link - Russian
+                </label>
+                <input
+                  name="whatsappLinkRu"
+                  defaultValue={
+                    settings.whatsappLinkRu || settings.whatsappLink || ""
+                  }
+                  placeholder="https://wa.me/905xxxxxxxxx?text=..."
+                  className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
+                />
+                <p className="mt-1 text-xs text-slate-500">
+                  Russian pages will use this WhatsApp link.
+                </p>
+              </div>
             </div>
             <div>
               <label className="text-xs uppercase tracking-[0.2em] text-slate-500">

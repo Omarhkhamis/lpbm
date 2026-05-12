@@ -3,6 +3,7 @@ import path from "path";
 
 import { notFound } from "next/navigation";
 
+import { requireFullAdmin } from "@lib/adminAccess";
 import MediaUpload from "../components/MediaUpload";
 import MediaGallery from "../components/MediaGallery";
 import { normalizeSite } from "@lib/sites";
@@ -47,6 +48,7 @@ export default async function MediaPage({ params }) {
   if (!site) {
     notFound();
   }
+  await requireFullAdmin(site, { scoped: true });
   const files = await getUploads();
 
   return (

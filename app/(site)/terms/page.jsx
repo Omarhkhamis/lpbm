@@ -5,7 +5,10 @@ import HollywoodHeader from "../hollywood-smile/en/components/Header";
 import CustomHeadSnippet from "../../components/CustomHeadSnippet";
 import { getCustomHeader } from "../../../lib/customHeader";
 import { getFooterSettings } from "../../../lib/footerSettings";
-import { getGeneralSettings } from "../../../lib/generalSettings";
+import {
+  getGeneralSettings,
+  getLocalizedGeneralSettings
+} from "../../../lib/generalSettings";
 import { getPageBySlug } from "../../../lib/pages";
 import { normalizeLocale, normalizeSite } from "../../../lib/sites";
 
@@ -44,10 +47,12 @@ export default async function TermsPage({ searchParams }) {
     return null;
   }
 
+  const localizedGeneral = getLocalizedGeneralSettings(general, locale);
+
   return (
     <>
       <CustomHeadSnippet html={customHeader?.content} />
-      <Header general={general} footer={footer} locale={locale} />
+      <Header general={localizedGeneral} footer={footer} locale={locale} />
       <main className="mx-auto min-h-[70vh] max-w-screen-md px-6 lg:px-10 py-16 lg:py-20 pt-24 flex items-center">
         <div className="w-full">
           <h1 className="mt-2 text-3xl sm:text-4xl font-extralight text-main-900">
@@ -60,7 +65,12 @@ export default async function TermsPage({ searchParams }) {
           </div>
         </div>
       </main>
-      <Footer general={general} footer={footer} locale={locale} site={site} />
+      <Footer
+        general={localizedGeneral}
+        footer={footer}
+        locale={locale}
+        site={site}
+      />
       {customHeader?.bodyContent ? (
         <div dangerouslySetInnerHTML={{ __html: customHeader.bodyContent }} />
       ) : null}

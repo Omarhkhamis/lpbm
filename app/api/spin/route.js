@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { prisma } from "../../../lib/prisma";
+import { normalizeLocale, normalizeSite } from "../../../lib/sites";
 
 export async function POST(request) {
   try {
@@ -8,6 +9,8 @@ export async function POST(request) {
     const fullName = body?.fullName?.trim();
     const phone = body?.phone?.trim();
     const prize = body?.prize?.trim();
+    const site = normalizeSite(body?.site) || null;
+    const locale = normalizeLocale(body?.locale);
 
     if (!fullName || !phone || !prize) {
       return NextResponse.json(
@@ -20,7 +23,9 @@ export async function POST(request) {
       data: {
         fullName,
         phone,
-        prize
+        prize,
+        site,
+        locale
       }
     });
 

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { requireFullAdmin } from "@lib/adminAccess";
 import { getSectionByKey } from "@lib/sections";
 import { getSectionDefaults } from "@lib/sectionDefaults";
 import {
@@ -25,6 +26,7 @@ export default async function SectionEditorPage({ params, searchParams }) {
   if (!site) {
     notFound();
   }
+  await requireFullAdmin(site, { scoped: true });
   const locale = normalizeLocale(searchParams?.locale);
   const section = await getSectionByKey(params.key, site, locale);
   if (!section) {

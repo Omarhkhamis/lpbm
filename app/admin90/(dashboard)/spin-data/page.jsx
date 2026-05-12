@@ -1,4 +1,10 @@
 import { prisma } from "@lib/prisma";
+import { requireDataAccess } from "@lib/adminAccess";
+import { resolveDataLanguageFilter } from "@lib/adminPermissions";
+import {
+  getSubmissionLocaleLabel,
+  normalizeSubmissionLocale
+} from "@lib/formSubmissionLocale";
 import { normalizeSite } from "@lib/sites";
 import AdminShell from "../AdminShell";
 
@@ -53,9 +59,15 @@ export default async function SpinDataPage({ searchParams }) {
   const month = typeof searchParams?.month === "string" ? searchParams.month : "";
   const from = typeof searchParams?.from === "string" ? searchParams.from : "";
   const to = typeof searchParams?.to === "string" ? searchParams.to : "";
+  const user = await requireDataAccess(site);
+  const language = resolveDataLanguageFilter(
+    user,
+    normalizeSubmissionLocale(searchParams?.language)
+  );
   const createdAt = buildDateRange(month, from, to);
   const where = {
     ...(createdAt ? { createdAt } : {}),
+    ...(language ? { locale: language } : {}),
     site
   };
 
@@ -65,7 +77,7 @@ export default async function SpinDataPage({ searchParams }) {
   });
 
   return (
-    <AdminShell site={site} locale={searchParams?.locale}>
+    <AdminShell site={site} locale={searchParams?.locale} allowDataViewer>
       <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
@@ -86,7 +98,8 @@ export default async function SpinDataPage({ searchParams }) {
               order: order === "asc" ? "oldest" : "newest",
               month,
               from,
-              to
+              to,
+              language
             }).toString()}`}
             className="rounded-lg bg-slate-900 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:bg-slate-800"
           >
@@ -100,7 +113,7 @@ export default async function SpinDataPage({ searchParams }) {
         className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
       >
         <input type="hidden" name="site" value={site} />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
               Order
@@ -147,6 +160,20 @@ export default async function SpinDataPage({ searchParams }) {
               className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
             />
           </div>
+          <div>
+            <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
+              Language
+            </label>
+            <select
+              name="language"
+              defaultValue={language}
+              className="mt-2 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-copper-400 focus:ring-1 focus:ring-copper-400/40"
+            >
+              <option value="">All</option>
+              <option value="en">English</option>
+              <option value="ru">Russian</option>
+            </select>
+          </div>
         </div>
         <div className="mt-4 flex items-center justify-end gap-3">
             <a
@@ -177,6 +204,7 @@ export default async function SpinDataPage({ searchParams }) {
                   <th className="px-6 py-4">Name</th>
                   <th className="px-6 py-4">Phone</th>
                   <th className="px-6 py-4">Prize</th>
+                  <th className="px-6 py-4">Language</th>
                   <th className="px-6 py-4">Submitted</th>
                 </tr>
               </thead>
@@ -188,6 +216,11 @@ export default async function SpinDataPage({ searchParams }) {
                     </td>
                     <td className="px-6 py-4">{record.phone}</td>
                     <td className="px-6 py-4">{record.prize}</td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-700 ring-1 ring-inset ring-slate-600/10">
+                        {getSubmissionLocaleLabel(record.locale)}
+                      </span>
+                    </td>
                     <td className="px-6 py-4">
                       {formatDate(record.createdAt)}
                     </td>

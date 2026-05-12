@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { requireFullAdmin } from "@lib/adminAccess";
 import { getPages } from "@lib/pages";
 import { normalizeSite } from "@lib/sites";
 
@@ -8,6 +9,7 @@ export default async function PagesIndex({ params }) {
   if (!site) {
     notFound();
   }
+  await requireFullAdmin(site, { scoped: true });
   const pages = await getPages();
 
   return (

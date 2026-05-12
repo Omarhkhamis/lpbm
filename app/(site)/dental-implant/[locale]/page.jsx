@@ -4,7 +4,10 @@ import Footer from "../en/components/Footer";
 import Header from "../en/components/Header";
 import Overlays from "../en/components/Overlays";
 import { getFooterSettings } from "@lib/footerSettings";
-import { getGeneralSettings } from "@lib/generalSettings";
+import {
+  getGeneralSettings,
+  getLocalizedGeneralSettings
+} from "@lib/generalSettings";
 import { getSectionsByLocale, getSectionsMap } from "@lib/sections";
 import { getSeoSettings } from "@lib/seoSettings";
 import {
@@ -78,10 +81,11 @@ const normalizeLocale = (paramsLocale) => {
 
 export async function generateMetadata({ params }) {
   const locale = normalizeLocale(params?.locale);
-  const [seo, general] = await Promise.all([
+  const [seo, generalSettings] = await Promise.all([
     getSeoSettings(SITE, locale),
     getGeneralSettings(SITE)
   ]);
+  const general = getLocalizedGeneralSettings(generalSettings, locale);
   const keywords = seo.metaKeywords
     ? seo.metaKeywords.split(",").map((item) => item.trim()).filter(Boolean)
     : undefined;
@@ -137,12 +141,13 @@ export async function generateMetadata({ params }) {
 
 export default async function DentalImplantPage({ params }) {
   const locale = normalizeLocale(params?.locale);
-  const [sectionsMap, orderedSections, general, footer] = await Promise.all([
+  const [sectionsMap, orderedSections, generalSettings, footer] = await Promise.all([
     getSectionsMap(SITE, locale),
     getSectionsByLocale(SITE, locale),
     getGeneralSettings(SITE),
     getFooterSettings(SITE, locale)
   ]);
+  const general = getLocalizedGeneralSettings(generalSettings, locale);
   const whatsappNumber = footer?.whatsappNumber
     ? footer.whatsappNumber.replace(/\s+/g, "")
     : null;

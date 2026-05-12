@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { requireFullAdmin } from "@lib/adminAccess";
 import { getCustomHeader } from "@lib/customHeader";
 import { normalizeSite } from "@lib/sites";
 import { updateCustomHeaderAction } from "../actions";
@@ -11,6 +12,7 @@ export default async function CustomHeaderPage({ params }) {
   if (!site) {
     notFound();
   }
+  await requireFullAdmin(site, { scoped: true });
   const customHeader = await getCustomHeader(site);
   const action = updateCustomHeaderAction.bind(null, site);
 

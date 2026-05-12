@@ -1,7 +1,10 @@
 import nodemailer from "nodemailer";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 
-import { getGeneralSettings } from "../../../../lib/generalSettings";
+import {
+  getGeneralSettings,
+  getLocalizedWhatsappLink
+} from "../../../../lib/generalSettings";
 import { prisma } from "../../../../lib/prisma";
 import { normalizeSite } from "../../../../lib/sites";
 
@@ -238,13 +241,15 @@ export async function POST(request) {
   const baseFields = {
     source,
     site,
+    locale,
     page: cleaned.page || "",
     submittedAt: new Date().toISOString()
   };
 
   const messageBody = buildTextBody({
     ...baseFields,
-    ...cleaned
+    ...cleaned,
+    locale
   });
   let formSubmissionId = null;
   let emailDelivery = {
@@ -261,7 +266,8 @@ export async function POST(request) {
           fullName: cleaned.fullName,
           phone: cleaned.phone,
           prize,
-          site
+          site,
+          locale
         }
       });
     } catch (error) {
@@ -278,6 +284,7 @@ export async function POST(request) {
           site,
           payload: {
             ...cleaned,
+            locale,
             submittedAt: baseFields.submittedAt,
             emailDelivery
           }
@@ -290,7 +297,7 @@ export async function POST(request) {
   }
 
   const baseRedirect =
-    settings?.whatsappLink ||
+    getLocalizedWhatsappLink(settings, locale) ||
     cleaned.redirectTo ||
     "https://wa.me/+905382112583";
   const redirectTo = isSpin
@@ -352,6 +359,7 @@ export async function POST(request) {
         data: {
           payload: {
             ...cleaned,
+            locale,
             submittedAt: baseFields.submittedAt,
             emailDelivery
           }
