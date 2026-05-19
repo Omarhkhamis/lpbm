@@ -12,12 +12,16 @@ import {
   normalizeAdminRole,
   normalizeDataLocaleAccess
 } from "@lib/adminPermissions";
-import { DEFAULT_CUSTOM_HEADER, getSharedCustomHeaderSite } from "@lib/customHeader";
+import {
+  DEFAULT_CUSTOM_HEADER,
+  ensureCustomHeader,
+  getSharedCustomHeaderSite
+} from "@lib/customHeader";
 import { prisma } from "@lib/prisma";
 import { getSectionDefaults } from "@lib/sectionDefaults";
 import { applyFormData, mergeSectionData } from "@lib/sectionForm";
 import { ensureSeoSettings } from "@lib/seoSettings";
-import { normalizeLocale, normalizeSite } from "@lib/sites";
+import { normalizeLocale, normalizeSite, SITES } from "@lib/sites";
 
 const revalidatePublic = (site, locale) => {
   revalidatePath(`/${site}/${locale}`);
@@ -372,30 +376,64 @@ export const updateCustomHeaderAction = async (site, formData) => {
   await requireFullAdminAction(siteId);
   const sharedSite = getSharedCustomHeaderSite();
   try {
-    const content =
-      String(formData.get("customHeader") || "").trim() ||
-      DEFAULT_CUSTOM_HEADER.content;
-    const bodyContent =
-      String(formData.get("customBody") || "").trim() ||
-      DEFAULT_CUSTOM_HEADER.bodyContent;
-    const bodyContentEn =
-      String(formData.get("customBodyEn") || "").trim() ||
-      DEFAULT_CUSTOM_HEADER.bodyContentEn;
-    const bodyContentRu =
-      String(formData.get("customBodyRu") || "").trim() ||
-      DEFAULT_CUSTOM_HEADER.bodyContentRu;
+    const existing = await ensureCustomHeader(siteId);
+    const readField = (name, fallback) => {
+      if (!formData.has(name)) return fallback;
+      return String(formData.get(name) || "").trim();
+    };
+    const content = readField(
+      "customHeader",
+      existing?.content ?? DEFAULT_CUSTOM_HEADER.content
+    );
+    const contentEn = readField(
+      "customHeaderEn",
+      existing?.contentEn ?? DEFAULT_CUSTOM_HEADER.contentEn
+    );
+    const contentRu = readField(
+      "customHeaderRu",
+      existing?.contentRu ?? DEFAULT_CUSTOM_HEADER.contentRu
+    );
+    const bodyContent = readField(
+      "customBody",
+      existing?.bodyContent ?? DEFAULT_CUSTOM_HEADER.bodyContent
+    );
+    const bodyContentEn = readField(
+      "customBodyEn",
+      existing?.bodyContentEn ?? DEFAULT_CUSTOM_HEADER.bodyContentEn
+    );
+    const bodyContentRu = readField(
+      "customBodyRu",
+      existing?.bodyContentRu ?? DEFAULT_CUSTOM_HEADER.bodyContentRu
+    );
 
     await prisma.customHeader.upsert({
       where: { site: sharedSite },
-      update: { content, bodyContent, bodyContentEn, bodyContentRu },
-      create: { site: sharedSite, content, bodyContent, bodyContentEn, bodyContentRu }
+      update: {
+        content,
+        contentEn,
+        contentRu,
+        bodyContent,
+        bodyContentEn,
+        bodyContentRu
+      },
+      create: {
+        site: sharedSite,
+        content,
+        contentEn,
+        contentRu,
+        bodyContent,
+        bodyContentEn,
+        bodyContentRu
+      }
     });
   } catch (error) {
     redirect(`/${siteId}/admin90/custom-header?error=1`);
   }
 
-  revalidatePublic(siteId, "en");
-  revalidatePublic(siteId, "ru");
+  SITES.forEach((siteItem) => {
+    revalidatePublic(siteItem.id, "en");
+    revalidatePublic(siteItem.id, "ru");
+  });
   redirect(`/${siteId}/admin90/custom-header?saved=1`);
 };
 

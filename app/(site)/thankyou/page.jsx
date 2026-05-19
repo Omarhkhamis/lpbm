@@ -3,7 +3,11 @@ import DentalHeader from "../dental-implant/en/components/Header";
 import HollywoodFooter from "../hollywood-smile/en/components/Footer";
 import HollywoodHeader from "../hollywood-smile/en/components/Header";
 import CustomHeadSnippet from "../../components/CustomHeadSnippet";
-import { getCustomHeader } from "../../../lib/customHeader";
+import {
+  getCustomHeader,
+  getLocalizedCustomBodyContent,
+  getLocalizedCustomHeadContent
+} from "../../../lib/customHeader";
 import { getFooterSettings } from "../../../lib/footerSettings";
 import {
   getGeneralSettings,
@@ -55,10 +59,12 @@ export default async function ThankYouPage({ searchParams }) {
 
   const paragraphs = renderParagraphs(page.content);
   const localizedGeneral = getLocalizedGeneralSettings(general, locale);
+  const localizedHeadContent = getLocalizedCustomHeadContent(customHeader, locale);
+  const localizedBodyContent = getLocalizedCustomBodyContent(customHeader, locale);
 
   return (
     <>
-      <CustomHeadSnippet html={customHeader?.content} />
+      <CustomHeadSnippet html={localizedHeadContent} />
       <Header general={localizedGeneral} footer={footer} locale={locale} />
       <main className="relative overflow-hidden bg-gradient-to-br from-main-950 via-main-900 to-main-800 text-white pt-24">
         <div className="absolute inset-0">
@@ -122,8 +128,8 @@ export default async function ThankYouPage({ searchParams }) {
         locale={locale}
         site={site}
       />
-      {customHeader?.bodyContent ? (
-        <div dangerouslySetInnerHTML={{ __html: customHeader.bodyContent }} />
+      {localizedBodyContent ? (
+        <div dangerouslySetInnerHTML={{ __html: localizedBodyContent }} />
       ) : null}
     </>
   );

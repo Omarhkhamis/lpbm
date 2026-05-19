@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import CustomHeadSnippet from "../../../components/CustomHeadSnippet";
 import {
   getCustomHeader,
+  getLocalizedCustomHeadContent,
   getLocalizedCustomBodyContent
 } from "../../../../lib/customHeader";
 import { normalizeLocale } from "../../../../lib/sites";
@@ -16,15 +17,13 @@ export default async function LocaleLayout({ children, params }) {
   }
 
   const customHeader = await getCustomHeader("hollywood-smile");
+  const localizedHeadContent = getLocalizedCustomHeadContent(customHeader, locale);
   const localizedBodyContent = getLocalizedCustomBodyContent(customHeader, locale);
 
   return (
     <>
-      <CustomHeadSnippet html={customHeader?.content} />
+      <CustomHeadSnippet html={localizedHeadContent} />
       {children}
-      {customHeader?.bodyContent ? (
-        <div dangerouslySetInnerHTML={{ __html: customHeader.bodyContent }} />
-      ) : null}
       {localizedBodyContent ? (
         <div dangerouslySetInnerHTML={{ __html: localizedBodyContent }} />
       ) : null}

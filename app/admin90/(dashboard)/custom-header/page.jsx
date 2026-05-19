@@ -33,26 +33,40 @@ export default async function CustomHeaderPage({ searchParams }) {
           </p>
           <div className="mt-4">
             <FieldInput
-              name="customHeader"
-              label="Custom Header Snippet"
-              defaultValue={customHeader.content || ""}
+              name="customHeaderEn"
+              label="Custom Header Snippet (English Only)"
+              defaultValue={customHeader.contentEn || ""}
               isTextarea
             />
             <p className="mt-2 text-xs text-slate-500">
-              Paste scripts or meta tags to inject into the page head. Use responsibly.
+              This snippet is injected only on English pages.
             </p>
           </div>
           <div className="mt-8">
             <FieldInput
-              name="customBody"
-              label="Custom Body Snippet (All Languages)"
-              defaultValue={customHeader.bodyContent || ""}
+              name="customHeaderRu"
+              label="Custom Header Snippet (Russian Only)"
+              defaultValue={customHeader.contentRu || ""}
               isTextarea
             />
             <p className="mt-2 text-xs text-slate-500">
-              Paste HTML to inject into the page body for all languages.
+              This snippet is injected only on Russian pages.
             </p>
           </div>
+          <div className="mt-8">
+            <FieldInput
+              name="customHeader"
+              label="Custom Header Snippet (Fallback / All Languages)"
+              defaultValue={customHeader.content || ""}
+              isTextarea
+            />
+            <p className="mt-2 text-xs text-slate-500">
+              Optional fallback snippet used only when the locale-specific header is empty.
+            </p>
+          </div>
+          <p className="mt-10 text-xs uppercase tracking-[0.24em] text-slate-400">
+            Body Code
+          </p>
           <div className="mt-8">
             <FieldInput
               name="customBodyEn"
@@ -61,7 +75,7 @@ export default async function CustomHeaderPage({ searchParams }) {
               isTextarea
             />
             <p className="mt-2 text-xs text-slate-500">
-              This snippet is injected only on English pages, below the global body snippet.
+              This snippet is injected only on English pages.
             </p>
           </div>
           <div className="mt-8">
@@ -72,7 +86,18 @@ export default async function CustomHeaderPage({ searchParams }) {
               isTextarea
             />
             <p className="mt-2 text-xs text-slate-500">
-              This snippet is injected only on Russian pages, below the global body snippet.
+              This snippet is injected only on Russian pages.
+            </p>
+          </div>
+          <div className="mt-8">
+            <FieldInput
+              name="customBody"
+              label="Custom Body Snippet (Fallback / All Languages)"
+              defaultValue={customHeader.bodyContent || ""}
+              isTextarea
+            />
+            <p className="mt-2 text-xs text-slate-500">
+              Optional fallback snippet used only when the locale-specific body is empty.
             </p>
           </div>
         </div>

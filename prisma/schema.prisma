@@ -101,6 +101,8 @@ model CustomHeader {
   id            String   @id @default(cuid())
   site          String   @unique
   content       String?
+  contentEn     String?
+  contentRu     String?
   bodyContent   String?
   bodyContentEn String?
   bodyContentRu String?
