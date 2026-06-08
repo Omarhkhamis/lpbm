@@ -25,7 +25,7 @@ export default function FullWidthCampaignBanner({ data }) {
         <div className="flex min-h-[260px] sm:min-h-[320px] lg:min-h-[350px] items-end sm:items-center py-10 lg:py-10">
           <div className="max-w-2xl text-white relative">
             <div className="pointer-events-none absolute -left-10 -top-8 h-56 w-56 rounded-full bg-copper-500/18 blur-3xl"></div>
-            <div className="inline-flex items-center gap-2 rounded-md border border-white/12 bg-black/25 px-4 py-2 text-[10px] uppercase tracking-[0.32em] text-white/90 backdrop-blur shadow-[0_18px_60px_rgba(0,0,0,0.22)]">
+            <div className="inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.32em] text-white/90">
               <span className="h-1.5 w-1.5 rounded-full bg-copper-400"></span>
               {content.badge}
             </div>

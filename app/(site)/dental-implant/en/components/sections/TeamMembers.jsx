@@ -138,7 +138,7 @@ export default function TeamMembers({ data, whatsappLink }) {
                   <button
                     type="button"
                     onClick={() => setActiveMember(member)}
-                    className="mt-4 inline-flex items-center rounded-xl border border-copper-200 bg-copper-50/60 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-copper-800 transition hover:border-copper-300 hover:bg-copper-100/70"
+                    className="read-more-button mt-4"
                   >
                     {labels.readMoreLabel}
                   </button>

@@ -31,7 +31,6 @@ import {
   ImplantMatrix,
   TechniquesUsed,
   GoogleReviews,
-  TrustpilotReviews,
   Faqs
 } from "../en/components/sections";
 
@@ -156,14 +155,25 @@ export default async function DentalImplantPage({ params }) {
     footer?.whatsappLink ||
     (whatsappNumber ? `https://wa.me/${whatsappNumber}` : "https://wa.me/+905382112583");
   const pageClassName = general?.hideFormPrivacyNote ? "hide-form-privacy" : "";
+  const enabledSections = orderedSections.filter(
+    (section) => sectionsMap[section.key]?.enabled
+  );
+  const firstReviewsSectionKey = enabledSections.find(
+    (section) =>
+      section.key === "googleReviews" || section.key === "trustpilotReviews"
+  )?.key;
+  const googleReviewsData = sectionsMap.googleReviews?.enabled
+    ? sectionsMap.googleReviews?.data
+    : null;
+  const trustpilotReviewsData = sectionsMap.trustpilotReviews?.enabled
+    ? sectionsMap.trustpilotReviews?.data
+    : null;
 
   return (
     <div className={pageClassName}>
       <Header general={general} footer={footer} locale={locale} />
       <main>
-        {orderedSections
-          .filter((section) => sectionsMap[section.key]?.enabled)
-          .map((section) => {
+        {enabledSections.map((section) => {
             const data = sectionsMap[section.key]?.data;
             switch (section.key) {
               case "hero":
@@ -286,19 +296,15 @@ export default async function DentalImplantPage({ params }) {
               case "techniquesUsed":
                 return <TechniquesUsed key={section.key} data={data} />;
               case "googleReviews":
+              case "trustpilotReviews":
+                if (section.key !== firstReviewsSectionKey) return null;
                 return (
                   <GoogleReviews
-                    key={section.key}
-                    data={data}
+                    key="combined-reviews"
+                    data={googleReviewsData}
+                    trustpilotData={trustpilotReviewsData}
                     whatsappLink={whatsappLink}
-                  />
-                );
-              case "trustpilotReviews":
-                return (
-                  <TrustpilotReviews
-                    key={section.key}
-                    data={data}
-                    whatsappLink={whatsappLink}
+                    locale={locale}
                   />
                 );
               case "faqs":

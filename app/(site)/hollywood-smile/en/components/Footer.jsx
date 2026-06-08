@@ -57,7 +57,7 @@ export default function Footer({ general, footer, locale, site }) {
 
             {footerData.badge ? (
               <div className="pt-1">
-                <div className="inline-flex items-center gap-2 rounded-full border border-copper-200/60 bg-white/60 px-3 py-1 text-[11px] text-gray-600">
+                <div className="inline-flex items-center gap-2 text-[11px] text-gray-600">
                   <span className="h-1.5 w-1.5 rounded-full bg-copper-400"></span>
                   {footerData.badge}
                 </div>

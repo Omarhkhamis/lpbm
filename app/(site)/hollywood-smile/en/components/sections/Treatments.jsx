@@ -237,7 +237,7 @@ export default function Treatments({ data, whatsappLink }) {
               {microHighlights.map((item) => (
                 <span
                   key={item}
-                  className="rounded-full border border-main-200 bg-white/70 px-4 py-2 text-[12px] font-light text-main-700"
+                  className="text-[12px] font-light text-main-700"
                 >
                   {item}
                 </span>

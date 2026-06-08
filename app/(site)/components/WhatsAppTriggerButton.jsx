@@ -26,18 +26,6 @@ export default function WhatsAppTriggerButton({
     onClick?.(event);
     if (event.defaultPrevented || isDisabled) return;
 
-    const linkData = {
-      href: link,
-      target: resolvedTarget,
-      source
-    };
-
-    const store = window.__WHATSAPP_INTENT_MODAL__;
-    if (typeof store?.open === "function") {
-      store.open(linkData);
-      return;
-    }
-
     if (resolvedTarget === "_self") {
       window.location.assign(link);
       return;
@@ -52,7 +40,7 @@ export default function WhatsAppTriggerButton({
       type={type}
       className={className}
       disabled={isDisabled}
-      data-whatsapp-trigger={isDisabled ? undefined : "1"}
+      data-whatsapp-modal="skip"
       data-whatsapp-href={isDisabled ? undefined : link}
       data-whatsapp-target={isDisabled ? undefined : resolvedTarget}
       data-whatsapp-source={isDisabled || !source ? undefined : source}

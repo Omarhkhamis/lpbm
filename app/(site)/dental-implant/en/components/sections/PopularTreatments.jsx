@@ -92,7 +92,7 @@ export default function PopularTreatments({ data, whatsappLink, locale = "en" })
         <button
           type="button"
           onClick={() => setActiveTreatment(item)}
-          className="mt-7 inline-flex items-center gap-2 text-[15px] font-light cursor-pointer text-copper-700 hover:text-copper-900 transition"
+          className="read-more-button mt-7"
         >
           {labels.readMoreLabel}
         </button>

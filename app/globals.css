@@ -17,6 +17,10 @@
   .review-card {
     @apply w-[320px] shrink-0 rounded-2xl border border-main-200/70 bg-white p-6;
   }
+
+  .read-more-button {
+    @apply inline-flex min-h-10 cursor-pointer items-center justify-center rounded-lg border border-copper-700 bg-copper-700 px-5 py-2 text-[12px] font-semibold uppercase tracking-[0.14em] text-white shadow-[0_10px_24px_rgba(47,44,39,0.16)] transition hover:-translate-y-0.5 hover:border-copper-800 hover:bg-copper-800 hover:shadow-[0_14px_30px_rgba(47,44,39,0.22)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper-700;
+  }
 }
 
 @layer utilities {
